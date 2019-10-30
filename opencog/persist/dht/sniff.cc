@@ -25,18 +25,20 @@ int main (int, const char **)
 
 	dht::InfoHash akey = dht::InfoHash::get("atom_key");
 	std::cout << "Key's this: " << akey << std::endl;
-#if 0
+#if PUT
 	// put some data on the dht
 	node.put(akey, "(some test stuff)");
-printf("duude put stuff\n");
+	printf("done put stuff\n");
 #endif
 
 	// put some data on the dht, signed with our generated private key
 	// node.putSigned("unique_key_42", some_data);
 
+#define GET 1
+#if GET
 	// get data from the dht
 	dht::GetCallback mycb =
-		[](const std::vector<std::shared_ptr<dht::Value>>& values)
+		[](const std::vector<std::shared_ptr<dht::Value>>& values)->bool
 		{
 			std::cout << "Num values found= " << values.size() << std::endl;
 			// Callback called when values are found
@@ -45,25 +47,27 @@ printf("duude put stuff\n");
 			return true; // return false to stop the search
 		};
 
-	printf("sleep\n");
-	sleep(10);
-	printf("wake\n");
-	node.get(akey, mycb);
-	printf("and again\n");
-	node.get("atom_key", mycb);
-printf("duude got stuff\n");
-
-	std::cout << "Searches: " << node.getSearchesLog() << std::endl;
-
-#if 0
-	// get data from the dht
-	node.get("other_unique_key", [](const std::vector<std::shared_ptr<dht::Value>>& values) {
-		// Callback called when values are found
-		for (const auto& value : values)
+	dht::GetCallbackSimple scb =
+		[](std::shared_ptr<dht::Value> value)->bool
+		{
 			std::cout << "Found value: " << *value << std::endl;
-		return true; // return false to stop the search
-	});
+			return true; // return false to stop the search
+		};
+
+	dht::DoneCallback donecb =
+		[](bool foo, const std::vector<std::shared_ptr<dht::Node> >& noo)
+		{
+			std::cout << "Done callback " << foo << std::endl;
+			// std::cout << "Done callback " << noo << std::endl;
+		};
+
+	node.get(akey, mycb, donecb);
+	// node.get("atom_key", mycb);
+	printf("done asking for stuff\n");
 #endif
+
+	sleep(10);
+	// std::cout << "Searches: " << node.getSearchesLog() << std::endl;
 
 	// wait for dht threads to end
 	node.join();
