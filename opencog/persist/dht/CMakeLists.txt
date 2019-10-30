@@ -1,20 +1,19 @@
 
 
-#ADD_LIBRARY (persist-dht SHARED
-#	IPFSAtomDelete
-#	IPFSAtomLoad
-#	IPFSAtomStorage
-#	IPFSAtomStore
-#	IPFSBulk
-#	IPFSIncoming
-#	IPFSValues
-#	IPFSPersistSCM
-#)
+ADD_LIBRARY (persist-dht SHARED
+#	DHTAtomDelete
+#	DHTAtomLoad
+	DHTAtomStorage
+#	DHTAtomStore
+#	DHTBulk
+#	DHTIncoming
+#	DHTValues
+	DHTPersistSCM
+)
 
-#TARGET_LINK_LIBRARIES(persist-ipfs
-#	smob
-#	ipfs-http-client
-#)
+TARGET_LINK_LIBRARIES(persist-dht
+	smob
+)
 
 ADD_GUILE_EXTENSION(SCM_CONFIG persist-dht "opencog-ext-path-persist-dht")
 
@@ -29,5 +28,4 @@ ADD_EXECUTABLE(sniff
 )
 
 TARGET_LINK_LIBRARIES(sniff
-	ipfs-api
 )
