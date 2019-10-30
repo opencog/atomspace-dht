@@ -99,12 +99,11 @@ DHTAtomStorage::~DHTAtomStorage()
 }
 
 /**
- * connected -- unconditionally true, right now. I guess.
- * XXX FIXME, return false if DHT connection cannot be made.
+ * connected -- Is the DHT node running?
  */
 bool DHTAtomStorage::connected(void)
 {
-	return true;
+	return _runner.isRunning();
 }
 
 /* ================================================================== */
@@ -128,8 +127,6 @@ void DHTAtomStorage::registerWith(AtomSpace* as)
 void DHTAtomStorage::unregisterWith(AtomSpace* as)
 {
 	BackingStore::unregisterWith(as);
-
-	flushStoreQueue();
 }
 
 /* ================================================================ */
@@ -220,4 +217,17 @@ void DHTAtomStorage::print_stats(void)
 	printf("\n");
 }
 
+// XXX Stubs FIXME
+Handle DHTAtomStorage::fetch_atom(const std::string&) { return Handle(); }
+void DHTAtomStorage::load_atomspace(AtomSpace*, const std::string&) {}
+Handle DHTAtomStorage::getNode(Type, const char *) { return Handle();}
+Handle DHTAtomStorage::getLink(Type, const HandleSeq&) { return Handle();  }
+void DHTAtomStorage::getIncomingSet(AtomTable&, const Handle&) {}
+void DHTAtomStorage::getIncomingByType(AtomTable&, const Handle&, Type t) {}
+void DHTAtomStorage::getValuations(AtomTable&, const Handle&, bool get_all) {}
+void DHTAtomStorage::storeAtom(const Handle&, bool synchronous) {}
+void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
+void DHTAtomStorage::loadType(AtomTable&, Type) {}
+void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents
+void DHTAtomStorage::storeAtomSpace(const AtomTable&) {} // Store entire contents
 /* ============================= END OF FILE ================= */

@@ -121,7 +121,6 @@ class DHTAtomStorage : public BackingStore
 		virtual ~DHTAtomStorage();
 		bool connected(void); // connection to DB is alive
 
-		std::string get_atom_guid(const Handle&);
 		Handle fetch_atom(const std::string&);
 		void load_atomspace(AtomSpace*, const std::string&);
 
@@ -149,8 +148,6 @@ class DHTAtomStorage : public BackingStore
 		// Debugging and performance monitoring
 		void print_stats(void);
 		void clear_stats(void); // reset stats counters.
-		void set_hilo_watermarks(int, int);
-		void set_stall_writers(bool);
 };
 
 
