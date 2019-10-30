@@ -13,6 +13,10 @@ ADD_LIBRARY (persist-dht SHARED
 
 TARGET_LINK_LIBRARIES(persist-dht
 	smob
+	opendht
+	gnutls
+	nettle
+	argon2
 )
 
 ADD_GUILE_EXTENSION(SCM_CONFIG persist-dht "opencog-ext-path-persist-dht")
@@ -28,4 +32,8 @@ ADD_EXECUTABLE(sniff
 )
 
 TARGET_LINK_LIBRARIES(sniff
+	opendht
+	gnutls
+	nettle
+	argon2
 )
