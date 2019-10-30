@@ -194,8 +194,6 @@ void DHTAtomStorage::clear_stats(void)
 void DHTAtomStorage::print_stats(void)
 {
 	printf("dht-stats: Currently open URI: %s\n", _uri.c_str());
-	printf("dht-stats: IPNS name: /ipns/%s\n", _key_cid.c_str());
-	printf("dht-stats: curr CID : /dht/%s\n", _atomspace_cid.c_str());
 	time_t now = time(0);
 	// ctime returns string with newline at end of it.
 	printf("dht-stats: Time since stats reset=%lu secs, at %s",

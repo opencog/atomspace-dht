@@ -21,8 +21,6 @@
 #include <set>
 #include <vector>
 
-#include <dht/client.h>
-
 #include <opencog/util/async_buffer.h>
 
 #include <opencog/atoms/base/Atom.h>
