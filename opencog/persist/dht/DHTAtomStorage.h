@@ -21,7 +21,7 @@
 #include <set>
 #include <vector>
 
-#include <opencog/util/async_buffer.h>
+#include <opendht.h>
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atoms/base/Link.h>
@@ -41,9 +41,6 @@ namespace opencog
  *  @{
  */
 
-// Number of threads do use for DHT I/O.
-#define NUM_OMP_THREADS 1
-
 class DHTAtomStorage : public BackingStore
 {
 	private:
@@ -52,11 +49,9 @@ class DHTAtomStorage : public BackingStore
 		std::string _hostname;
 		int _port;
 
-		// Pool of shared connections
-		concurrent_stack<int> conn_pool;
-		int _initial_conn_pool_size;
-
 		Handle tvpred; // the key to a very special valuation.
+
+		dht::DhtRunner _runner;
 
 		// Fetching of atoms.
 		Handle do_fetch_atom(Handle&);
@@ -118,13 +113,6 @@ class DHTAtomStorage : public BackingStore
 		std::atomic<size_t> _valuation_stores;
 		std::atomic<size_t> _value_stores;
 		time_t _stats_time;
-
-		// --------------------------
-		// Provider of asynchronous store of atoms.
-		// async_caller<DHTAtomStorage, Handle> _write_queue;
-		async_buffer<DHTAtomStorage, Handle> _write_queue;
-		std::exception_ptr _async_write_queue_exception;
-		void rethrow(void);
 
 	public:
 		DHTAtomStorage(std::string uri);
