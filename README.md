@@ -1,7 +1,7 @@
 # atomspace-dht
 [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki)
 backend driver to the
-[AtomSpace](https://github.com/opencog/atomspace).
+[AtomSpace](https://github.com/opencog/atomspace) (hyper-)graph database.
 
 The code here is a backend driver to the AtomSpace graph database,
 enabling AtomSpace contents to be shared via the OpenDHT content
