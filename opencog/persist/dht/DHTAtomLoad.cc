@@ -104,10 +104,11 @@ Handle DHTAtomStorage::fetch_atom(Handle &h)
 	for (const auto& dval : dvals)
 	{
 		// std::cout << "Got value: " << dval->toString() << std::endl;
-		std::cout << "Got svalue: " << dval->unpack<std::string>() << std::endl;
+		std::string alist = dval->unpack<std::string>();
+		std::cout << "Got svalue: " << alist << std::endl;
+		decodeAlist(h, alist);
 	}
 
-	// get_atom_values(h, dag);
 	return h;
 }
 
