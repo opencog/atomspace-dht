@@ -66,20 +66,16 @@ class DHTAtomStorage : public BackingStore
 			return h->to_short_string(); }
 
 		std::mutex _guid_mutex;
-		std::unordered_map<Handle, std::string> _guid_map;
+		std::map<Handle, dht::InfoHash> _guid_map;
+		dht::InfoHash get_guid(const Handle&);
 
 		// The inverted map to above.
 		std::mutex _inv_mutex;
-		std::unordered_map<std::string, Handle> _guid_inv_map;
-
-		std::mutex _atom_cid_mutex;
-		std::unordered_map<Handle, std::string> _atom_cid_map;
+		std::map<dht::InfoHash, Handle> _guid_inv_map;
 
 		void do_store_atom(const Handle&);
-		void vdo_store_atom(const Handle&);
 		void do_store_single_atom(const Handle&);
 
-		bool guid_not_yet_stored(const Handle&);
 
 		// --------------------------
 		// Bulk load and store

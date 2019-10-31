@@ -29,15 +29,15 @@ using namespace opencog;
  */
 void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 {
+	dht::InfoHash guid = get_guid(h);
+std::cout << "GUID is " << guid << std::endl;
 
-	if (guid_not_yet_stored(h)) do_store_atom(h);
+	// do_store_atom(h);
 	store_atom_values(h);
 }
 
 void DHTAtomStorage::do_store_atom(const Handle& h)
 {
-	if (not guid_not_yet_stored(h)) return;
-
 	if (h->is_node())
 	{
 		do_store_single_atom(h);
@@ -55,10 +55,16 @@ void DHTAtomStorage::do_store_atom(const Handle& h)
 		store_incoming_of(ho,h);
 }
 
-bool DHTAtomStorage::guid_not_yet_stored(const Handle& h)
+dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)
 {
 	std::lock_guard<std::mutex> lck(_guid_mutex);
-	return _guid_map.end() == _guid_map.find(h);
+	const auto& ip = _guid_map.find(h);
+	if (_guid_map.end() != ip)
+		return ip->second;
+	std::string astr = _atomspace_name + encodeAtomToStr(h);
+	dht::InfoHash akey = dht::InfoHash::get(astr);
+	_guid_map[h] = akey;
+	return akey;
 }
 
 /* ================================================================ */
