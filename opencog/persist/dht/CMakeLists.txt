@@ -4,7 +4,7 @@ ADD_LIBRARY (persist-dht SHARED
 #	DHTAtomDelete
 #	DHTAtomLoad
 	DHTAtomStorage
-#	DHTAtomStore
+	DHTAtomStore
 #	DHTBulk
 #	DHTIncoming
 #	DHTValues

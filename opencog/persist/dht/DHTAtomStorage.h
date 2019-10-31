@@ -48,10 +48,12 @@ class DHTAtomStorage : public BackingStore
 		std::string _uri;
 		std::string _hostname;
 		int _port;
+		std::string _atomspace_name;
 
 		Handle tvpred; // the key to a very special valuation.
 
 		dht::DhtRunner _runner;
+		dht::InfoHash _atomspace_hash;
 
 		// Fetching of atoms.
 		Handle do_fetch_atom(Handle&);

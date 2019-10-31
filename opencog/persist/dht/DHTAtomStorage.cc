@@ -37,9 +37,9 @@ void DHTAtomStorage::init(const char * uri)
 		throw IOException(TRACE_INFO, "Unknown URI '%s'\n", uri);
 
 	// We expect the URI to be for the form
-	//    dht:///
-	//    dht://hostname/
-	//    dht://hostname:port/
+	//    dht:///atomspace-name
+	//    dht://hostname/atomspace-name
+	//    dht://hostname:port/atomspace-name
 
 	_port = 4222;
 	if ('/' == uri[URIX_LEN])
@@ -66,18 +66,17 @@ void DHTAtomStorage::init(const char * uri)
 			_hostname.resize(len);
 		}
 
-#if 0
-		_keyname = &uri[len+URIX_LEN+1];
+		_atomspace_name = &uri[len+URIX_LEN+1];
 		// Keys are not allowed to have trailing slashes.
-		size_t pos = _keyname.find('/');
-		if (pos != std::string::npos) _keyname.resize(pos);
-#endif
-	}
+		size_t pos = _atomspace_name.find('/');
+		if (pos != std::string::npos) _atomspace_name.resize(pos);
 
+		_atomspace_hash = dht::InfoHash::get(_atomspace_name);
+	}
 
 	// Launch a dht node on a new thread, using a generated
 	// RSA key pair, and listen on port 4224.
-	// FIXME, need seomethin better.
+	// FIXME, need something better.
 	_runner.run(4224, dht::crypto::generateIdentity(), true);
 
 	_runner.bootstrap(_hostname, std::to_string(_port));
@@ -225,7 +224,6 @@ Handle DHTAtomStorage::getLink(Type, const HandleSeq&) { return Handle();  }
 void DHTAtomStorage::getIncomingSet(AtomTable&, const Handle&) {}
 void DHTAtomStorage::getIncomingByType(AtomTable&, const Handle&, Type t) {}
 void DHTAtomStorage::getValuations(AtomTable&, const Handle&, bool get_all) {}
-void DHTAtomStorage::storeAtom(const Handle&, bool synchronous) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
 void DHTAtomStorage::loadType(AtomTable&, Type) {}
 void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents

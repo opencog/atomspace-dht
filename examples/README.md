@@ -1,5 +1,6 @@
 
 Examples
 ========
+Example use of the DHT backend.
 
-Nothing here yet.
+* [basic.scm](basic.scm) -- A very elementary example.
