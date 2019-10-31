@@ -73,10 +73,6 @@ class DHTAtomStorage : public BackingStore
 		std::mutex _inv_mutex;
 		std::map<dht::InfoHash, Handle> _guid_inv_map;
 
-		void do_store_atom(const Handle&);
-		void do_store_single_atom(const Handle&);
-
-
 		// --------------------------
 		// Bulk load and store
 		bool bulk_load;

@@ -24,10 +24,11 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 {
 	dht::InfoHash guid = get_guid(atom);
 
+	// Attach the value to the atom
 	_runner.put(guid, atom->valuesToString());
 
-   // Update the atomspace, so that it holds the new value.
-   // update_atom_in_atomspace(atom, atoid);
+	// Put the tom into the Atomspsce too
+	_runner.put(_atomspace_hash, encodeAtomToStr(atom));
 }
 
 /* ================================================================== */
