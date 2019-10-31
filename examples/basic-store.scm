@@ -1,7 +1,7 @@
 ;
-; basic.scm
+; basic-store.scm
 ;
-; Simple example
+; Simple example of storing Atoms in the DHT.
 ;
 (use-modules (opencog))
 (use-modules (opencog persist))
@@ -20,3 +20,9 @@
 
 ; Store a single atom
 (store-atom (Concept "foo" (stv 0.6 0.8)))
+
+; View stats
+(dht-stats)
+
+; Close the connection to the dht table.
+(dht-close)

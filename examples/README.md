@@ -3,4 +3,5 @@ Examples
 ========
 Example use of the DHT backend.
 
-* [basic.scm](basic.scm) -- A very elementary example.
+* [basic-store.scm](basic-store.scm) -- Storing Atoms.
+* [basic-fetch.scm](basic-fetch.scm) -- Fectching Atoms.

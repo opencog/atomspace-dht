@@ -12,7 +12,7 @@
 	"opencog_persist_dht_init")
 
 (export dht-clear-stats dht-close dht-open dht-stats
-	dht-fetch-atom dht-load-atomspace)
+	dht-load-atomspace)
 
 (set-procedure-property! dht-clear-stats 'documentation
 "
@@ -54,18 +54,6 @@
     This will cause some database performance statistics to be printed
     to the stdout of the server. These statistics can be quite arcane
     and are useful primarily to the developers of the database backend.
-")
-
-(set-procedure-property! dht-fetch-atom 'documentation
-"
- dht-fetch-atom CID - Return the Atom associated to the CID.
-
-     For example:
-        `(dht-fetch-atom \"QmTBUxX48jRZPwAU3dEgPQm4bShxW2ED3gXTHM78gvqugB\")`
-     should always return
-        `(Concept \"example concept\")`
-
-     See also `dht-atom-cid` for the inverse operation.
 ")
 
 (set-procedure-property! dht-load-atomspace 'documentation
