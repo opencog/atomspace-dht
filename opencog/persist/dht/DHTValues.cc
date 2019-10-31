@@ -99,15 +99,16 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 	}
 	if (std::string::npos != vos)
 	{
-		size_t epos;
-		double strength = stod(stv.substr(vos), &epos);
-		vos += epos;
-		double confidence = stod(stv.substr(vos), &epos);
-		epos = stv.find(')', epos);
-		if (std::string::npos == epos)
+		size_t elen;
+		double strength = stod(stv.substr(vos), &elen);
+		vos += elen;
+		double confidence = stod(stv.substr(vos), &elen);
+		vos += elen;
+		vos = stv.find(')', vos);
+		if (std::string::npos == vos)
 			throw SyntaxException(TRACE_INFO,
 				"Malformed SimpleTruthValue: %s", stv.substr(pos).c_str());
-		pos = epos + 1;
+		pos = vos + 1;
 		return ValueCast(createSimpleTruthValue(strength, confidence));
 	}
 
