@@ -111,6 +111,19 @@ bool DHTAtomStorage::connected(void)
 }
 
 /* ================================================================== */
+/**
+ * Publish Atom to the AtomSpace
+ */
+void DHTAtomStorage::add_atom_to_atomspace(const Handle& atom)
+{
+	std::lock_guard<std::mutex> lck(_publish_mutex);
+	const auto& pa = _published.find(atom);
+	if (_published.end() != pa) return;
+	_runner.put(_atomspace_hash, encodeAtomToStr(atom));
+	_published.emplace(atom);
+}
+
+/* ================================================================== */
 /// Drain the pending store queue. This is a fencing operation; the
 /// goal is to make sure that all writes that occurred before the
 /// barrier really are performed before before all the writes after
@@ -147,7 +160,7 @@ void DHTAtomStorage::unregisterWith(AtomSpace* as)
 void DHTAtomStorage::kill_data(void)
 {
 	// Special case for TruthValues - must always have this atom.
-	do_store_single_atom(tvpred);
+	storeAtom(tvpred);
 }
 
 /* ================================================================ */
@@ -174,11 +187,11 @@ void DHTAtomStorage::clear_stats(void)
 void DHTAtomStorage::print_stats(void)
 {
 	printf("dht-stats: Currently open URI: %s\n", _uri.c_str());
+	printf("dht-stats: AtomSpace hash: %s\n", _atomspace_hash.to_c_str());
 	time_t now = time(0);
 	// ctime returns string with newline at end of it.
 	printf("dht-stats: Time since stats reset=%lu secs, at %s",
 		now - _stats_time, ctime(&_stats_time));
-
 
 	size_t load_count = _load_count;
 	size_t store_count = _store_count;

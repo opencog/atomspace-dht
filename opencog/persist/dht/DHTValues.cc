@@ -27,8 +27,8 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	// Attach the value to the atom
 	_runner.put(guid, atom->valuesToString());
 
-	// Put the tom into the Atomspsce too
-	_runner.put(_atomspace_hash, encodeAtomToStr(atom));
+	// Put the atom into the Atomspace too
+	add_atom_to_atomspace(atom);
 }
 
 /* ================================================================== */

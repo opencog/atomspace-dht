@@ -66,12 +66,12 @@ class DHTAtomStorage : public BackingStore
 			return h->to_short_string(); }
 
 		std::mutex _guid_mutex;
-		std::map<Handle, dht::InfoHash> _guid_map;
+		std::unordered_map<Handle, dht::InfoHash> _guid_map;
 		dht::InfoHash get_guid(const Handle&);
 
-		// The inverted map to above.
-		std::mutex _inv_mutex;
-		std::map<dht::InfoHash, Handle> _guid_inv_map;
+		std::mutex _publish_mutex;
+		std::unordered_set<Handle> _published;
+		void add_atom_to_atomspace(const Handle&);
 
 		// --------------------------
 		// Bulk load and store
