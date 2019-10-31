@@ -28,5 +28,9 @@
 (cog-value c (second (cog-keys c)))
 (cog-value c (third (cog-keys c)))
 
+; Get the incoming set -- The previous example placed the ConceptNode
+; into a ListLink. Lets get that.
+(fetch-incoming-set c)
+
 (dht-stats)
 (dht-close)

@@ -19,6 +19,11 @@ using namespace opencog;
 void DHTAtomStorage::store_incoming_of(const Handle& atom,
                                        const Handle& holder)
 {
+	dht::InfoHash guid = get_guid(atom);
+	dht::InfoHash hoguid = get_guid(holder);
+
+	// Declare an incoming value
+	_runner.put(guid, dht::Value(_incoming_policy, hoguid));
 }
 
 /* ================================================================== */
@@ -39,21 +44,25 @@ void DHTAtomStorage::remove_incoming_of(const Handle& atom,
  */
 void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 {
+	dht::InfoHash ahash = get_guid(h);
 
-#if 0
-	auto iset = dag["incoming"];
-	for (auto acid: iset)
+	// Get a future for the atom
+	auto afut = _runner.get(ahash);
+
+	// Block until we've got it.
+	std::cout << "Start waiting for incoming" << std::endl;
+	afut.wait();
+	std::cout << "Done waiting for incoming" << std::endl;
+
+	auto dincs = afut.get();
+	for (const auto& dinc : dincs)
 	{
-		// std::cout << "The incoming is:" << acid.dump(2) << std::endl;
-		// Fetch once, to get it's type & name/outgoing
-		// Fetch a second time to get the current values.
-		Handle h(fetch_atom(acid));
-		table.add(do_fetch_atom(h), false);
+		std::cout << "Got incoming: " << dinc->toString() << std::endl;
+		// table.add(do_fetch_atom(h), false);
 	}
-#endif
 
 	_num_get_insets++;
-	// _num_get_inlinks += iset.size();
+	_num_get_inlinks += dincs.size();
 }
 
 /**

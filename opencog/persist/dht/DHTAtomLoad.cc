@@ -104,9 +104,9 @@ Handle DHTAtomStorage::fetch_atom(Handle &h)
 	auto afut = _runner.get(ahash);
 
 	// Block until we've got it.
-	std::cout << "Start waiting" << std::endl;
+	std::cout << "Start waiting for atom" << std::endl;
 	afut.wait();
-	std::cout << "Done waiting" << std::endl;
+	std::cout << "Done waiting for atom" << std::endl;
 
 	auto dvals = afut.get();
 	for (const auto& dval : dvals)
