@@ -39,5 +39,14 @@
 ; Store the new data
 (store-atom (Concept "foo"))
 
+; Add an EvaluationLink to the AtomSpace; give it a TruthValue
+(define e
+	(Evaluation (stv 0.2 0.9)
+		(Predicate "relation")
+		(List (Concept "foo") (Concept "bar"))))
+
+; Store it as well.
+(store-atom e)
+
 ; Close the connection to the dht table.
 (dht-close)
