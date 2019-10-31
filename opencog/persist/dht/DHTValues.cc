@@ -35,13 +35,22 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 
 /* ================================================================== */
 
+/**
+ * Return a Value correspnding to the input string.
+ * It is assumed the input string is encoded as a scheme string.
+ * For example, `(FloatValue 1 2 3 4)`
+ *
+ * XXX FIXME This needs to be fuzzed; it is very likely to crash
+ * and/or contain bugs if it is given strings of unexpected formats
+ */
 ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 {
 	size_t totlen = stv.size();
-	size_t vos = stv.find("(LinkValue", pos);
-	if (std::string::npos != vos)
+
+#define LV "(LinkValue"
+	if (0 == stv.compare(pos, sizeof(LV)-1, LV))
 	{
-		vos += strlen("(LinkValue");
+		size_t vos = pos + sizeof(LV)-1;
 		std::vector<ValuePtr> vv;
 		vos = stv.find('(', vos);
 		size_t epos = vos;
@@ -73,10 +82,10 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		return createLinkValue(vv);
 	}
 
-	vos = stv.find("(FloatValue ", pos);
-	if (std::string::npos != vos)
+#define FV "(FloatValue"
+	if (0 == stv.compare(pos, sizeof(FV)-1, FV))
 	{
-		vos += strlen("(FloatValue ");
+		size_t vos = pos + sizeof(FV)-1;
 		std::vector<double> fv;
 		while (vos < totlen and stv[vos] != ')')
 		{
@@ -88,15 +97,15 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		return createFloatValue(fv);
 	}
 
-	vos = stv.find("(SimpleTruthValue ", pos);
-	if (std::string::npos != vos)
-		vos += strlen("(SimpleTruthValue ");
+#define TVL "(SimpleTruthValue "
+#define TVS "(stv "
+	size_t vos = std::string::npos;
+	if (0 == stv.compare(pos, sizeof(TVL)-1, TVL))
+		vos = pos + sizeof(TVL) - 1;
 	else
-	{
-		vos = stv.find("(stv ", pos);
-		if (std::string::npos != vos)
-			vos += strlen("(stv ");
-	}
+	if (0 == stv.compare(pos, sizeof(TVS)-1, TVS))
+		vos = pos + sizeof(TVS) - 1;
+
 	if (std::string::npos != vos)
 	{
 		size_t elen;
@@ -112,10 +121,10 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		return ValueCast(createSimpleTruthValue(strength, confidence));
 	}
 
-	vos = stv.find("(StringValue ", pos);
-	if (std::string::npos != vos)
+#define SV "(StringValue"
+	if (0 == stv.compare(pos, sizeof(SV)-1, SV))
 	{
-		vos += strlen("(StringValue ");
+		size_t vos = pos + sizeof(SV) - 1;
 		std::vector<std::string> sv;
 		size_t epos = vos;
 		while (true)
@@ -134,7 +143,8 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		return createStringValue(sv);
 	}
 
-	throw SyntaxException(TRACE_INFO, "Unknown Value %s", stv.c_str());
+	throw SyntaxException(TRACE_INFO, "Unknown Value %s",
+		stv.substr(pos).c_str());
 }
 
 /* ================================================================== */

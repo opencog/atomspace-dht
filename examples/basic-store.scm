@@ -24,5 +24,15 @@
 ; View stats
 (dht-stats)
 
+; Add some data to the atom
+(cog-set-value! (Concept "foo") (Predicate "floater")
+	(FloatValue 1 2 3 4))
+
+(cog-set-value! (Concept "foo") (Predicate "name list")
+	(StringValue "Joe" "Smith" "42nd and Main St."))
+
+; Store the new data
+(store-atom (Concept "foo"))
+
 ; Close the connection to the dht table.
 (dht-close)
