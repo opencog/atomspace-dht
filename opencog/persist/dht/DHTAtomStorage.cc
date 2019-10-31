@@ -235,10 +235,7 @@ void DHTAtomStorage::print_stats(void)
 }
 
 // XXX Stubs FIXME
-Handle DHTAtomStorage::fetch_atom(const std::string&) { return Handle(); }
 void DHTAtomStorage::load_atomspace(AtomSpace*, const std::string&) {}
-Handle DHTAtomStorage::getNode(Type, const char *) { return Handle();}
-Handle DHTAtomStorage::getLink(Type, const HandleSeq&) { return Handle();  }
 void DHTAtomStorage::getIncomingSet(AtomTable&, const Handle&) {}
 void DHTAtomStorage::getIncomingByType(AtomTable&, const Handle&, Type t) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}

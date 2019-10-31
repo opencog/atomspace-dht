@@ -51,7 +51,6 @@ void DHTPersistSCM::init(void)
     define_scheme_primitive("dht-stats", &DHTPersistSCM::do_stats, this, "persist-dht");
     define_scheme_primitive("dht-clear-stats", &DHTPersistSCM::do_clear_stats, this, "persist-dht");
 
-    define_scheme_primitive("dht-fetch-atom", &DHTPersistSCM::do_fetch_atom, this, "persist-dht");
     define_scheme_primitive("dht-load-atomspace", &DHTPersistSCM::do_load_atomspace, this, "persist-dht");
 }
 
@@ -111,15 +110,6 @@ void DHTPersistSCM::do_close(void)
     // Only then actually call the dtor.
     backing->unregisterWith(_as);
     delete backing;
-}
-
-Handle DHTPersistSCM::do_fetch_atom(const std::string& cid)
-{
-    if (nullptr == _backing)
-        throw RuntimeException(TRACE_INFO,
-            "dht-fetch-atom: Error: Database not open");
-
-    return _as->add_atom(_backing->fetch_atom(cid));
 }
 
 void DHTPersistSCM::do_load_atomspace(const std::string& cid)

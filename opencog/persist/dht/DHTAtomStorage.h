@@ -56,7 +56,7 @@ class DHTAtomStorage : public BackingStore
 		dht::InfoHash _atomspace_hash;
 
 		// Fetching of atoms.
-		Handle do_fetch_atom(Handle&);
+		Handle fetch_atom(Handle&);
 
 		// --------------------------
 		// Storing of atoms
@@ -64,6 +64,7 @@ class DHTAtomStorage : public BackingStore
 		std::string encodeValueToStr(const ValuePtr&);
 		std::string encodeAtomToStr(const Handle& h) {
 			return h->to_short_string(); }
+		Handle decodeStrAtom(const std::string&);
 
 		std::mutex _guid_mutex;
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
@@ -115,7 +116,6 @@ class DHTAtomStorage : public BackingStore
 		virtual ~DHTAtomStorage();
 		bool connected(void); // connection to DB is alive
 
-		Handle fetch_atom(const std::string&);
 		void load_atomspace(AtomSpace*, const std::string&);
 
 		void kill_data(void); // destroy DB contents
