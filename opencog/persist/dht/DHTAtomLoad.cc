@@ -85,6 +85,20 @@ Handle DHTAtomStorage::fetch_atom(Handle &h)
 {
 	dht::InfoHash ahash = get_guid(h);
 
+	// Get a future for the atom
+	auto afut = _runner.get(ahash);
+
+	// Block until we've got it.
+	std::cout << "Start waiting" << std::endl;
+	afut.wait();
+	std::cout << "Done waiting" << std::endl;
+
+	auto dvals = afut.get();
+	for (const auto& dval : dvals)
+	{
+		std::cout << "Got svalue: " << dval->toString() << std::endl;
+	}
+
 	// get_atom_values(h, dag);
 	return h;
 }

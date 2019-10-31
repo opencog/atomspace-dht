@@ -11,13 +11,6 @@
 ; This is a bad assumption, unless you've started up such a node.
 (dht-open "dht:///test-atomspace")
 
-; Open a DHT node on the localhost, port 4222
-; (dht-open "dht://localhost:4222/test-atomspace")
-
-; The below works, but is not that good an idea, since it spams the
-; Jami/Ring network with our junk.
-; (dht-open "dht://bootstrap.ring.cx:4222/test-atomspace")
-
 ; Fetch a single atom
 (define c (Concept "foo"))
 (fetch-atom c)
