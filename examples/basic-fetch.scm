@@ -8,9 +8,13 @@
 (use-modules (opencog persist))
 (use-modules (opencog persist-dht))
 
-; Open connection of a DHT node assumed to be running on localhost
-; This is a bad assumption, unless you've started up such a node.
+; Declare th name of the AtomSpace to work with.
 (dht-open "dht:///test-atomspace")
+
+; Connect to a DHT peer. This must be a machine on a DHT network that
+; contains the test atomspace.  If one cannot connect to this peer,
+; then the atomspace won't be found.
+(dht-bootstrap "dht://localhost:4444")
 
 ; Fetch a single atom
 (define c (Concept "foo"))

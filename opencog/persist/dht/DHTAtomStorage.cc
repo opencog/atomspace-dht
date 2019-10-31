@@ -40,7 +40,7 @@ void DHTAtomStorage::init(const char * uri)
 	//    dht:///atomspace-name
 	//    dht://:port/atomspace-name
 
-	_port = 4222;
+	_port = 4242;
 	if ('/' == uri[URIX_LEN])
 	{
 		_atomspace_name = &uri[URIX_LEN+1];
@@ -76,7 +76,7 @@ void DHTAtomStorage::init(const char * uri)
 		std::chrono::minutes(100));
 
 	// Launch a dht node on a new thread, using a generated
-	// RSA key pair, and listen on port 4222.
+	// RSA key pair, and listen on port 4242.
 	_runner.run(_port, dht::crypto::generateIdentity(), true);
 
 	bulk_load = false;
@@ -84,18 +84,18 @@ void DHTAtomStorage::init(const char * uri)
 	clear_stats();
 }
 
-void DHTAtomStorage::bootstrap(std::string uri)
+void DHTAtomStorage::bootstrap(const std::string& uri)
 {
 #define URIX_LEN (sizeof("dht://") - 1)  // Should be 6
 
-	if (uri.compare("dht://"))
+	if (uri.compare(0, URIX_LEN, "dht://"))
 		throw IOException(TRACE_INFO, "Unknown URI '%s'\n", uri);
 
 	// We expect the URI to be for the form
 	//    dht://hostname/
 	//    dht://hostname:port/
 
-	int port = 4222;
+	int port = 4242;
 	std::string hostname = uri.substr(URIX_LEN);
 	size_t pos = hostname.find('/');
 	if (std::string::npos != pos)

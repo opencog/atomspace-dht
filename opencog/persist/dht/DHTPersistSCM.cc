@@ -117,7 +117,7 @@ void DHTPersistSCM::do_bootstrap(const std::string& uri)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-load-atomspace: Error: Database not open");
+            "dht-bookstrap: Error: DHT is not running");
 
     _backing->bootstrap(uri);
 }
