@@ -29,13 +29,13 @@ using namespace opencog;
 void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 {
 	store_atom_values(h);
+	_store_count ++;
+
 	if (h->is_node()) return;
 
 	// Make note of the incoming set.
 	for (const Handle& ho: h->getOutgoingSet())
 		store_incoming_of(ho,h);
-
-	_store_count ++;
 
 	if (bulk_store and _store_count%100 == 0)
 	{

@@ -55,16 +55,21 @@ class DHTAtomStorage : public BackingStore
 		dht::DhtRunner _runner;
 		dht::InfoHash _atomspace_hash;
 
-		// Fetching of atoms.
-		Handle fetch_atom(Handle&);
+		// Storage policies
+		dht::ValueType _values_policy;
+		dht::ValueType _space_policy;
+		// dht::ValueType _incoming_policy;
 
 		// --------------------------
-		// Storing of atoms
+		// Fetch and storing of atoms
 
 		std::string encodeValueToStr(const ValuePtr&);
 		std::string encodeAtomToStr(const Handle& h) {
 			return h->to_short_string(); }
 		Handle decodeStrAtom(const std::string&);
+
+		// Fetching of atoms.
+		Handle fetch_atom(Handle&);
 
 		std::mutex _guid_mutex;
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
@@ -105,7 +110,6 @@ class DHTAtomStorage : public BackingStore
 		std::atomic<size_t> _num_atom_deletes;
 		std::atomic<size_t> _load_count;
 		std::atomic<size_t> _store_count;
-		std::atomic<size_t> _valuation_stores;
 		std::atomic<size_t> _value_stores;
 		time_t _stats_time;
 

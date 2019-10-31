@@ -25,7 +25,9 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	dht::InfoHash guid = get_guid(atom);
 
 	// Attach the value to the atom
-	_runner.put(guid, atom->valuesToString());
+	_runner.put(guid, dht::Value(_values_policy, atom->valuesToString()));
+
+	_value_stores ++;
 
 	// Put the atom into the Atomspace too
 	add_atom_to_atomspace(atom);

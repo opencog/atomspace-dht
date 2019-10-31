@@ -96,7 +96,8 @@ Handle DHTAtomStorage::fetch_atom(Handle &h)
 	auto dvals = afut.get();
 	for (const auto& dval : dvals)
 	{
-		std::cout << "Got svalue: " << dval->toString() << std::endl;
+		// std::cout << "Got value: " << dval->toString() << std::endl;
+		std::cout << "Got svalue: " << dval->unpack<std::string>() << std::endl;
 	}
 
 	// get_atom_values(h, dag);

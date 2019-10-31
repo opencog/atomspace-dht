@@ -79,6 +79,13 @@ void DHTAtomStorage::init(const char * uri)
 
 	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
+	// Policies for storing atoms
+	_values_policy = dht::ValueType(4097, "values policy",
+		std::chrono::minutes(100));
+
+	_space_policy = dht::ValueType(4098, "space policy",
+		std::chrono::minutes(100));
+
 	// Launch a dht node on a new thread, using a generated
 	// RSA key pair, and listen on port 4224.
 	// FIXME, need something better.
@@ -170,7 +177,6 @@ void DHTAtomStorage::clear_stats(void)
 	_stats_time = time(0);
 	_load_count = 0;
 	_store_count = 0;
-	_valuation_stores = 0;
 	_value_stores = 0;
 
 	_num_get_atoms = 0;
@@ -199,10 +205,8 @@ void DHTAtomStorage::print_stats(void)
 	printf("dht-stats: total loads = %zu total stores = %zu ratio=%f\n",
 	       load_count, store_count, frac);
 
-	size_t valuation_stores = _valuation_stores;
 	size_t value_stores = _value_stores;
-	printf("dht-stats: valuation updates = %zu value updates = %zu\n",
-	       valuation_stores, value_stores);
+	printf("dht-stats: value updates = %zu\n", value_stores);
 
 	size_t num_atom_removes = _num_atom_removes;
 	size_t num_atom_deletes = _num_atom_deletes;
