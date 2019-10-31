@@ -62,7 +62,6 @@ dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)
 	if (_guid_map.end() != ip)
 		return ip->second;
 	std::string astr = _atomspace_name + encodeAtomToStr(h);
-std::cout << " nameo=" << astr << std::endl;
 	dht::InfoHash akey = dht::InfoHash::get(astr);
 	_guid_map[h] = akey;
 	return akey;

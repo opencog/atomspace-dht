@@ -74,6 +74,9 @@ void DHTAtomStorage::init(const char * uri)
 	if (pos != std::string::npos) _atomspace_name.resize(pos);
 	_atomspace_name += '/';
 
+	if (_atomspace_name.size() < 2)
+		throw IOException(TRACE_INFO, "Missing AtomSpace name '%s'\n", uri);
+
 	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
 	// Launch a dht node on a new thread, using a generated
@@ -225,10 +228,8 @@ Handle DHTAtomStorage::getNode(Type, const char *) { return Handle();}
 Handle DHTAtomStorage::getLink(Type, const HandleSeq&) { return Handle();  }
 void DHTAtomStorage::getIncomingSet(AtomTable&, const Handle&) {}
 void DHTAtomStorage::getIncomingByType(AtomTable&, const Handle&, Type t) {}
-void DHTAtomStorage::getValuations(AtomTable&, const Handle&, bool get_all) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
 void DHTAtomStorage::loadType(AtomTable&, Type) {}
 void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents
 void DHTAtomStorage::storeAtomSpace(const AtomTable&) {}
-void DHTAtomStorage::store_atom_values(const Handle&) {}
 /* ============================= END OF FILE ================= */
