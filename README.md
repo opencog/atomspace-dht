@@ -29,11 +29,13 @@ Almost nothing works yet. See the [examples](examples) for what does work.
 In the current implementation:
  * Initial impression: OpenDHT is very highly compatible with the
    AtomSpace in it's design philosophy!
- * This is sparked by the now-"finished" atomspace-ipfs driver, which
-   has numerous annoying design faults due to deficiencies in the IPFS
-   API. It appears that OpenDHT provides a far more usable API that is
-   much more closely aligned to what the AtomSpace actually needs. Or
-   so it seems, upon reading the docs.  We shall see.
+ * This is sparked by the now-"finished"
+   [atomspace-ipfs](https://github.com/opencog/atomspace-ipfs) driver,
+   which has numerous annoying design faults due to deficiencies in the
+   IPFS API. It appears that OpenDHT provides a far more usable API that
+   is much more closely aligned to what the AtomSpace actually needs.
+   Or so it seems, based on reading header files and the code so far.
+   We shall see.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
@@ -44,11 +46,13 @@ and install mechanisms are the same.
 
 ### Design Notes
 * Every Atom gets a unique hash. This is called the GUID.
-  Do Atoms need to be published?
+  Do Atoms need to be published? No, bare ones do not need to be.
 * Every (Atom, AtomSpace-name) pair gets a unique hash.  The current
-  values on that atom are stored under that hash.
+  values on that atom are stored under that hash. Yes.
 * How can we find all current members of an AtomSpace?
+  Easy, DHT values.
 * How can we find all members of the incoming set of an Atom?
+  Easy, DHT values.
 
 ## Build Prereqs
 
