@@ -37,6 +37,7 @@ public:
 	~DHTPersistSCM();
 
 	void do_open(const std::string&);
+	void do_bootstrap(const std::string&);
 	void do_close(void);
 	void do_load(void);
 	void do_store(void);

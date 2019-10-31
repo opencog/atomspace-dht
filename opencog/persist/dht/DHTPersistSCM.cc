@@ -48,6 +48,7 @@ void DHTPersistSCM::init(void)
 {
     define_scheme_primitive("dht-open", &DHTPersistSCM::do_open, this, "persist-dht");
     define_scheme_primitive("dht-close", &DHTPersistSCM::do_close, this, "persist-dht");
+    define_scheme_primitive("dht-bootstrap", &DHTPersistSCM::do_bootstrap, this, "persist-dht");
     define_scheme_primitive("dht-stats", &DHTPersistSCM::do_stats, this, "persist-dht");
     define_scheme_primitive("dht-clear-stats", &DHTPersistSCM::do_clear_stats, this, "persist-dht");
 
@@ -112,13 +113,22 @@ void DHTPersistSCM::do_close(void)
     delete backing;
 }
 
-void DHTPersistSCM::do_load_atomspace(const std::string& cid)
+void DHTPersistSCM::do_bootstrap(const std::string& uri)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
             "dht-load-atomspace: Error: Database not open");
 
-    return _backing->load_atomspace(_as, cid);
+    _backing->bootstrap(uri);
+}
+
+void DHTPersistSCM::do_load_atomspace(const std::string& asname)
+{
+    if (nullptr == _backing)
+        throw RuntimeException(TRACE_INFO,
+            "dht-load-atomspace: Error: Database not open");
+
+    _backing->load_atomspace(_as, asname);
 }
 
 void DHTPersistSCM::do_stats(void)

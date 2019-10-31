@@ -46,7 +46,6 @@ class DHTAtomStorage : public BackingStore
 	private:
 		void init(const char *);
 		std::string _uri;
-		std::string _hostname;
 		int _port;
 		std::string _atomspace_name;
 
@@ -119,6 +118,7 @@ class DHTAtomStorage : public BackingStore
 		DHTAtomStorage(const DHTAtomStorage&) = delete; // disable copying
 		DHTAtomStorage& operator=(const DHTAtomStorage&) = delete; // disable assignment
 		virtual ~DHTAtomStorage();
+		void bootstrap(std::string uri);
 		bool connected(void); // connection to DB is alive
 
 		void load_atomspace(AtomSpace*, const std::string&);

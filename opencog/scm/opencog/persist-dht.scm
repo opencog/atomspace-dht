@@ -11,8 +11,22 @@
 	(string-append opencog-ext-path-persist-dht "libpersist-dht")
 	"opencog_persist_dht_init")
 
-(export dht-clear-stats dht-close dht-open dht-stats
+(export dht-bootstrap dht-clear-stats dht-close dht-open dht-stats
 	dht-load-atomspace)
+
+(set-procedure-property! dht-bootstrap 'documentation
+"
+ dht-bootstrap URI - Provide a DHT peer to connect to.
+    This will cause the local DHT node to connect to the indicated peer,
+    and join the DHT network that it is connected to. More than one peer
+    can be specified; all peers should belong to the same network,
+    else there is a risk of bridging two unrelated networks.  This
+    might reult in chaos.
+
+    The URI should be of one of the following forms:
+        dht://hostname/
+        dht://hostname:port/
+")
 
 (set-procedure-property! dht-clear-stats 'documentation
 "

@@ -38,36 +38,25 @@ void DHTAtomStorage::init(const char * uri)
 
 	// We expect the URI to be for the form
 	//    dht:///atomspace-name
-	//    dht://hostname/atomspace-name
-	//    dht://hostname:port/atomspace-name
+	//    dht://:port/atomspace-name
 
 	_port = 4222;
 	if ('/' == uri[URIX_LEN])
 	{
-		_hostname = "localhost";
 		_atomspace_name = &uri[URIX_LEN+1];
 	}
 	else
+	if (':' == uri[URIX_LEN])
 	{
-		const char* start = &uri[URIX_LEN];
-		_hostname = start;
-		char* p = strchr((char *)start, '/');
+		const char * start = &uri[URIX_LEN+1];
+		_port = atoi(start);
+		const char * p = strchr(start, '/');
 		if (nullptr == p)
-			throw IOException(TRACE_INFO, "Bad URI format '%s'\n", uri);
-		size_t len = p - start;
-		_hostname.resize(len);
-
-		// Search for a port, if present.
-		p = strchr((char *)start, ':');
-		if (p)
-		{
-			_port = atoi(p+1);
-			size_t len = p - start;
-			_hostname.resize(len);
-		}
-
-		_atomspace_name = &uri[len+URIX_LEN+1];
+			throw IOException(TRACE_INFO, "Bad URI '%s'\n", uri);
+		_atomspace_name = p+1;
 	}
+	else
+		throw IOException(TRACE_INFO, "Bad URI '%s'\n", uri);
 
 	// Strip out and replace trailing slash.
 	size_t pos = _atomspace_name.find('/');
@@ -87,15 +76,40 @@ void DHTAtomStorage::init(const char * uri)
 		std::chrono::minutes(100));
 
 	// Launch a dht node on a new thread, using a generated
-	// RSA key pair, and listen on port 4224.
-	// FIXME, need something better.
-	_runner.run(4224, dht::crypto::generateIdentity(), true);
-
-	_runner.bootstrap(_hostname, std::to_string(_port));
+	// RSA key pair, and listen on port 4222.
+	_runner.run(_port, dht::crypto::generateIdentity(), true);
 
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
+}
+
+void DHTAtomStorage::bootstrap(std::string uri)
+{
+#define URIX_LEN (sizeof("dht://") - 1)  // Should be 6
+
+	if (uri.compare("dht://"))
+		throw IOException(TRACE_INFO, "Unknown URI '%s'\n", uri);
+
+	// We expect the URI to be for the form
+	//    dht://hostname/
+	//    dht://hostname:port/
+
+	int port = 4222;
+	std::string hostname = uri.substr(URIX_LEN);
+	size_t pos = hostname.find('/');
+	if (std::string::npos != pos)
+		hostname.resize(pos);
+
+	// Search for a port, if present.
+	pos = hostname.find(':');
+	if (std::string::npos != pos)
+	{
+		port = atoi(hostname.substr(pos+1).c_str());
+		hostname.resize(pos);
+	}
+
+	_runner.bootstrap(hostname, std::to_string(port));
 }
 
 DHTAtomStorage::DHTAtomStorage(std::string uri)

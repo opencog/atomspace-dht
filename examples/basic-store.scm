@@ -7,16 +7,21 @@
 (use-modules (opencog persist))
 (use-modules (opencog persist-dht))
 
-; Open connection of a DHT node assumed to be running on localhost
-; This is a bad assumption, unless you've started up such a node.
+; Use the atomspace called "test-atomspace" for this demo.
+; This will run an OpenDHT node on localhost at port 4222
 (dht-open "dht:///test-atomspace")
 
-; Open a DHT node on the localhost, port 4222
-; (dht-open "dht://localhost:4222/test-atomspace")
+; Run the DHT node on a non-default port
+; (dht-open "dht://:4444/test-atomspace")
 
-; The below works, but is not that good an idea, since it spams the
-; Jami/Ring network with our junk.
-; (dht-open "dht://bootstrap.ring.cx:4222/test-atomspace")
+; Bootstrap to an existing AtomSpace DHT Network.
+; (dht-bootstrap "dht://bootstrap.opencog.org:4222/")
+;
+; For debugging, it can be useful to run a private dhtnode on the local
+; machine. It can be started at teh bash prompt with `dhtnode -p 4444`
+; In this case, bootstrap to it:
+;     (dht-bootstrap "dht://localhost:4444/")
+; You can then examinethe DHT directly with the dhtnode console.
 
 ; Store a single atom
 (store-atom (Concept "foo" (stv 0.6 0.8)))
