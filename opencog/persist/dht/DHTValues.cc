@@ -35,110 +35,128 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 
 /* ================================================================== */
 
-#if 0
-/// Get ALL of the values associated with an atom.
-void DHTAtomStorage::get_atom_values(Handle& atom, const ipfs::Json& jatom)
+ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 {
-	// If no values, then nothing to do.
-	auto pvals = jatom.find("values");
-	if (pvals == jatom.end()) return;
-
-	ipfs::Json jvals = *pvals;
-	// std::cout << "Jatom vals: " << jvals.dump(2) << std::endl;
-
-	for (const auto& [jkey, jvalue]: jvals.items())
+	size_t totlen = stv.size();
+	size_t vos = stv.find("(LinkValue", pos);
+	if (std::string::npos != vos)
 	{
-		// std::cout << "KV Pair: " << jkey << " "<<jvalue<< std::endl;
-		atom->setValue(decodeStrAtom(jkey), decodeStrValue(jvalue));
-	}
-}
-#endif
-
-/* ================================================================ */
-
-ValuePtr DHTAtomStorage::decodeStrValue(const std::string& stv)
-{
-	size_t pos = stv.find("(LinkValue");
-	if (std::string::npos != pos)
-	{
-		pos += strlen("(LinkValue");
+		vos += strlen("(LinkValue");
 		std::vector<ValuePtr> vv;
-		while (pos != std::string::npos and stv[pos] != ')')
+		vos = stv.find('(', vos);
+		size_t epos = vos;
+		while (vos != std::string::npos)
 		{
-			pos = stv.find('(', pos);
-			if (std::string::npos == pos) break;
-
 			// Find the next balanced paren, and restart there.
 			// This is not very efficient, but it works.
-			size_t epos = pos;
+			epos = vos;
 			int pcnt = 1;
-			while (0 < pcnt and epos != std::string::npos)
+			while (0 < pcnt and epos < totlen)
 			{
 				char c = stv[++epos];
 				if ('(' == c) pcnt ++;
 				else if (')' == c) pcnt--;
 			}
-			if (epos == std::string::npos) break;
-			vv.push_back(decodeStrValue(stv.substr(pos, epos-pos+1)));
-			pos = epos+1;
+			if (epos >= totlen)
+				throw SyntaxException(TRACE_INFO,
+					"Malformed LinkValue: %s", stv.substr(pos).c_str());
+
+			size_t junk = 0;
+			vv.push_back(decodeStrValue(stv.substr(vos, epos-vos+1), junk));
+			vos = stv.find('(', ++epos);
 		}
+		epos = stv.find(')', epos);
+		if (std::string::npos == epos)
+			throw SyntaxException(TRACE_INFO,
+				"Malformed LinkValue: %s", stv.substr(pos).c_str());
+		pos = epos + 1;
 		return createLinkValue(vv);
 	}
 
-	pos = stv.find("(FloatValue ");
-	if (std::string::npos != pos)
+	vos = stv.find("(FloatValue ", pos);
+	if (std::string::npos != vos)
 	{
-		pos += strlen("(FloatValue ");
+		vos += strlen("(FloatValue ");
 		std::vector<double> fv;
-		while (pos != std::string::npos and stv[pos] != ')')
+		while (vos < totlen and stv[vos] != ')')
 		{
 			size_t epos;
-			fv.push_back(stod(stv.substr(pos), &epos));
-			pos += epos;
+			fv.push_back(stod(stv.substr(vos), &epos));
+			vos += epos;
 		}
+		pos = vos + 1;
 		return createFloatValue(fv);
 	}
 
-	pos = stv.find("(SimpleTruthValue ");
-	if (std::string::npos != pos)
+	vos = stv.find("(SimpleTruthValue ", pos);
+	if (std::string::npos != vos)
+		vos += strlen("(SimpleTruthValue ");
+	else
+	{
+		vos = stv.find("(stv ", pos);
+		if (std::string::npos != vos)
+			vos += strlen("(stv ");
+	}
+	if (std::string::npos != vos)
 	{
 		size_t epos;
-		pos += strlen("(SimpleTruthValue ");
-		double strength = stod(stv.substr(pos), &epos);
-		pos += epos;
-		double confidence = stod(stv.substr(pos), &epos);
+		double strength = stod(stv.substr(vos), &epos);
+		vos += epos;
+		double confidence = stod(stv.substr(vos), &epos);
+		epos = stv.find(')', epos);
+		if (std::string::npos == epos)
+			throw SyntaxException(TRACE_INFO,
+				"Malformed SimpleTruthValue: %s", stv.substr(pos).c_str());
+		pos = epos + 1;
 		return ValueCast(createSimpleTruthValue(strength, confidence));
 	}
 
-	pos = stv.find("(StringValue ");
-	if (std::string::npos != pos)
+	vos = stv.find("(StringValue ", pos);
+	if (std::string::npos != vos)
 	{
-		pos += strlen("(StringValue ");
+		vos += strlen("(StringValue ");
 		std::vector<std::string> sv;
+		size_t epos;
 		while (true)
 		{
-			pos = stv.find('\"', pos);
-			if (std::string::npos == pos) break;
-			size_t epos = stv.find('\"', pos+1);
-			sv.push_back(stv.substr(pos+1, epos-pos-1));
-			pos = epos+1;
+			vos = stv.find('\"', vos);
+			if (std::string::npos == vos) break;
+			epos = stv.find('\"', vos+1);
+			sv.push_back(stv.substr(vos+1, epos-vos-1));
+			vos = epos+1;
 		}
+		epos = stv.find(')', epos+1);
+		if (std::string::npos == epos)
+			throw SyntaxException(TRACE_INFO,
+				"Malformed StringValue: %s", stv.substr(pos).c_str());
+		pos = epos + 1;
 		return createStringValue(sv);
 	}
 
 	throw SyntaxException(TRACE_INFO, "Unknown Value %s", stv.c_str());
 }
 
-/* ================================================================ */
+/* ================================================================== */
 
-/// Get all atoms having indicated key on them.
-/// It appears that there are zero users of this thing, because the
-/// guile API for this was never created.  Should probably get rid
-/// of this.
-void DHTAtomStorage::getValuations(AtomTable& table,
-                                   const Handle& key, bool get_all_values)
+/**
+ * Decode a Valuations association list.
+ * This list has the format
+ * ((KEY . VALUE)(KEY2 . VALUE2)...)
+ * Store the results as values on the atom.
+ */
+void DHTAtomStorage::decodeAlist(Handle& atom, const std::string& alist)
 {
-	throw SyntaxException(TRACE_INFO, "Not Implemented!");
+	// Skip over opening paren
+	size_t pos = 1;
+	size_t totlen = alist.size();
+	while (std::string::npos != pos and pos < totlen)
+	{
+		Handle key(decodeStrAtom(alist, pos));
+		pos = alist.find(" . ", pos);
+		pos += 3;
+		ValuePtr val(decodeStrValue(alist, pos));
+		atom->setValue(key, val);
+	}
 }
 
 /* ============================= END OF FILE ================= */

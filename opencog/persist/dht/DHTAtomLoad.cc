@@ -27,26 +27,34 @@ using namespace opencog;
 /// `(Evaluation (Predicate "blort") (List (Concept "foo") (Concept "bar")))`
 /// will return the corresponding atoms.
 ///
-Handle DHTAtomStorage::decodeStrAtom(const std::string& satom)
+Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 {
-	std::string scm = satom;
-	if ('(' != scm[0])
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
-	size_t pos = scm.find(' ');
+	if ('(' != scm[pos])
+		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+			scm.substr(pos).c_str());
+	pos = scm.find(' ', pos);
 	if (pos == std::string::npos)
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
+		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+			 scm.substr(pos).c_str());
 	scm[pos] = 0;
 
-	Type t = nameserver().getType(&scm[1]);
+	Type t = nameserver().getType(&scm[pos+1]);
 	if (nameserver().isNode(t))
 	{
-		size_t name_start = scm.find('"', pos+1);
+		size_t name_start = scm.find('"', pos+2);
 		if (name_start == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
+			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+				scm.substr(pos).c_str());
 		size_t name_end = scm.find('"', name_start+1);
 		if (name_end == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
-		scm[name_end] = 0;
+			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+				scm.substr(pos).c_str());
+		scm[name_end] = 0; // Clobber the ending quote
+		size_t close = scm.find(')', name_end + 1);
+		if (close == std::string::npos)
+			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+				scm.substr(pos).c_str());
+		pos = close + 1;
 		_num_got_nodes ++;
 		return createNode(t, &scm[name_start+1]);
 	}
@@ -55,6 +63,7 @@ Handle DHTAtomStorage::decodeStrAtom(const std::string& satom)
 		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
 
 	// If we are here, its a Link.
+	size_t totlen = scm.size();
 	HandleSeq oset;
 	size_t oset_start = scm.find('(', pos+1);
 	while (oset_start != std::string::npos)
@@ -63,17 +72,21 @@ Handle DHTAtomStorage::decodeStrAtom(const std::string& satom)
 
 		// Find the next balanced paren, and restart there.
 		// This is not very efficient, but it works.
-		size_t pos = oset_start;
+		size_t cos = oset_start;
 		int pcnt = 1;
-		while (0 < pcnt and pos != std::string::npos)
+		while (0 < pcnt and cos < totlen)
 		{
-			char c = scm[++pos];
+			char c = scm[++cos];
 			if ('(' == c) pcnt ++;
 			else if (')' == c) pcnt--;
 		}
-		if (pos == std::string::npos) break;
-		oset_start = scm.find('(', pos+1);
+		oset_start = scm.find('(', cos+1);
 	}
+	size_t close = scm.find(')', cos+1);
+	if (close == std::string::npos)
+		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+			scm.substr(pos).c_str());
+	pos = close + 1;
 
 	_num_got_links ++;
 	return createLink(oset, t);

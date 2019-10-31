@@ -66,7 +66,7 @@ class DHTAtomStorage : public BackingStore
 		std::string encodeValueToStr(const ValuePtr&);
 		std::string encodeAtomToStr(const Handle& h) {
 			return h->to_short_string(); }
-		Handle decodeStrAtom(const std::string&);
+		Handle decodeStrAtom(std::string&, size_t&);
 
 		// Fetching of atoms.
 		Handle fetch_atom(Handle&);
@@ -90,7 +90,8 @@ class DHTAtomStorage : public BackingStore
 		// --------------------------
 		// Values
 		void store_atom_values(const Handle &);
-		ValuePtr decodeStrValue(const std::string&);
+		ValuePtr decodeStrValue(std::string&, size_t&);
+		void decodeStrAlist(Handle&, const std::string&);
 
 		// --------------------------
 		// Incoming set management
@@ -134,7 +135,6 @@ class DHTAtomStorage : public BackingStore
 		Handle getLink(Type, const HandleSeq&);
 		void getIncomingSet(AtomTable&, const Handle&);
 		void getIncomingByType(AtomTable&, const Handle&, Type t);
-		void getValuations(AtomTable&, const Handle&, bool get_all);
 		void storeAtom(const Handle&, bool synchronous = false);
 		void removeAtom(const Handle&, bool recursive);
 		void loadType(AtomTable&, Type);
