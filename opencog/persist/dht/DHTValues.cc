@@ -22,9 +22,14 @@ using namespace opencog;
 /// Store ALL of the values associated with the atom.
 void DHTAtomStorage::store_atom_values(const Handle& atom)
 {
+	dht::InfoHash guid = get_guid(atom);
+
+	_runner.put(guid, atom->valuesToString());
+
    // Update the atomspace, so that it holds the new value.
    // update_atom_in_atomspace(atom, atoid);
 }
+
 /* ================================================================== */
 
 #if 0

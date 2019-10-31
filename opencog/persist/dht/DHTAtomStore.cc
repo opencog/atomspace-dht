@@ -29,9 +29,6 @@ using namespace opencog;
  */
 void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 {
-	dht::InfoHash guid = get_guid(h);
-std::cout << "GUID is " << guid << std::endl;
-
 	// do_store_atom(h);
 	store_atom_values(h);
 }
