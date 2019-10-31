@@ -46,8 +46,9 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 {
 	dht::InfoHash ahash = get_guid(h);
 
-	// Get a future for the atom
-	auto afut = _runner.get(ahash);
+	// Get a future for the incoming set on the atom.
+	auto afut = _runner.get(ahash,
+		dht::Value::TypeFilter(_incoming_policy));
 
 	// Block until we've got it.
 	std::cout << "Start waiting for incoming" << std::endl;
