@@ -22,7 +22,7 @@ OpenDHT is an internet-wide globally-accesible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.0.2
+## Alpha version 0.0.3
 Almost nothing works yet. See the [examples](examples) for what does work.
 
 ### Status
@@ -53,6 +53,13 @@ and install mechanisms are the same.
   Easy, DHT values.
 * How can we find all members of the incoming set of an Atom?
   Easy, DHT values.
+* TODO: listen for new values on specific atoms or atom types
+* TODO: list for atomspace updates.
+* TODO: implement a CRDT type for CountTruthValue
+* TODO: flush writes before closing.
+* TODO: defer fetches until barrier.
+* TODO: honor timeouts
+* TODO: hash explore utility
 
 ## Build Prereqs
 
