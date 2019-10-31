@@ -60,33 +60,27 @@ Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 	}
 
 	if (not nameserver().isLink(t))
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n", scm.c_str());
+		throw SyntaxException(TRACE_INFO, "Bad Atom string! %s\n",
+			scm.substr(pos).c_str());
 
 	// If we are here, its a Link.
-	size_t totlen = scm.size();
 	HandleSeq oset;
 	size_t oset_start = scm.find('(', pos+1);
-	while (oset_start != std::string::npos)
+	size_t oset_end = scm.find(')', pos+1);
+	if (std::string::npos == oset_end)
+		throw SyntaxException(TRACE_INFO, "Bad Atom string! %s\n",
+			scm.substr(pos).c_str());
+	while (oset_start != std::string::npos and oset_start < oset_end)
 	{
-		oset.push_back(decodeStrAtom(&scm[oset_start]));
-
-		// Find the next balanced paren, and restart there.
-		// This is not very efficient, but it works.
-		size_t cos = oset_start;
-		int pcnt = 1;
-		while (0 < pcnt and cos < totlen)
-		{
-			char c = scm[++cos];
-			if ('(' == c) pcnt ++;
-			else if (')' == c) pcnt--;
-		}
-		oset_start = scm.find('(', cos+1);
+		size_t vos = oset_start;
+		oset.push_back(decodeStrAtom(scm, vos));
+		oset_start = scm.find('(', vos);
+		oset_end = scm.find(')', vos);
 	}
-	size_t close = scm.find(')', cos+1);
-	if (close == std::string::npos)
+	if (oset_end == std::string::npos)
 		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
 			scm.substr(pos).c_str());
-	pos = close + 1;
+	pos = oset_end + 1;
 
 	_num_got_links ++;
 	return createLink(oset, t);

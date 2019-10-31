@@ -91,7 +91,7 @@ class DHTAtomStorage : public BackingStore
 		// Values
 		void store_atom_values(const Handle &);
 		ValuePtr decodeStrValue(std::string&, size_t&);
-		void decodeStrAlist(Handle&, const std::string&);
+		void decodeAlist(Handle&, std::string&);
 
 		// --------------------------
 		// Incoming set management

@@ -45,7 +45,8 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		std::vector<ValuePtr> vv;
 		vos = stv.find('(', vos);
 		size_t epos = vos;
-		while (vos != std::string::npos)
+		size_t done = vos + 1;
+		while (vos != std::string::npos and vos < done)
 		{
 			// Find the next balanced paren, and restart there.
 			// This is not very efficient, but it works.
@@ -61,15 +62,14 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 				throw SyntaxException(TRACE_INFO,
 					"Malformed LinkValue: %s", stv.substr(pos).c_str());
 
-			size_t junk = 0;
-			vv.push_back(decodeStrValue(stv.substr(vos, epos-vos+1), junk));
-			vos = stv.find('(', ++epos);
+			vv.push_back(decodeStrValue(stv, vos));
+			done = stv.find(')', epos+1);
+			vos = stv.find('(', epos+1);
 		}
-		epos = stv.find(')', epos);
-		if (std::string::npos == epos)
+		if (std::string::npos == done)
 			throw SyntaxException(TRACE_INFO,
 				"Malformed LinkValue: %s", stv.substr(pos).c_str());
-		pos = epos + 1;
+		pos = done + 1;
 		return createLinkValue(vv);
 	}
 
@@ -144,7 +144,7 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
  * ((KEY . VALUE)(KEY2 . VALUE2)...)
  * Store the results as values on the atom.
  */
-void DHTAtomStorage::decodeAlist(Handle& atom, const std::string& alist)
+void DHTAtomStorage::decodeAlist(Handle& atom, std::string& alist)
 {
 	// Skip over opening paren
 	size_t pos = 1;
