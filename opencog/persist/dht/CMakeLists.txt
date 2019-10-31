@@ -6,7 +6,7 @@ ADD_LIBRARY (persist-dht SHARED
 	DHTAtomStorage
 	DHTAtomStore
 #	DHTBulk
-#	DHTIncoming
+	DHTIncoming
 	DHTValues
 	DHTPersistSCM
 )

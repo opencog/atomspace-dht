@@ -55,9 +55,9 @@ class DHTAtomStorage : public BackingStore
 		dht::InfoHash _atomspace_hash;
 
 		// Storage policies
-		dht::ValueType _values_policy;
 		dht::ValueType _space_policy;
-		// dht::ValueType _incoming_policy;
+		dht::ValueType _values_policy;
+		dht::ValueType _incoming_policy;
 
 		// --------------------------
 		// Fetch and storing of atoms

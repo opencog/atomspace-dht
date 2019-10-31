@@ -69,10 +69,13 @@ void DHTAtomStorage::init(const char * uri)
 	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
 	// Policies for storing atoms
-	_values_policy = dht::ValueType(4097, "values policy",
+	_space_policy = dht::ValueType(4097, "space policy",
 		std::chrono::minutes(100));
 
-	_space_policy = dht::ValueType(4098, "space policy",
+	_values_policy = dht::ValueType(4098, "values policy",
+		std::chrono::minutes(100));
+
+	_incoming_policy = dht::ValueType(4099, "incoming policy",
 		std::chrono::minutes(100));
 
 	// Launch a dht node on a new thread, using a generated
@@ -254,8 +257,6 @@ void DHTAtomStorage::print_stats(void)
 
 // XXX Stubs FIXME
 void DHTAtomStorage::load_atomspace(AtomSpace*, const std::string&) {}
-void DHTAtomStorage::getIncomingSet(AtomTable&, const Handle&) {}
-void DHTAtomStorage::getIncomingByType(AtomTable&, const Handle&, Type t) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
 void DHTAtomStorage::loadType(AtomTable&, Type) {}
 void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents
