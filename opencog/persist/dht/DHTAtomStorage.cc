@@ -45,7 +45,7 @@ void DHTAtomStorage::init(const char * uri)
 	if ('/' == uri[URIX_LEN])
 	{
 		_hostname = "localhost";
-		// _keyname = &uri[URIX_LEN+1];
+		_atomspace_name = &uri[URIX_LEN+1];
 	}
 	else
 	{
@@ -67,12 +67,14 @@ void DHTAtomStorage::init(const char * uri)
 		}
 
 		_atomspace_name = &uri[len+URIX_LEN+1];
-		// Keys are not allowed to have trailing slashes.
-		size_t pos = _atomspace_name.find('/');
-		if (pos != std::string::npos) _atomspace_name.resize(pos);
-
-		_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 	}
+
+	// Strip out and replace trailing slash.
+	size_t pos = _atomspace_name.find('/');
+	if (pos != std::string::npos) _atomspace_name.resize(pos);
+	_atomspace_name += '/';
+
+	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
 	// Launch a dht node on a new thread, using a generated
 	// RSA key pair, and listen on port 4224.
@@ -227,5 +229,6 @@ void DHTAtomStorage::getValuations(AtomTable&, const Handle&, bool get_all) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
 void DHTAtomStorage::loadType(AtomTable&, Type) {}
 void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents
-void DHTAtomStorage::storeAtomSpace(const AtomTable&) {} // Store entire contents
+void DHTAtomStorage::storeAtomSpace(const AtomTable&) {}
+void DHTAtomStorage::store_atom_values(const Handle&) {}
 /* ============================= END OF FILE ================= */
