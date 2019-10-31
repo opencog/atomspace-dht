@@ -116,7 +116,7 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 	{
 		vos += strlen("(StringValue ");
 		std::vector<std::string> sv;
-		size_t epos;
+		size_t epos = vos;
 		while (true)
 		{
 			vos = stv.find('\"', vos);
@@ -149,13 +149,16 @@ void DHTAtomStorage::decodeAlist(Handle& atom, std::string& alist)
 	// Skip over opening paren
 	size_t pos = 1;
 	size_t totlen = alist.size();
+	pos = alist.find('(', pos);
 	while (std::string::npos != pos and pos < totlen)
 	{
+		++pos;  // over first paren of pair
 		Handle key(decodeStrAtom(alist, pos));
 		pos = alist.find(" . ", pos);
 		pos += 3;
 		ValuePtr val(decodeStrValue(alist, pos));
 		atom->setValue(key, val);
+		pos = alist.find('(', pos);
 	}
 }
 

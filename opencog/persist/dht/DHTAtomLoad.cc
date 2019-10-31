@@ -29,19 +29,27 @@ using namespace opencog;
 ///
 Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 {
-	if ('(' != scm[pos])
+	size_t vos = scm.find('(', pos);
+	if (std::string::npos == vos)
 		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
 			scm.substr(pos).c_str());
-	pos = scm.find(' ', pos);
-	if (pos == std::string::npos)
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-			 scm.substr(pos).c_str());
-	scm[pos] = 0;
 
-	Type t = nameserver().getType(&scm[pos+1]);
+	size_t post = scm.find(' ', vos+1);
+	if (post != std::string::npos)
+		scm[post] = 0;
+	else
+	{
+		post = scm.find(')', vos+1);
+		if (post == std::string::npos)
+			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
+				scm.substr(pos).c_str());
+		scm[post] = 0;
+	}
+
+	Type t = nameserver().getType(&scm[vos+1]);
 	if (nameserver().isNode(t))
 	{
-		size_t name_start = scm.find('"', pos+2);
+		size_t name_start = scm.find('"', post+1);
 		if (name_start == std::string::npos)
 			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
 				scm.substr(pos).c_str());
@@ -65,8 +73,8 @@ Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 
 	// If we are here, its a Link.
 	HandleSeq oset;
-	size_t oset_start = scm.find('(', pos+1);
-	size_t oset_end = scm.find(')', pos+1);
+	size_t oset_start = scm.find('(', post+1);
+	size_t oset_end = scm.find(')', post+1);
 	if (std::string::npos == oset_end)
 		throw SyntaxException(TRACE_INFO, "Bad Atom string! %s\n",
 			scm.substr(pos).c_str());
