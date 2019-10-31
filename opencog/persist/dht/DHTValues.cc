@@ -121,24 +121,24 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 		return ValueCast(createSimpleTruthValue(strength, confidence));
 	}
 
+	// XXX FIXME this mishandles escaped quotes
 #define SV "(StringValue"
 	if (0 == stv.compare(pos, sizeof(SV)-1, SV))
 	{
 		size_t vos = pos + sizeof(SV) - 1;
 		std::vector<std::string> sv;
-		size_t epos = vos;
-		while (true)
-		{
-			vos = stv.find('\"', vos);
-			if (std::string::npos == vos) break;
-			epos = stv.find('\"', vos+1);
-			sv.push_back(stv.substr(vos+1, epos-vos-1));
-			vos = epos+1;
-		}
-		epos = stv.find(')', epos+1);
+		size_t epos = stv.find(')', vos+1);
 		if (std::string::npos == epos)
 			throw SyntaxException(TRACE_INFO,
 				"Malformed StringValue: %s", stv.substr(pos).c_str());
+		while (vos < epos)
+		{
+			vos = stv.find('\"', vos);
+			if (std::string::npos == vos) break;
+			size_t evos = stv.find('\"', vos+1);
+			sv.push_back(stv.substr(vos+1, evos-vos-1));
+			vos = evos+1;
+		}
 		pos = epos + 1;
 		return createStringValue(sv);
 	}
