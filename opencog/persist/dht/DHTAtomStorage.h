@@ -73,6 +73,10 @@ class DHTAtomStorage : public BackingStore
 		std::string encodeValueToStr(const ValuePtr&);
 		std::string encodeAtomToStr(const Handle& h) {
 			return h->to_short_string(); }
+		Handle decodeStrAtom(std::string& s) {
+			size_t junk = 0;
+			return decodeStrAtom(s, junk);
+		}
 		Handle decodeStrAtom(std::string&, size_t&);
 
 		std::mutex _guid_mutex;

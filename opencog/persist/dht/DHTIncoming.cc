@@ -92,8 +92,7 @@ void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t
 	afut.wait();
 	std::cout << "Done waiting for incoming" << std::endl;
 
-	auto dincs = afut.get();
-	for (const auto& dinc : dincs)
+	for (const auto& dinc : afut.get())
 	{
 		// std::cout << "Got incoming guid: " <<
 		//	dinc->unpack<dht::InfoHash>().toString() << std::endl;

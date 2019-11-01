@@ -33,20 +33,20 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 	bulk_load = true;
 	bulk_start = time(0);
 
-#if 0
-	auto atom_list = dag["links"];
-	for (auto acid: atom_list)
-	{
-		// std::cout << "Atom CID is: " << acid["Cid"]["/"] << std::endl;
+	dht::InfoHash space_hash = dht::InfoHash::get(spacename);
+	auto sfut = _runner.get(space_hash);
+	std::cout << "Start waiting for atomspace" << std::endl;
+	sfut.wait();
+	std::cout << "Done waiting for atomspace" << std::endl;
 
-		// In the current design, the Cid entry is NOT an IPNS entry,
-		// but is instead the DHT CID of the Atom, with values
-		// attached to it. So we have to fetch that, to get the latest
-		// values on the atom.
-		as->add_atom(fetch_atom(acid["Cid"]["/"]));
+	for (auto ato: sfut.get())
+	{
+		std::string sname = ato->unpack<std::string>();
+		std::cout << "Load Atom " << sname << std::endl;
+		Handle h(decodeStrAtom(sname));
+		as->add_atom(fetch_values(std::move(h)));
 		_load_count++;
 	}
-#endif
 
 	time_t secs = time(0) - bulk_start;
 	double rate = ((double) _load_count) / secs;

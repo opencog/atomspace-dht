@@ -128,9 +128,8 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 
 	// There may be more than one value, but they should all be
 	// one and the same.
-	size_t junk = 0;
 	std::string satom = gvals[0]->unpack<std::string>();
-	Handle h(decodeStrAtom(satom, junk));
+	Handle h(decodeStrAtom(satom));
 
 	lck.lock();
 	_decode_map.emplace(std::make_pair(guid, h));
