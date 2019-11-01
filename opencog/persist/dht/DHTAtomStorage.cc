@@ -69,13 +69,13 @@ void DHTAtomStorage::init(const char * uri)
 	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
 	// Policies for storing atoms
-	_space_policy = dht::ValueType(4097, "space policy",
+	_space_policy = dht::ValueType(SPACE_ID, "space policy",
 		std::chrono::minutes(100));
 
-	_values_policy = dht::ValueType(4098, "values policy",
+	_values_policy = dht::ValueType(VALUES_ID, "values policy",
 		std::chrono::minutes(100));
 
-	_incoming_policy = dht::ValueType(4099, "incoming policy",
+	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		std::chrono::minutes(100));
 
 	// Launch a dht node on a new thread, using a generated
@@ -151,8 +151,22 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 	auto ivals = ifut.get();
 	for (const auto& ival : ivals)
 	{
-		ss << "Raw: " << ival->toString() << std::endl;
-		ss << "Type: " << std::to_string(ival->type) << std::endl;
+		switch (ival->type)
+		{
+			case SPACE_ID:
+				ss << "Atom: " << ival->unpack<std::string>() << std::endl;
+				break;
+			case VALUES_ID:
+				ss << "Value: " << ival->unpack<std::string>() << std::endl;
+				break;
+			case INCOMING_ID:
+				ss << "Incoming: " << ival->unpack<std::string>() << std::endl;
+				break;
+			default:
+				ss << "Raw: " << ival->toString() << std::endl;
+				ss << "Raw as string: " << ival->unpack<std::string>() << std::endl;
+				break;
+		}
 	}
 
 	return ss.str();
