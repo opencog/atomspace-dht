@@ -82,6 +82,10 @@ class DHTAtomStorage : public BackingStore
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
 		dht::InfoHash get_guid(const Handle&);
 
+		Handle fetch_atom(const dht::InfoHash&);
+		std::mutex _decode_mutex;
+		std::map<dht::InfoHash, Handle> _decode_map;
+
 		std::mutex _membership_mutex;
 		std::unordered_map<Handle, dht::InfoHash> _membership_map;
 		dht::InfoHash get_membership(const Handle&);

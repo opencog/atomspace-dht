@@ -96,6 +96,49 @@ Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 
 /* ================================================================ */
 
+Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
+{
+	// Try to find what atom this is from our local cache.
+	// XXX Investigate.  This map presumes that it is somehow
+	// faster to cache locally and look up locally.  But really,
+	// doesn't the DHT library maintain this map too? Wouldn't
+	// it be more space-efficient to never use this map, and to
+	// always got straight to the DHT library? How slow would
+	// that be? How much of a diffrence does it make?
+	std::unique_lock<std::mutex> lck(_decode_mutex);
+	const auto& da = _decode_map.find(guid);
+	if (_decode_map.end() != da) return da->second;
+	lck.unlock();
+
+	// Not found. Ask the DHT for it.
+	// Get a future for the atom
+	auto gfut = _runner.get(guid);
+
+	// Block until we've got it.
+	std::cout << "Start waiting for atom" << std::endl;
+	gfut.wait();
+	std::cout << "Done waiting for atom" << std::endl;
+
+	// Yikes! Fatal error! We're asked to process a GUID and we
+	// have no clue what Atom it corresponds to!
+	auto gvals = gfut.get();
+	if (0 == gvals.size())
+		throw RuntimeException(TRACE_INFO, "Can't find Atom!");
+
+	std::cout << "Got atom: " << gvals[0]->toString() << std::endl;
+	std::string satom = gvals[0]->unpack<std::string>();
+	std::cout << "Got satom: " << satom << std::endl;
+
+	size_t junk;
+	Handle h(decodeStrAtom(satom, junk));
+
+	lck.lock();
+	_decode_map.emplace(std::make_pair(guid, h));
+	return h;
+}
+
+/* ================================================================ */
+
 Handle DHTAtomStorage::fetch_atom(Handle &h)
 {
 	dht::InfoHash ahash = get_membership(h);
@@ -104,9 +147,9 @@ Handle DHTAtomStorage::fetch_atom(Handle &h)
 	auto afut = _runner.get(ahash);
 
 	// Block until we've got it.
-	std::cout << "Start waiting for atom" << std::endl;
+	std::cout << "Start waiting for values" << std::endl;
 	afut.wait();
-	std::cout << "Done waiting for atom" << std::endl;
+	std::cout << "Done waiting for values" << std::endl;
 
 	auto dvals = afut.get();
 	for (const auto& dval : dvals)
