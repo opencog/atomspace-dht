@@ -55,14 +55,16 @@ class DHTAtomStorage : public BackingStore
 		dht::InfoHash _atomspace_hash;
 
 		// Storage policies
+		dht::ValueType _atom_policy;
 		dht::ValueType _space_policy;
 		dht::ValueType _values_policy;
 		dht::ValueType _incoming_policy;
 		enum
 		{
-			SPACE_ID = 4097,
-			VALUES_ID = 4098,
-			INCOMING_ID = 4099,
+			ATOM_ID = 4097,
+			SPACE_ID = 4098,
+			VALUES_ID = 4099,
+			INCOMING_ID = 4100,
 		};
 
 		// --------------------------

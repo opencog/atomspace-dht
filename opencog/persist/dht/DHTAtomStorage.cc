@@ -67,6 +67,9 @@ void DHTAtomStorage::init(const char * uri)
 	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 
 	// Policies for storing atoms
+	_atom_policy = dht::ValueType(ATOM_ID, "space policy",
+		std::chrono::minutes(100));
+
 	_space_policy = dht::ValueType(SPACE_ID, "space policy",
 		std::chrono::minutes(100));
 
@@ -157,8 +160,11 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 	{
 		switch (ival->type)
 		{
-			case SPACE_ID:
+			case ATOM_ID:
 				ss << "Atom: " << ival->unpack<std::string>() << std::endl;
+				break;
+			case SPACE_ID:
+				ss << "Member: " << ival->unpack<std::string>() << std::endl;
 				break;
 			case VALUES_ID:
 				ss << "Value: " << ival->unpack<std::string>() << std::endl;
