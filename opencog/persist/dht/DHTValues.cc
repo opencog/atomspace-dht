@@ -43,8 +43,11 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 {
 	dht::InfoHash ahash = get_membership(h);
 
-	// Get a future for the atom
-	auto afut = _runner.get(ahash);
+	// Get a future for the values on this atom. We filter,
+	// because the same membership hash gets used for both
+	// values and for incoming sets. We only want the values.
+	auto afut = _runner.get(ahash,
+		dht::Value::TypeFilter(_values_policy));
 
 	// Block until we've got it.
 	std::cout << "Start waiting for values" << std::endl;
