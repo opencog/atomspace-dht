@@ -98,8 +98,6 @@ class DHTAtomStorage : public BackingStore
 		bool bulk_store;
 		time_t bulk_start;
 
-		void load_as_from_cid(AtomSpace*, const std::string&);
-
 		// --------------------------
 		// Values
 		void store_atom_values(const Handle &);

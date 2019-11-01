@@ -291,9 +291,5 @@ void DHTAtomStorage::print_stats(void)
 }
 
 // XXX Stubs FIXME
-void DHTAtomStorage::load_atomspace(AtomSpace*, const std::string&) {}
 void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
-void DHTAtomStorage::loadType(AtomTable&, Type) {}
-void DHTAtomStorage::loadAtomSpace(AtomTable&) {} // Load entire contents
-void DHTAtomStorage::storeAtomSpace(const AtomTable&) {}
 /* ============================= END OF FILE ================= */
