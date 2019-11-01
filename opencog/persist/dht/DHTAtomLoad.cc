@@ -96,6 +96,10 @@ Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 
 /* ================================================================ */
 
+/**
+ * Given a guid, obtain and return the corresponding Atom for it.
+ * This does NOT fetch the values on this Atom!
+ */
 Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 {
 	// Try to find what atom this is from our local cache.
@@ -110,14 +114,11 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 	if (_decode_map.end() != da) return da->second;
 	lck.unlock();
 
-	// Not found. Ask the DHT for it.
-	// Get a future for the atom
+	// Not found. Ask the DHT for it. Get a future for the atom,
+	// and wait on it. We cannot do an async wait here; we MUST
+	// get something back, before we return to the caller.
 	auto gfut = _runner.get(guid);
-
-	// Block until we've got it.
-	std::cout << "Start waiting for atom" << std::endl;
 	gfut.wait();
-	std::cout << "Done waiting for atom" << std::endl;
 
 	// Yikes! Fatal error! We're asked to process a GUID and we
 	// have no clue what Atom it corresponds to!
@@ -125,11 +126,10 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 	if (0 == gvals.size())
 		throw RuntimeException(TRACE_INFO, "Can't find Atom!");
 
-	std::cout << "Got atom: " << gvals[0]->toString() << std::endl;
+	// There may be more than one value, but they should all be
+	// one and the same.
+	size_t junk = 0;
 	std::string satom = gvals[0]->unpack<std::string>();
-	std::cout << "Got satom: " << satom << std::endl;
-
-	size_t junk;
 	Handle h(decodeStrAtom(satom, junk));
 
 	lck.lock();

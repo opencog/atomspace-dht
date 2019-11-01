@@ -61,7 +61,11 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 		std::cout << "Got incoming: " << dinc->toString() << std::endl;
 		std::cout << "Got incoming guid: " <<
 			dinc->unpack<dht::InfoHash>().toString() << std::endl;
-		// table.add(do_fetch_atom(h), false);
+		Handle h(fetch_atom(dinc->unpack<dht::InfoHash>()));
+		std::cout << "Got incoming Atom: " << h->to_string() << std::endl;
+
+		// TODO get the values too
+		table.add(h, false);
 	}
 
 	_num_get_insets++;
