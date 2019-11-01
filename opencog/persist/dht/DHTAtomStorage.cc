@@ -38,7 +38,8 @@ void DHTAtomStorage::init(const char * uri)
 	//    dht:///atomspace-name
 	//    dht://:port/atomspace-name
 
-	_port = 4242;
+#define DEFAULT_ATOMSPACE_PORT 4242
+	_port = DEFAULT_ATOMSPACE_PORT;
 	if ('/' == uri[URIX_LEN])
 	{
 		_atomspace_name = &uri[URIX_LEN+1];
@@ -79,13 +80,37 @@ void DHTAtomStorage::init(const char * uri)
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		std::chrono::minutes(100));
 
-	// Launch a dht node on a new thread, using a generated
-	// RSA key pair, and listen on port 4242.
-	_runner.run(_port, dht::crypto::generateIdentity(), true);
-
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
+
+	// Launch a dht node on a new thread, using a generated
+	// RSA key pair, and listen on port 4242. If the defalut port
+	// is in use, try a larger one. This can happen in if more
+	// than one user on the machine is accessing the DHT; also
+	// the unit tests trigger this.
+	if (DEFAULT_ATOMSPACE_PORT == _port)
+	{
+		for (int i=0; i<10; i++)
+		{
+			try
+			{
+				_runner.run(_port, dht::crypto::generateIdentity(), true);
+			}
+			catch (const dht::DhtException& ex)
+			{
+				_port++;
+				continue;
+			}
+			break;
+		}
+
+		if (not connected())
+			throw IOException(TRACE_INFO,
+				"Unable to start DHT node, all ports are in use");
+	}
+	else
+		_runner.run(_port, dht::crypto::generateIdentity(), true);
 
 	tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
 	store_recursive(tvpred);
@@ -102,7 +127,7 @@ void DHTAtomStorage::bootstrap(const std::string& uri)
 	//    dht://hostname/
 	//    dht://hostname:port/
 
-	int port = 4242;
+	int port = DEFAULT_ATOMSPACE_PORT;
 	std::string hostname = uri.substr(URIX_LEN);
 	size_t pos = hostname.find('/');
 	if (std::string::npos != pos)
