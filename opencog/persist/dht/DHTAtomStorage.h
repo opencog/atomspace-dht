@@ -82,6 +82,10 @@ class DHTAtomStorage : public BackingStore
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
 		dht::InfoHash get_guid(const Handle&);
 
+		std::mutex _auid_mutex;
+		std::unordered_map<Handle, dht::InfoHash> _auid_map;
+		dht::InfoHash get_auid(const Handle&);
+
 		std::mutex _publish_mutex;
 		std::unordered_set<Handle> _published;
 		void add_atom_to_atomspace(const Handle&);

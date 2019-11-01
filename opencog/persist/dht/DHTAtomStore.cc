@@ -63,15 +63,43 @@ void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 	store_recursive(h);
 }
 
+/* ================================================================== */
+
+/**
+ * Return the globally-unique hash corresponding to the Atom.
+ * XXX TODO this should use all of the hashing and alpha-equivalence
+ * rules that ContentHash Atom::compute_hash() const uses.
+ * !! Perhaps we should extend class Atom to provide both 20-byte
+ * (160 bit) and larger (256 bit) hashes? Yes, we should!
+ * That would avoid bugs & shit...
+ */
 dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)
 {
 	std::lock_guard<std::mutex> lck(_guid_mutex);
 	const auto& ip = _guid_map.find(h);
 	if (_guid_map.end() != ip)
 		return ip->second;
+	std::string gstr = encodeAtomToStr(h);
+	dht::InfoHash gkey = dht::InfoHash::get(gstr);
+	_guid_map[h] = gkey;
+	return gkey;
+}
+
+/* ================================================================== */
+/**
+ * Return the AtomSpace-specific (bus still globally-unique) hash
+ * corresponding to the Atom, in this AtomSpace.  This hash is
+ * required for looking up values and incoming sets.
+ */
+dht::InfoHash DHTAtomStorage::get_auid(const Handle& h)
+{
+	std::lock_guard<std::mutex> lck(_auid_mutex);
+	const auto& ip = _auid_map.find(h);
+	if (_auid_map.end() != ip)
+		return ip->second;
 	std::string astr = _atomspace_name + encodeAtomToStr(h);
 	dht::InfoHash akey = dht::InfoHash::get(astr);
-	_guid_map[h] = akey;
+	_auid_map[h] = akey;
 	return akey;
 }
 
