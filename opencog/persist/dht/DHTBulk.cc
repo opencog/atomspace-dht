@@ -1,6 +1,6 @@
 /*
  * DHTBulk.cc
- * Bulk save & restore of Atoms.
+ * Bulk save & restore of entire AtomSpaces.
  *
  * Copyright (c) 2008,2009,2013,2017,2019 Linas Vepstas <linas@linas.org>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -8,9 +8,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-
-#include <opencog/util/oc_assert.h>
-#include <opencog/util/oc_omp.h>
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atoms/atom_types/NameServer.h>
@@ -59,32 +56,28 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 }
 
 /// A copy of the above.
-/// Stunningly inefficient, but it works.
+/// Inefficient, but it works. We could solve the inefficiency
+/// by maintaining an index of atoms-by-type in the DHT. This
+/// would certainly push more crap into the DHT ... is it worth
+/// it, to have this index?
 ///
 void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 {
-#if 0
-	rethrow();
+	auto sfut = _runner.get(_atomspace_hash);
+	std::cout << "Start waiting for atomspace" << std::endl;
+	sfut.wait();
+	std::cout << "Done waiting for atomspace" << std::endl;
 
-	ipfs::Json dag;
-	ipfs::Client* conn = conn_pool.pop();
-	conn->DagGet(_atomspace_cid, &dag);
-	conn_pool.push(conn);
-	// std::cout << "The atomspace dag is:" << dag.dump(2) << std::endl;
-
-	auto atom_list = dag["links"];
-	for (auto acid: atom_list)
+	for (auto ato: sfut.get())
 	{
-		// std::cout << "Atom CID is: " << acid["Cid"]["/"] << std::endl;
+		std::string sname = ato->unpack<std::string>();
+		std::cout << "Load Atom " << sname << std::endl;
+		Handle h(decodeStrAtom(sname));
+		if (h->get_type() != atom_type) continue;
 
-		Handle h(fetch_atom(acid["Cid"]["/"]));
-		if (h->get_type() == atom_type)
-		{
-			table.add(h, false);
-			_load_count++;
-		}
+		as->add_atom(fetch_values(std::move(h)));
+		_load_count++;
 	}
-#endif
 }
 
 /// Store all of the atoms in the atom table.
