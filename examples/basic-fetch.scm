@@ -29,8 +29,20 @@
 (cog-value c (third (cog-keys c)))
 
 ; Get the incoming set -- The previous example placed the ConceptNode
-; into a ListLink. Lets get that.
+; into a ListLink. Lets get that back.
 (fetch-incoming-set c)
+
+; Take a look at what we found.  We should have gotten back a ListLink.
+(cog-incoming-set c)
+
+; Do it again -- get the incoming set of the ListLink.  It should
+; be the EvaluationLink.
+(define ll (first (cog-incoming-set c)))
+(fetch-incoming-set ll)
+
+; And ... take a look at the incoming set. The EvaluationLink
+; should be there, AND it should have the correct values on it, too.
+(cog-incoming-set ll)
 
 (dht-stats)
 (dht-close)
