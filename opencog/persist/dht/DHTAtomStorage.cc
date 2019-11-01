@@ -164,11 +164,11 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 				ss << "Value: " << ival->unpack<std::string>() << std::endl;
 				break;
 			case INCOMING_ID:
-				ss << "Incoming: " << ival->unpack<std::string>() << std::endl;
+				ss << "Incoming: "
+				   << ival->unpack<dht::InfoHash>().toString() << std::endl;
 				break;
 			default:
 				ss << "Raw: " << ival->toString() << std::endl;
-				ss << "Raw as string: " << ival->unpack<std::string>() << std::endl;
 				break;
 		}
 	}
