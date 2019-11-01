@@ -136,9 +136,26 @@ bool DHTAtomStorage::connected(void)
 
 /* ================================================================== */
 
-std::string DHTAtomStorage::dht_examine(const std::string& id)
+std::string DHTAtomStorage::dht_examine(const std::string& hash)
 {
-	return "yoo hoo";
+	std::stringstream ss;
+
+	dht::InfoHash ihash(hash);
+	clock_t begin = clock();
+	auto ifut = _runner.get(ihash);
+	ifut.wait();
+	clock_t end = clock();
+	double elapsed = double(end-begin)/CLOCKS_PER_SEC;
+	ss << "Elapsed time: " << std::to_string(elapsed) << " seconds" << std::endl;
+
+	auto ivals = ifut.get();
+	for (const auto& ival : ivals)
+	{
+		ss << "Raw: " << ival->toString() << std::endl;
+		ss << "Type: " << std::to_string(ival->type) << std::endl;
+	}
+
+	return ss.str();
 }
 
 /* ================================================================== */
