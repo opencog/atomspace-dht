@@ -28,6 +28,12 @@
 (cog-value c (second (cog-keys c)))
 (cog-value c (third (cog-keys c)))
 
+; Print the values, using a loop:
+(for-each
+	(lambda (key)
+		(format #t "Key ~A   has value ~A\n" key (cog-value c key)))
+	(cog-keys c))
+
 ; Get the incoming set -- The previous example placed the ConceptNode
 ; into a ListLink. Lets get that back.
 (fetch-incoming-set c)
