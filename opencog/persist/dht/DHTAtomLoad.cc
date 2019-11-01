@@ -139,40 +139,14 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 
 /* ================================================================ */
 
-Handle DHTAtomStorage::fetch_atom(Handle &h)
-{
-	dht::InfoHash ahash = get_membership(h);
-
-	// Get a future for the atom
-	auto afut = _runner.get(ahash);
-
-	// Block until we've got it.
-	std::cout << "Start waiting for values" << std::endl;
-	afut.wait();
-	std::cout << "Done waiting for values" << std::endl;
-
-	auto dvals = afut.get();
-	for (const auto& dval : dvals)
-	{
-		// std::cout << "Got value: " << dval->toString() << std::endl;
-		std::string alist = dval->unpack<std::string>();
-		std::cout << "Got svalue: " << alist << std::endl;
-		decodeAlist(h, alist);
-	}
-
-	return h;
-}
-
 Handle DHTAtomStorage::getNode(Type t, const char * str)
 {
-	Handle h(createNode(t, str));
-	return fetch_atom(h);
+	return fetch_values(createNode(t, str));
 }
 
 Handle DHTAtomStorage::getLink(Type t, const HandleSeq& hs)
 {
-	Handle h(createLink(hs, t));
-	return fetch_atom(h);
+	return fetch_values(createLink(hs, t));
 }
 
 /* ============================= END OF FILE ================= */

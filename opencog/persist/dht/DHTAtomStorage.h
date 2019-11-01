@@ -75,9 +75,6 @@ class DHTAtomStorage : public BackingStore
 			return h->to_short_string(); }
 		Handle decodeStrAtom(std::string&, size_t&);
 
-		// Fetching of atoms.
-		Handle fetch_atom(Handle&);
-
 		std::mutex _guid_mutex;
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
 		dht::InfoHash get_guid(const Handle&);
@@ -106,6 +103,8 @@ class DHTAtomStorage : public BackingStore
 		// --------------------------
 		// Values
 		void store_atom_values(const Handle &);
+		Handle fetch_values(Handle&&);
+
 		ValuePtr decodeStrValue(std::string&, size_t&);
 		void decodeAlist(Handle&, std::string&);
 
