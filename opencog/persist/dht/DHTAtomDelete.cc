@@ -1,5 +1,5 @@
 /*
- * IPFSAtomDelete.cc
+ * DHTAtomDelete.cc
  * Deletion of individual atoms.
  *
  * Copyright (c) 2017,2019 Linas Vepstas <linas@linas.org>
@@ -11,7 +11,7 @@
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
 
-#include "IPFSAtomStorage.h"
+#include "DHTAtomStorage.h"
 
 using namespace opencog;
 
@@ -20,12 +20,13 @@ using namespace opencog;
 /// unless the recursive flag is set. If the recursive flag is set, then
 /// the atom, and everything in its incoming set is removed.
 ///
-void IPFSAtomStorage::removeAtom(const Handle& h, bool recursive)
+void DHTAtomStorage::removeAtom(const Handle& h, bool recursive)
 {
 	// Synchronize. The atom that we are deleting might be sitting
 	// in the store queue.
 	flushStoreQueue();
 
+#if 0
 	ipfs::Json jatom;
 	{
 		std::lock_guard<std::mutex> lck(_json_mutex);
@@ -122,6 +123,7 @@ std::cout << "Quasi-error: expected to find atom but did not!" << std::endl;
 		          << " is " << _atomspace_cid << std::endl;
 	}
 	conn_pool.push(conn);
+#endif
 
 	// Bug with stats: should not increment on recursion.
 	_num_atom_deletes++;

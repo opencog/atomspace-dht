@@ -290,6 +290,4 @@ void DHTAtomStorage::print_stats(void)
 	printf("\n");
 }
 
-// XXX Stubs FIXME
-void DHTAtomStorage::removeAtom(const Handle&, bool recursive) {}
 /* ============================= END OF FILE ================= */

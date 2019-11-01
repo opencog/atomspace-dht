@@ -1,7 +1,7 @@
 
 
 ADD_LIBRARY (persist-dht SHARED
-#	DHTAtomDelete
+	DHTAtomDelete
 	DHTAtomLoad
 	DHTAtomStorage
 	DHTAtomStore
