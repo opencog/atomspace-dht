@@ -74,22 +74,38 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 
 /**
  * Retreive the incoming set of the indicated atom, but only those atoms
- * of type t.
+ * of type t.  This is done brute-force right now, and a faster, more
+ * elegant version could be provided in the future, someday, I guess.
  */
 void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t)
 {
-#if 0
-	auto iset = dag["incoming"];
-	for (auto acid: iset)
+	dht::InfoHash mhash = get_membership(h);
+
+	// Get a future for the incoming set on the atom. We filter,
+	// because the same membership hash gets used for both values
+	// and for incoming sets. We only want the incoming set.
+	auto afut = _runner.get(mhash,
+		dht::Value::TypeFilter(_incoming_policy));
+
+	// Block until we've got it.
+	std::cout << "Start waiting for incoming" << std::endl;
+	afut.wait();
+	std::cout << "Done waiting for incoming" << std::endl;
+
+	auto dincs = afut.get();
+	for (const auto& dinc : dincs)
 	{
-		Handle h(fetch_atom(acid));
-		if (t == h->get_type())
-		{
-			table.add(h, false);
-			_num_get_inlinks ++;
-		}
+		// std::cout << "Got incoming guid: " <<
+		//	dinc->unpack<dht::InfoHash>().toString() << std::endl;
+		Handle h(fetch_atom(dinc->unpack<dht::InfoHash>()));
+		if (h->get_type() != t) continue;
+
+		Handle hv(fetch_values(std::move(h)));
+		std::cout << "Got typed incoming Atom: " << hv->to_string() << std::endl;
+
+		table.add(hv, false);
+		_num_get_inlinks ++;
 	}
-#endif
 
 	_num_get_insets++;
 }
