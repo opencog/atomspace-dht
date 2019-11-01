@@ -7,7 +7,8 @@ LINK_LIBRARIES(
 
 # The seven unit tests, ported over from the
 # atomspace/persist/sql/multi-driver unit tests.
-# ADD_CXXTEST(BasicSaveUTest)
+# Same as the atomspace/persist/ipfs unit tests.
+ADD_CXXTEST(BasicSaveUTest)
 # ADD_CXXTEST(ValueSaveUTest)
 # ADD_CXXTEST(PersistUTest)
 # ADD_CXXTEST(FetchUTest)

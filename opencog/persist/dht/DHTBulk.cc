@@ -98,7 +98,7 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 		[&](const Handle& h)->void { storeAtom(h); },
 		LINK, true);
 
-	flushStoreQueue();
+	barrier();
 	bulk_store = false;
 
 	time_t secs = time(0) - bulk_start;

@@ -24,7 +24,7 @@ void DHTAtomStorage::removeAtom(const Handle& h, bool recursive)
 {
 	// Synchronize. The atom that we are deleting might be sitting
 	// in the store queue.
-	flushStoreQueue();
+	barrier();
 
 #if 0
 	auto pinc = jatom.find("incoming");

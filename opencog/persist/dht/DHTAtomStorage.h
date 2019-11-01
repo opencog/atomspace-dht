@@ -160,7 +160,6 @@ class DHTAtomStorage : public BackingStore
 		void loadAtomSpace(AtomTable&); // Load entire contents
 		void storeAtomSpace(const AtomTable&); // Store entire contents
 		void barrier();
-		void flushStoreQueue();
 
 		// Debugging and performance monitoring
 		void print_stats(void);
