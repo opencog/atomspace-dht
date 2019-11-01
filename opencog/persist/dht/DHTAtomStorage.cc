@@ -135,6 +135,13 @@ bool DHTAtomStorage::connected(void)
 }
 
 /* ================================================================== */
+
+std::string DHTAtomStorage::dht_examine(const std::string& id)
+{
+	return "yoo hoo";
+}
+
+/* ================================================================== */
 /**
  * Publish Atom to the AtomSpace
  */

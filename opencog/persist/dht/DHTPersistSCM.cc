@@ -52,6 +52,7 @@ void DHTPersistSCM::init(void)
     define_scheme_primitive("dht-stats", &DHTPersistSCM::do_stats, this, "persist-dht");
     define_scheme_primitive("dht-clear-stats", &DHTPersistSCM::do_clear_stats, this, "persist-dht");
 
+    define_scheme_primitive("dht-examine", &DHTPersistSCM::do_examine, this, "persist-dht");
     define_scheme_primitive("dht-load-atomspace", &DHTPersistSCM::do_load_atomspace, this, "persist-dht");
 }
 
@@ -120,6 +121,15 @@ void DHTPersistSCM::do_bootstrap(const std::string& uri)
             "dht-bookstrap: Error: DHT is not running");
 
     _backing->bootstrap(uri);
+}
+
+std::string DHTPersistSCM::do_examine(const std::string& id)
+{
+    if (nullptr == _backing)
+        throw RuntimeException(TRACE_INFO,
+            "dht-examine: Error: DHT is not running");
+
+    return _backing->dht_examine(id);
 }
 
 void DHTPersistSCM::do_load_atomspace(const std::string& asname)

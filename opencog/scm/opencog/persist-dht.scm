@@ -12,7 +12,7 @@
 	"opencog_persist_dht_init")
 
 (export dht-bootstrap dht-clear-stats dht-close dht-open dht-stats
-	dht-load-atomspace)
+	dht-examine dht-load-atomspace)
 
 (set-procedure-property! dht-bootstrap 'documentation
 "
@@ -42,6 +42,13 @@
     Close open connections to the currently-open backend, after flushing
     any pending writes in the write queues. After the close, atoms can
     no longer be stored to or fetched from the database.
+")
+
+(set-procedure-property! dht-examine 'documentation
+"
+ dht-examine ID - Print information about a DHT entry
+    The DHT should be a 40-character hex string encoding the
+    20-byte key of a DHT entry.
 ")
 
 (set-procedure-property! dht-open 'documentation

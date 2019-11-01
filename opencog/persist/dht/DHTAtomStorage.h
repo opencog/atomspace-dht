@@ -121,6 +121,7 @@ class DHTAtomStorage : public BackingStore
 		void bootstrap(const std::string& uri);
 		bool connected(void); // connection to DB is alive
 
+		std::string dht_examine(const std::string&);
 		void load_atomspace(AtomSpace*, const std::string&);
 
 		void kill_data(void); // destroy DB contents

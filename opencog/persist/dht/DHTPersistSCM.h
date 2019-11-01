@@ -41,7 +41,7 @@ public:
 	void do_close(void);
 	void do_load(void);
 	void do_store(void);
-	Handle do_fetch_atom(const std::string&);
+	std::string do_examine(const std::string&);
 	void do_load_atomspace(const std::string&);
 
 	void do_stats(void);
