@@ -183,21 +183,6 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 }
 
 /* ================================================================== */
-/**
- * Publish Atom to the AtomSpace
- */
-void DHTAtomStorage::add_atom_to_atomspace(const Handle& atom)
-{
-	std::lock_guard<std::mutex> lck(_publish_mutex);
-	const auto& pa = _published.find(atom);
-	if (_published.end() != pa) return;
-	_runner.put(_atomspace_hash,
-		dht::Value(_space_policy, encodeAtomToStr(atom)));
-	_published.emplace(atom);
-	_store_count ++;
-}
-
-/* ================================================================== */
 /// Drain the pending store queue. This is a fencing operation; the
 /// goal is to make sure that all writes that occurred before the
 /// barrier really are performed before before all the writes after

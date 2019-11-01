@@ -33,7 +33,7 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 {
 	if (h->is_node())
 	{
-		add_atom_to_atomspace(h);
+		publish_to_atomspace(h);
 		return;
 	}
 
@@ -42,7 +42,7 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 		store_recursive(ho);
 
 	// Only after adding leaves, add the atom.
-	add_atom_to_atomspace(h);
+	publish_to_atomspace(h);
 
 	// Finally, update the incoming sets.
 	for (const Handle& ho: h->getOutgoingSet())
@@ -61,6 +61,21 @@ void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 {
 	store_atom_values(h);
 	store_recursive(h);
+}
+
+/* ================================================================== */
+/**
+ * Publish Atom to the AtomSpace
+ */
+void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
+{
+	std::lock_guard<std::mutex> lck(_publish_mutex);
+	const auto& pa = _published.find(atom);
+	if (_published.end() != pa) return;
+	_runner.put(_atomspace_hash,
+		dht::Value(_space_policy, encodeAtomToStr(atom)));
+	_published.emplace(atom);
+	_store_count ++;
 }
 
 /* ================================================================== */
