@@ -19,11 +19,11 @@ using namespace opencog;
 void DHTAtomStorage::store_incoming_of(const Handle& atom,
                                        const Handle& holder)
 {
-	dht::InfoHash guid = get_guid(atom);
+	dht::InfoHash memuid = get_membership(atom);
 	dht::InfoHash hoguid = get_guid(holder);
 
 	// Declare an incoming value
-	_runner.put(guid, dht::Value(_incoming_policy, hoguid));
+	_runner.put(memuid, dht::Value(_incoming_policy, hoguid));
 }
 
 /* ================================================================== */
@@ -44,10 +44,10 @@ void DHTAtomStorage::remove_incoming_of(const Handle& atom,
  */
 void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 {
-	dht::InfoHash ahash = get_guid(h);
+	dht::InfoHash mhash = get_membership(h);
 
 	// Get a future for the incoming set on the atom.
-	auto afut = _runner.get(ahash,
+	auto afut = _runner.get(mhash,
 		dht::Value::TypeFilter(_incoming_policy));
 
 	// Block until we've got it.

@@ -98,7 +98,7 @@ Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
 
 Handle DHTAtomStorage::fetch_atom(Handle &h)
 {
-	dht::InfoHash ahash = get_guid(h);
+	dht::InfoHash ahash = get_membership(h);
 
 	// Get a future for the atom
 	auto afut = _runner.get(ahash);

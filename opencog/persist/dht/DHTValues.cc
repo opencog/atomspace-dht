@@ -30,8 +30,9 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 		store_recursive(key);
 
 	// Attach the value to the atom
-	dht::InfoHash guid = get_guid(atom);
-	_runner.put(guid, dht::Value(_values_policy, atom->valuesToString()));
+	// XXX TODO publish each value in it's own entry...
+	dht::InfoHash muid = get_membership(atom);
+	_runner.put(muid, dht::Value(_values_policy, atom->valuesToString()));
 
 	_value_stores ++;
 }
