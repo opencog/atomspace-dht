@@ -72,8 +72,13 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	std::lock_guard<std::mutex> lck(_publish_mutex);
 	const auto& pa = _published.find(atom);
 	if (_published.end() != pa) return;
-	_runner.put(_atomspace_hash,
-		dht::Value(_space_policy, encodeAtomToStr(atom)));
+
+	// Publish the generic AtomSpace encoding.
+	std::string gstr = encodeAtomToStr(atom);
+	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr));
+
+	// Put the atom into the atomspace.
+	_runner.put(_atomspace_hash, dht::Value(_space_policy, gstr));
 	_published.emplace(atom);
 	_store_count ++;
 }
