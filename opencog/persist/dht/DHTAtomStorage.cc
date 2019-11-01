@@ -28,8 +28,6 @@ using namespace opencog;
 
 void DHTAtomStorage::init(const char * uri)
 {
-	tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
-
 	_uri = uri;
 
 #define URIX_LEN (sizeof("dht://") - 1)  // Should be 6
@@ -85,6 +83,9 @@ void DHTAtomStorage::init(const char * uri)
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
+
+	tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
+	store_recursive(tvpred);
 }
 
 void DHTAtomStorage::bootstrap(const std::string& uri)

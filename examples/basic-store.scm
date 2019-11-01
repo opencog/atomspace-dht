@@ -26,6 +26,10 @@
 ; Store a single atom
 (store-atom (Concept "foo" (stv 0.6 0.8)))
 
+; The hash of this atom should be globally unique, it should be
+; d2bf1fd0312cbf309df74c537bea16769b419f44 and can be examined:
+(display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
+
 ; View stats
 (dht-stats)
 

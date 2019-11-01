@@ -24,6 +24,10 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 {
 	dht::InfoHash guid = get_guid(atom);
 
+	// Make sure all of the keys appear in the AtomSpace
+	for (const Handle& key : atom->getKeys())
+		store_recursive(key);
+
 	// Attach the value to the atom
 	_runner.put(guid, dht::Value(_values_policy, atom->valuesToString()));
 
