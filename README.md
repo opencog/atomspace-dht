@@ -22,8 +22,9 @@ OpenDHT is an internet-wide globally-accesible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.0.3
-Almost nothing works yet. See the [examples](examples) for what does work.
+## Alpha version 0.0.4
+Most things mostly work. See the [examples](examples). No unit tests,
+yet.
 
 ### Status
 In the current implementation:
@@ -46,13 +47,18 @@ and install mechanisms are the same.
 
 ### Design Notes
 * Every Atom gets a unique hash. This is called the GUID.
-  Do Atoms need to be published? No, bare ones do not need to be.
-* Every (Atom, AtomSpace-name) pair gets a unique hash.  The current
-  values on that atom are stored under that hash. Yes.
+  Every GUID is published, because, givin only a GUID,
+  there needs to be a way of finding out what the Atom is.
+  This is needed for IncmingSet fetch, for example.
+* Every (Atom, AtomSpace-name) pair gets a unique hash.
+  The current values on that atom, as well as it's incoming set
+  are stored under that hash.
 * How can we find all current members of an AtomSpace?
-  Easy, DHT values.
+  Easy, the AtomSpace is just one hash, and the atoms in it are
+  DHT values.
 * How can we find all members of the incoming set of an Atom?
-  Easy, DHT values.
+  Easy, we generate the hash for that atom, and then look at
+  all the DHT entries on it.
 * TODO: listen for new values on specific atoms or atom types
 * TODO: list for atomspace updates.
 * TODO: implement a CRDT type for CountTruthValue

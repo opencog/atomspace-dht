@@ -27,17 +27,6 @@ void DHTAtomStorage::removeAtom(const Handle& h, bool recursive)
 	flushStoreQueue();
 
 #if 0
-	ipfs::Json jatom;
-	{
-		std::lock_guard<std::mutex> lck(_json_mutex);
-		const auto& ptr = _json_map.find(h);
-		// If might be not found, because it had never been
-		// stored before. This is not an error.
-		if (_json_map.end() == ptr) return;
-
-		jatom = ptr->second;
-	}
-
 	auto pinc = jatom.find("incoming");
 	if (jatom.end() != pinc)
 	{
