@@ -106,15 +106,15 @@ dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)
  * corresponding to the Atom, in this AtomSpace.  This hash is
  * required for looking up values and incoming sets.
  */
-dht::InfoHash DHTAtomStorage::get_auid(const Handle& h)
+dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 {
-	std::lock_guard<std::mutex> lck(_auid_mutex);
-	const auto& ip = _auid_map.find(h);
-	if (_auid_map.end() != ip)
+	std::lock_guard<std::mutex> lck(_membership_mutex);
+	const auto& ip = _membership_map.find(h);
+	if (_membership_map.end() != ip)
 		return ip->second;
 	std::string astr = _atomspace_name + encodeAtomToStr(h);
 	dht::InfoHash akey = dht::InfoHash::get(astr);
-	_auid_map[h] = akey;
+	_membership_map[h] = akey;
 	return akey;
 }
 
