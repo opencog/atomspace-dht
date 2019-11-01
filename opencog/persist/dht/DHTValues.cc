@@ -22,13 +22,15 @@ using namespace opencog;
 /// Store ALL of the values associated with the atom.
 void DHTAtomStorage::store_atom_values(const Handle& atom)
 {
-	dht::InfoHash guid = get_guid(atom);
+	// If there are no keys, there's nothing to do.
+	if (0 == atom->getKeys().size()) return;
 
 	// Make sure all of the keys appear in the AtomSpace
 	for (const Handle& key : atom->getKeys())
 		store_recursive(key);
 
 	// Attach the value to the atom
+	dht::InfoHash guid = get_guid(atom);
 	_runner.put(guid, dht::Value(_values_policy, atom->valuesToString()));
 
 	_value_stores ++;
