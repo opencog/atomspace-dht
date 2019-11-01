@@ -83,6 +83,7 @@ class DHTAtomStorage : public BackingStore
 		std::mutex _publish_mutex;
 		std::unordered_set<Handle> _published;
 		void add_atom_to_atomspace(const Handle&);
+		void store_recursive(const Handle&);
 
 		// --------------------------
 		// Bulk load and store

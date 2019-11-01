@@ -18,6 +18,37 @@
 using namespace opencog;
 
 /* ================================================================ */
+
+/**
+ * Recursively store the atom, and update the incoming sets,
+ * as needed. This attempts to perform these updates in a
+ * specific chronological order, although it seems unlikely
+ * that the actual DHT publication will preserve this chronology.
+ * (The chronology is to publish leaves first, then the things
+ * that hold the leaves, then the incoming sets of the leaves,
+ * the idea being that many users want to see the leaves, before
+ * the links holding them.).
+ */
+void DHTAtomStorage::store_recursive(const Handle& h)
+{
+	if (h->is_node())
+	{
+		add_atom_to_atomspace(h);
+		return;
+	}
+
+	// Resursive store; add leaves first.
+	for (const Handle& ho: h->getOutgoingSet())
+		store_recursive(ho);
+
+	// Only after adding leaves, add the atom.
+	add_atom_to_atomspace(h);
+
+	// Finally, update the incoming sets.
+	for (const Handle& ho: h->getOutgoingSet())
+		store_incoming_of(ho,h);
+}
+
 /**
  * Store the indicated atom and all of the values attached to it.
  * Also store it's incoming set.
@@ -29,22 +60,7 @@ using namespace opencog;
 void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
 {
 	store_atom_values(h);
-	_store_count ++;
-
-	if (h->is_node()) return;
-
-	// Make note of the incoming set.
-	for (const Handle& ho: h->getOutgoingSet())
-		store_incoming_of(ho,h);
-
-	if (bulk_store and _store_count%100 == 0)
-	{
-		time_t secs = time(0) - bulk_start;
-		double rate = ((double) _store_count) / secs;
-		unsigned long kays = ((unsigned long) _store_count) / 1000;
-		printf("\tStored %luK atoms in %d seconds (%d per second)\n",
-			kays, (int) secs, (int) rate);
-	}
+	store_recursive(h);
 }
 
 dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)

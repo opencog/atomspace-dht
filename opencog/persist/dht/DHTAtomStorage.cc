@@ -136,6 +136,9 @@ bool DHTAtomStorage::connected(void)
 
 /* ================================================================== */
 
+/**
+ * Get the values attached to a key, decode and pretty-print them.
+ */
 std::string DHTAtomStorage::dht_examine(const std::string& hash)
 {
 	std::stringstream ss;
@@ -181,8 +184,10 @@ void DHTAtomStorage::add_atom_to_atomspace(const Handle& atom)
 	std::lock_guard<std::mutex> lck(_publish_mutex);
 	const auto& pa = _published.find(atom);
 	if (_published.end() != pa) return;
-	_runner.put(_atomspace_hash, encodeAtomToStr(atom));
+	_runner.put(_atomspace_hash,
+		dht::Value(_space_policy, encodeAtomToStr(atom)));
 	_published.emplace(atom);
+	_store_count ++;
 }
 
 /* ================================================================== */
