@@ -47,6 +47,7 @@ class DHTAtomStorage : public BackingStore
 		void init(const char *);
 		std::string _uri;
 		int _port;
+		bool _observing_only;
 		std::string _atomspace_name;
 
 		Handle tvpred; // the key to a very special valuation.

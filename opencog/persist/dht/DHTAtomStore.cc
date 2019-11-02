@@ -69,6 +69,9 @@ void DHTAtomStorage::storeAtom(const Handle& h, bool synchronous)
  */
 void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 {
+	if (_observing_only)
+		throw IOException(TRACE_INFO, "DHT Node is only observing!");
+
 	std::lock_guard<std::mutex> lck(_publish_mutex);
 	const auto& pa = _published.find(atom);
 	if (_published.end() != pa) return;

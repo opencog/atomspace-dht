@@ -26,3 +26,16 @@
 ;
 ; Examine the network stats
 (display (dht-node-info))
+;
+; A list of the objects stored on this node.
+(display (dht-storage-log))
+;
+; Examine some of them:
+(display (dht-examine "0000000000000000000000000000000000000000"))
+(display (dht-examine "51fd892f0ee03a96be14322b6c9b02db697c5074"))
+
+; Examine the routing tables:
+(display (dht-routing-tables-log))
+
+; Examine the searches log:
+(display (dht-searches-log))

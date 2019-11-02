@@ -22,8 +22,11 @@ using namespace opencog;
 /// Store ALL of the values associated with the atom.
 void DHTAtomStorage::store_atom_values(const Handle& atom)
 {
+	if (_observing_only)
+		throw IOException(TRACE_INFO, "DHT Node is only observing!");
+
 	// If there are no keys, there's nothing to do.
-	if (0 == atom->getKeys().size()) return;
+	// if (0 == atom->getKeys().size()) return;
 
 	// Make sure all of the keys appear in the AtomSpace
 	for (const Handle& key : atom->getKeys())

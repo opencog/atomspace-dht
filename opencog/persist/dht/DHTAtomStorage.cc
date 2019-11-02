@@ -28,6 +28,7 @@ using namespace opencog;
 
 void DHTAtomStorage::init(const char * uri)
 {
+	_observing_only = true;
 	_uri = uri;
 
 #define URIX_LEN (sizeof("dht://") - 1)  // Should be 6
@@ -65,6 +66,7 @@ void DHTAtomStorage::init(const char * uri)
 	if (1 < _atomspace_name.size())
 	{
 		_atomspace_hash = dht::InfoHash::get(_atomspace_name);
+		_observing_only = false;
 	}
 
 	// Policies for storing atoms
@@ -112,8 +114,12 @@ void DHTAtomStorage::init(const char * uri)
 	else
 		_runner.run(_port, dht::crypto::generateIdentity(), true);
 
-	tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
-	store_recursive(tvpred);
+	// Do NOT fiddle with atomspace contents, if nothing is open!
+	if (_observing_only)
+	{
+		tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
+		store_recursive(tvpred);
+	}
 }
 
 void DHTAtomStorage::dht_bootstrap(const std::string& uri)

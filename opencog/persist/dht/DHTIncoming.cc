@@ -19,6 +19,9 @@ using namespace opencog;
 void DHTAtomStorage::store_incoming_of(const Handle& atom,
                                        const Handle& holder)
 {
+	if (_observing_only)
+		throw IOException(TRACE_INFO, "DHT Node is only observing!");
+
 	dht::InfoHash memuid = get_membership(atom);
 	dht::InfoHash hoguid = get_guid(holder);
 
