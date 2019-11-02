@@ -143,7 +143,8 @@ static void atomCompare(AtomPtr a, AtomPtr b, const char* where)
             {
                 fprintf(stderr, "Error, truth value miscompare, "
                     "ma=%f mb=%f ca=%f cb=%f\n",
-                    ta->get_mean(), tb->get_mean(), ta->get_count(), tb->get_count());
+                    ta->get_mean(), tb->get_mean(),
+                    ta->get_confidence(), tb->get_confidence());
             }
         }
     }
@@ -379,7 +380,7 @@ void BasicSaveUTest::test_table()
 #endif
     delete store;
     delete as1;
-    printf("Done sorint table; size=%lu\n", num_stored);
+    printf("Done storing table; size=%lu\n", num_stored);
 
     // Reopen connection, and load the atom table.
     store = new DHTAtomStorage(uri);

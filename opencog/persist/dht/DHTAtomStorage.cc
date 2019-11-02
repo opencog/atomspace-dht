@@ -157,7 +157,13 @@ DHTAtomStorage::DHTAtomStorage(std::string uri)
 
 DHTAtomStorage::~DHTAtomStorage()
 {
-	// Wait for dht threads to end
+	_runner.loop();
+sleep(2);
+	_runner.loop();
+sleep(2);
+	_runner.shutdown([=](void) { printf("did shut down\n"); });
+	// Wait for dht threads to end. This seems to clobber the
+	// pending job queues...
 	_runner.join();
 }
 
@@ -266,6 +272,11 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 ///
 void DHTAtomStorage::barrier()
 {
+	// Calling this twice seems to cause all queues to be drained:
+	// The first time, its the high-priority queue, and the second
+	// time, the regular queue.
+	_runner.loop();
+	_runner.loop();
 	// Not sure... How do we do this?
 }
 
