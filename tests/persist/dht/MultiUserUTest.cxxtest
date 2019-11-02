@@ -1,5 +1,5 @@
 /*
- * tests/persist/ipfs/MultiUserUTest.cxxtest
+ * tests/persist/dht/MultiUserUTest.cxxtest
  * Ported over from
  * tests/persist/sql/multi-driver/MultiUserUTest.cxxtest
  *
@@ -18,8 +18,8 @@
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
-#include <opencog/persist/ipfs/IPFSAtomStorage.h>
-#include <opencog/persist/ipfs/IPFSPersistSCM.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
+#include <opencog/persist/dht/DHTPersistSCM.h>
 #include <opencog/atoms/truthvalue/CountTruthValue.h>
 
 #include <opencog/util/Logger.h>
@@ -50,7 +50,7 @@ class MultiUserUTest :  public CxxTest::TestSuite
     private:
 #define NUSERS 6
         AtomSpace* _as[NUSERS];
-        IPFSPersistSCM* _pm[NUSERS];
+        DHTPersistSCM* _pm[NUSERS];
         std::atomic<int> nstarted;
 
         std::string uri;
@@ -124,7 +124,7 @@ MultiUserUTest:: MultiUserUTest(void)
     hl2 = new Handle[NATOMS];
     hl3 = new Handle[NATOMS];
 
-    uri = "ipfs:///atomspace-ipfs-test";
+    uri = "dht:///atomspace-dht-test";
 }
 
 /*
@@ -137,7 +137,7 @@ void MultiUserUTest::setUp(void)
 void MultiUserUTest::connect_to_db(int i)
 {
     _as[i] = new AtomSpace();
-    _pm[i] = new IPFSPersistSCM(_as[i]);
+    _pm[i] = new DHTPersistSCM(_as[i]);
     _pm[i]->do_open(uri);
 }
 
@@ -422,7 +422,7 @@ void MultiUserUTest::do_test_multiuser(void)
     printf("Done joining threads\n");
 
     AtomSpace* aspace = new AtomSpace();
-    IPFSPersistSCM* pm = new IPFSPersistSCM(aspace);
+    DHTPersistSCM* pm = new DHTPersistSCM(aspace);
 
     pm->do_open(uri);
     for (int off=0; off<n_threads; off++)

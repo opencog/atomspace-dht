@@ -1,5 +1,5 @@
 /*
- * tests/persist/ipfs/FetchUTest.cxxtest
+ * tests/persist/dht/FetchUTest.cxxtest
  *
  * Test atom fetch semantics.  Assumes PersistUTest is passing.
  * Ported over from original unit test at
@@ -15,7 +15,7 @@
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
 #include <opencog/guile/SchemeEval.h>
-#include <opencog/persist/ipfs/IPFSAtomStorage.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
 #include <opencog/atoms/truthvalue/SimpleTruthValue.h>
 
 #include <opencog/util/Logger.h>
@@ -26,7 +26,7 @@ class FetchUTest :  public CxxTest::TestSuite
 {
 	private:
 		std::string uri;
-		std::string ipfs_open;
+		std::string dht_open;
 
 		AtomSpace *_as;
 		SchemeEval *eval;
@@ -55,8 +55,8 @@ FetchUTest::FetchUTest(void)
 	logger().set_level(Logger::DEBUG);
 	logger().set_print_to_stdout_flag(true);
 
-	uri = "ipfs:///atomspace-ipfs-test";
-	ipfs_open = "(ipfs-open \"" + uri + "\")\n";
+	uri = "dht:///atomspace-dht-test";
+	dht_open = "(dht-open \"" + uri + "\")\n";
 }
 
 /*
@@ -131,21 +131,21 @@ void FetchUTest::test_stuff(void)
 	logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
 	// First, initialize the database
-	eval->eval("(use-modules (opencog persist) (opencog persist-ipfs))");
-	eval->eval(ipfs_open);
+	eval->eval("(use-modules (opencog persist) (opencog persist-dht))");
+	eval->eval(dht_open);
 	eval->eval(R"((cog-set-tv! (Concept "AAA") (stv 0.1 0.11)))");
 	eval->eval(R"((cog-set-tv! (Concept "BBB") (stv 0.2 0.22)))");
 	eval->eval("(store-atomspace)");
-	eval->eval("(ipfs-publish-atomspace)");
-	std::string final_atomspace_cid = eval->eval("(ipfs-atomspace-cid)");
+	eval->eval("(dht-publish-atomspace)");
+	std::string final_atomspace_cid = eval->eval("(dht-atomspace-cid)");
 	printf("Final atomspace CID=>>%s<<\n", final_atomspace_cid.c_str());
-	eval->eval("(ipfs-close)");
+	eval->eval("(dht-close)");
 
 	delete _as;
 	_as = new AtomSpace();
 	eval = SchemeEval::get_evaluator(_as);
-	eval->eval(ipfs_open);
-	eval->eval("(ipfs-resolve-atomspace)");
+	eval->eval(dht_open);
+	eval->eval("(dht-resolve-atomspace)");
 	eval->eval(R"((fetch-atom (List (Concept "AAA") (Concept "BBB"))))");
 
 	// The above should NOT update the TV of (Concept "AAA")
@@ -169,14 +169,14 @@ void FetchUTest::test_stuff(void)
 	// Saving everything should not crash.  It should, however,
 	// change the TV on (Concept "BBB") back to DEFAULT_TV.
 	eval->eval("(store-atomspace)");
-	eval->eval("(ipfs-publish-atomspace)");
-	final_atomspace_cid = eval->eval("(ipfs-atomspace-cid)");
-	eval->eval("(ipfs-close)");
+	eval->eval("(dht-publish-atomspace)");
+	final_atomspace_cid = eval->eval("(dht-atomspace-cid)");
+	eval->eval("(dht-close)");
 
 	delete _as;
 	_as = new AtomSpace();
 	eval = SchemeEval::get_evaluator(_as);
-	eval->eval("(ipfs-open \"ipfs://" + final_atomspace_cid + "\")");
+	eval->eval("(dht-open \"dht://" + final_atomspace_cid + "\")");
 
 	// AAA should have been updated, as above.
 	eval->eval(R"((fetch-atom (Concept "AAA")))");
@@ -193,7 +193,7 @@ void FetchUTest::test_stuff(void)
 	printf("Expecting %s\n", dtv->to_string().c_str());
 	printf("Got %s\n", tv->to_string().c_str());
 
-	eval->eval("(ipfs-close)");
+	eval->eval("(dht-close)");
 	logger().debug("END TEST: %s", __FUNCTION__);
 }
 
@@ -204,23 +204,21 @@ void FetchUTest::test_readonly(void)
 	logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
 	// First, initialize the database
-	eval->eval("(use-modules (opencog persist) (opencog persist-ipfs))");
-	eval->eval(ipfs_open);
+	eval->eval("(use-modules (opencog persist) (opencog persist-dht))");
+	eval->eval(dht_open);
 	eval->eval(R"((cog-set-tv! (Concept "AAA") (stv 0.1 0.11)))");
 	eval->eval(R"((cog-set-tv! (Concept "BBB") (stv 0.2 0.22)))");
 	eval->eval(R"((List (Concept "AAA") (Concept "BBB")))");
 	eval->eval("(store-atomspace)");
-	eval->eval("(ipfs-publish-atomspace)");
-	std::string final_atomspace_cid = eval->eval("(ipfs-atomspace-cid)");
-	eval->eval("(ipfs-close)");
+	eval->eval("(dht-publish-atomspace)");
+	std::string final_atomspace_cid = eval->eval("(dht-atomspace-cid)");
+	eval->eval("(dht-close)");
 
 	delete _as;
 	_as = new AtomSpace();
 	_as->set_read_only();
 	eval = SchemeEval::get_evaluator(_as);
-	// eval->eval("(ipfs-open \"ipfs://" + final_atomspace_cid + "\")");
-	eval->eval(ipfs_open);
-	eval->eval("(ipfs-resolve-atomspace)");
+	eval->eval(dht_open);
 
 	// Despite the AtomSpace being readonly, we should still be
 	// able to load atoms from the database.

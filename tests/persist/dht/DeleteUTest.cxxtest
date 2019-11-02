@@ -1,5 +1,5 @@
 /*
- * tests/persist/ipfs/DeleteUTest.cxxtest
+ * tests/persist/dht/DeleteUTest.cxxtest
  *
  * Test deletion from backing store.  Assumes PersistUTest is passing.
  * Ported from tests/persist/sql/multi-driver/DeleteUTest.cxxtest
@@ -17,8 +17,8 @@
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atoms/truthvalue/SimpleTruthValue.h>
-#include <opencog/persist/ipfs/IPFSAtomStorage.h>
-#include <opencog/persist/ipfs/IPFSPersistSCM.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
+#include <opencog/persist/dht/DHTPersistSCM.h>
 
 #include <opencog/util/Logger.h>
 
@@ -77,7 +77,7 @@ class DeleteUTest :  public CxxTest::TestSuite
 
 DeleteUTest:: DeleteUTest(void)
 {
-    uri = "ipfs:///atomspace-ipfs-test";
+    uri = "dht:///atomspace-dht-test";
     logger().set_level(Logger::DEBUG);
     logger().set_print_to_stdout_flag(true);
     logger().set_sync_flag(true);
@@ -373,7 +373,7 @@ void DeleteUTest::test_remove(void)
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-    IPFSPersistSCM* _pm = new IPFSPersistSCM(_as);
+    DHTPersistSCM* _pm = new DHTPersistSCM(_as);
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);
@@ -456,7 +456,7 @@ void DeleteUTest::test_recurse(void)
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-    IPFSPersistSCM* _pm = new IPFSPersistSCM(_as);
+    DHTPersistSCM* _pm = new DHTPersistSCM(_as);
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);

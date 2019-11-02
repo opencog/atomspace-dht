@@ -1,5 +1,5 @@
 /*
- * tests/persist/ipfs/MultiPersistUTest.cxxtest
+ * tests/persist/dht/MultiPersistUTest.cxxtest
  *
  * Test multi-threaded persistance.  Assumes PersistUTest is passing.
  * Ported over from original unit test at
@@ -17,8 +17,8 @@
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
-#include <opencog/persist/ipfs/IPFSAtomStorage.h>
-#include <opencog/persist/ipfs/IPFSPersistSCM.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
+#include <opencog/persist/dht/DHTPersistSCM.h>
 #include <opencog/atoms/truthvalue/SimpleTruthValue.h>
 
 #include <opencog/util/Logger.h>
@@ -29,7 +29,7 @@ class MultiPersistUTest :  public CxxTest::TestSuite
 {
     private:
         AtomSpace *_as;
-        IPFSPersistSCM *_pm;
+        DHTPersistSCM *_pm;
         std::string uri;
 
 #define NTHREADS 6
@@ -99,7 +99,7 @@ MultiPersistUTest:: MultiPersistUTest(void)
     hl2 = new Handle[NATOMS];
     hl3 = new Handle[NATOMS];
 
-    uri = "ipfs:///atomspace-ipfs-test";
+    uri = "dht:///atomspace-dht-test";
 }
 
 /*
@@ -108,7 +108,7 @@ MultiPersistUTest:: MultiPersistUTest(void)
 void MultiPersistUTest::setUp(void)
 {
     _as = new AtomSpace();
-    _pm = new IPFSPersistSCM(_as);
+    _pm = new DHTPersistSCM(_as);
     _pm->do_open(uri);
 }
 
@@ -384,14 +384,13 @@ void MultiPersistUTest::test_atomspace(void)
     printf("Done joining threads\n");
 
     /* Extract atoms from the AtomSpace. This does not delete them from
-     * the IPFS storage, though; to do that, they must be deleted, not
+     * the DHT storage, though; to do that, they must be deleted, not
      * extracted.
      */
     _as->barrier();
     _as->clear();
     TSM_ASSERT("Non-empty atomspace", 0 == _as->get_size());
 
-    printf("AtomSpace CID is %s\n", _pm->do_ipfs_atomspace().c_str());
     printf("===============================================\n");
 
     int i, off;
