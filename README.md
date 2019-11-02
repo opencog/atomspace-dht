@@ -22,7 +22,7 @@ OpenDHT is an internet-wide globally-accesible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.0
+## Alpha version 0.1.1
 Most things mostly work. See the [examples](examples). Some unit tests
 pass.
 
@@ -64,8 +64,14 @@ and install mechanisms are the same.
 * TODO: implement a CRDT type for CountTruthValue
 * TODO: flush writes before closing.
 * TODO: defer fetches until barrier.
-* TODO: honor timeouts
 * TODO: hash explore utility
+
+### Issues
+* Rate limiting causes published data to be discarded.  This is
+  currently solved with a `std::this_thread::sleep_for()` in several
+  places in the code. See
+  [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
+  for details.
 
 ## Build Prereqs
 
