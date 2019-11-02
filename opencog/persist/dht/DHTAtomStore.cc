@@ -89,7 +89,8 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	// is a slight chance of collision.  This is solved by having
 	// the edit policy allow duplicates.
 	_runner.put(_atomspace_hash,
-	            dht::Value(_space_policy, gstr, atom->get_hash()));
+	            dht::Value(_space_policy, gstr, atom->get_hash()),
+	            (dht::DoneCallback) {}, std::chrono::steady_clock::time_point::max(), true);
 	_published.emplace(atom);
 	_store_count ++;
 }

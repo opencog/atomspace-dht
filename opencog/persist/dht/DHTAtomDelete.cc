@@ -26,11 +26,10 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	// in the store queue.
 	barrier();
 printf("duuude gonnna remove %s\n", atom->to_string().c_str());
-	// std::string gstr = encodeAtomToStr(atom);
-	// dht::Value v(_space_policy, gstr, atom->get_hash());
-	// std::shared_ptr<Value> vp(&v);
-	// _runner.cancelPut(_atomspace_hash, vp);
-	_runner.cancelPut(_atomspace_hash, atom->get_hash());
+	std::string gstr = encodeAtomToStr(atom);
+	_runner.put(_atomspace_hash,
+	            dht::Value(_space_policy, gstr, atom->get_hash()),
+					(dht::DoneCallback) {}, std::chrono::steady_clock::time_point::max(), false);
 
 #if 0
 	auto pinc = jatom.find("incoming");
