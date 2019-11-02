@@ -77,11 +77,19 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	if (_published.end() != pa) return;
 
 	// Publish the generic AtomSpace encoding.
+	// These will always have a dht-id of "1", so that only one copy
+	// is kept around.
 	std::string gstr = encodeAtomToStr(atom);
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
 	// Put the atom into the atomspace.
-	_runner.put(_atomspace_hash, dht::Value(_space_policy, gstr));
+	// These will have a dht-id that is the atom hash, thus allowing
+	// multiple dht-values on the atomspace, but each value having
+	// a distinct dht-id.  Now, the atom-hashes are 64-bit, so there
+	// is a slight chance of collision.  This is solved by having
+	// the edit policy allow duplicates.
+	_runner.put(_atomspace_hash,
+	            dht::Value(_space_policy, gstr, atom->get_hash()));
 	_published.emplace(atom);
 	_store_count ++;
 }
@@ -127,6 +135,7 @@ dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 }
 
 /* ================================================================== */
+
 bool DHTAtomStorage::store_atom(dht::InfoHash key,
                                 std::shared_ptr<dht::Value>& value,
                                 const dht::InfoHash& from,
@@ -142,8 +151,28 @@ bool DHTAtomStorage::edit_atom(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	printf("duuude ed old %s\n", prt_dht_value(old_val).c_str());
-	printf("duuude ed new %s\n", prt_dht_value(new_val).c_str());
+	printf("duuude edat old %s\n", prt_dht_value(old_val).c_str());
+	printf("duuude edat new %s\n", prt_dht_value(new_val).c_str());
+	return true;
+}
+
+bool DHTAtomStorage::store_space(dht::InfoHash key,
+                                std::shared_ptr<dht::Value>& value,
+                                const dht::InfoHash& from,
+                                const dht::SockAddr& addr)
+{
+	printf("duuude storspa %s\n", prt_dht_value(value).c_str());
+	return true;
+}
+
+bool DHTAtomStorage::edit_space(dht::InfoHash key,
+                              const std::shared_ptr<dht::Value>& old_val,
+                              std::shared_ptr<dht::Value>& new_val,
+                              const dht::InfoHash& from,
+                              const dht::SockAddr& addr)
+{
+	printf("duuude edspa old %s\n", prt_dht_value(old_val).c_str());
+	printf("duuude edspa new %s\n", prt_dht_value(new_val).c_str());
 	return false;
 }
 

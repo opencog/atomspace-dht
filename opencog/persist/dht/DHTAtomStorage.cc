@@ -74,7 +74,7 @@ void DHTAtomStorage::init(const char * uri)
 		std::chrono::minutes(100), store_atom, edit_atom);
 
 	_space_policy = dht::ValueType(SPACE_ID, "space policy",
-		std::chrono::minutes(100));
+		std::chrono::minutes(100), store_space, edit_space);
 
 	_values_policy = dht::ValueType(VALUES_ID, "values policy",
 		std::chrono::minutes(100));
@@ -276,7 +276,8 @@ std::string DHTAtomStorage::prt_dht_value(
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case SPACE_ID:
-			ss << "Member: " << ival->unpack<std::string>() << std::endl;
+			ss << "Member id=: " << std::to_string(ival->id) << " "
+			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case VALUES_ID:
 			ss << "Value: " << ival->unpack<std::string>() << std::endl;
