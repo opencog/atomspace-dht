@@ -50,8 +50,8 @@ class BasicSaveUTest :  public CxxTest::TestSuite
             logger().set_print_to_stdout_flag(true);
 
             uri = "dht:///atomspace-dht-test";
-            boot = "dht://localhost:4444/";
-            // boot = "dht://localhost:4555/";
+            // boot = "dht://localhost:4444/";
+            boot = "dht://localhost:4555/";
 
             // Create a singe DHT node that will act as
 				// as the repo for the duration of the test.
@@ -349,6 +349,10 @@ void BasicSaveUTest::test_table()
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
+    // Use a distinct atomspace name for this test; that's because
+    // currently, kill_data() doesn't work, and the test space is
+    // polluted.
+    uri += "-table";
     DHTAtomStorage *store = new DHTAtomStorage(uri);
     store->dht_bootstrap(boot);
     if (!store->connected())
@@ -396,7 +400,8 @@ void BasicSaveUTest::test_table()
     size_t num_fetched = table2->getSize();
     printf("test_table: Done loading table; fetched %lu, expected %lu\n",
            num_fetched, num_stored);
-    TSM_ASSERT("Wrong number of atoms fetched", num_fetched == num_stored);
+    // One extra, for the (PredicateNode "*-TruthValueKey-*")
+    TSM_ASSERT("Wrong number of atoms fetched", num_fetched == num_stored+1);
 
     idx = 0;
     check_table(idx++, table2, "aaa ");

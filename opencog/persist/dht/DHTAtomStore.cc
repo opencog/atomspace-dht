@@ -77,6 +77,10 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 
 	lck.unlock();
 
+// XXX FIXME!! Currently, rate-limiting hoses our ability to store
+// atoms and values. So use a hard-coded stall. See issue
+// https://github.com/savoirfairelinux/opendht/issues/460
+std::this_thread::sleep_for(std::chrono::milliseconds(120));
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
 	// is kept around.
@@ -84,9 +88,11 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
 #if 0
-	// The done_cb seems to be inconsistently called: at low
-	// rates of publication, the callback is invoked. At high
-	// rates, it seems to be lost.
+	// The done_cb will not be called, if other nodes dropped our
+	// data due to rate-limiting.  The done_cb seems to run only
+	// when a reply to an announce is received.  It also does not
+	// seem to be 1-1 with the published data? i.e. multiple
+	// publishes get mashed together?
 	auto done_cb = [=](bool success,
 	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
 	{
