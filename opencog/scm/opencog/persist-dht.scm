@@ -12,7 +12,9 @@
 	"opencog_persist_dht_init")
 
 (export dht-bootstrap dht-clear-stats dht-close dht-open dht-stats
-	dht-examine dht-load-atomspace)
+	dht-examine dht-node-info dht-storage-log dht-routing-tables-log
+	dht-searches-log
+	dht-load-atomspace)
 
 (set-procedure-property! dht-bootstrap 'documentation
 "
@@ -81,6 +83,21 @@
     This will cause some database performance statistics to be printed
     to the stdout of the server. These statistics can be quite arcane
     and are useful primarily to the developers of the database backend.
+")
+
+(set-procedure-property! dht-storage-log 'documentation
+"
+ dht-storage-log - Print the DHT Node storage log.
+")
+
+(set-procedure-property! dht-routing-tables-log 'documentation
+"
+ dht-routing-tables-log - Print the DHT Node routing tables log.
+")
+
+(set-procedure-property! dht-searches-log 'documentation
+"
+ dht-searches-log - Print the DHT Node searches log.
 ")
 
 (set-procedure-property! dht-load-atomspace 'documentation

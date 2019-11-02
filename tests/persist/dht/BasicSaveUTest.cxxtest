@@ -144,7 +144,7 @@ static void atomCompare(AtomPtr a, AtomPtr b, const char* where)
 void BasicSaveUTest::single_atom_save_restore(std::string id)
 {
     DHTAtomStorage *store = new DHTAtomStorage(uri);
-    store->bootstrap(boot);
+    store->dht_bootstrap(boot);
     if (!store->connected())
     {
         logger().debug("single_atom_save_restore: cannot connect to db");
@@ -277,7 +277,7 @@ void BasicSaveUTest::test_single_atom(void)
         exit(1);
     }
     logger().info("Connected to \"%s\"", uri.c_str());
-    astore->bootstrap(boot);
+    astore->dht_bootstrap(boot);
 
     // Trash the contents of the database.
     astore->kill_data();
@@ -298,7 +298,7 @@ void BasicSaveUTest::test_fresh_atom(void)
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
     DHTAtomStorage *store = new DHTAtomStorage(uri);
-    store->bootstrap(boot);
+    store->dht_bootstrap(boot);
     if (!store->connected())
     {
         logger().debug("single_atom_save_restore: cannot connect to db");
@@ -340,7 +340,7 @@ void BasicSaveUTest::test_table()
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
     DHTAtomStorage *store = new DHTAtomStorage(uri);
-    store->bootstrap(boot);
+    store->dht_bootstrap(boot);
     if (!store->connected())
     {
         logger().debug("test_table: cannot connect to db");
@@ -365,7 +365,7 @@ void BasicSaveUTest::test_table()
 
     // Reopen connection, and load the atom table.
     store = new DHTAtomStorage(uri);
-    store->bootstrap(boot);
+    store->dht_bootstrap(boot);
     TSM_ASSERT("Not connected to database", store->connected());
 
     AtomSpace *as2 = new AtomSpace();

@@ -41,8 +41,11 @@ public:
 	void do_close(void);
 	void do_load(void);
 	void do_store(void);
-	std::string do_node_info(void);
 	std::string do_examine(const std::string&);
+	std::string do_node_info(void);
+	std::string do_storage_log(void);
+	std::string do_routing_tables_log(void);
+	std::string do_searches_log(void);
 	void do_load_atomspace(const std::string&);
 
 	void do_stats(void);

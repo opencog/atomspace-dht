@@ -51,10 +51,13 @@ void DHTPersistSCM::init(void)
     define_scheme_primitive("dht-bootstrap", &DHTPersistSCM::do_bootstrap, this, "persist-dht");
     define_scheme_primitive("dht-stats", &DHTPersistSCM::do_stats, this, "persist-dht");
     define_scheme_primitive("dht-clear-stats", &DHTPersistSCM::do_clear_stats, this, "persist-dht");
+    define_scheme_primitive("dht-load-atomspace", &DHTPersistSCM::do_load_atomspace, this, "persist-dht");
 
     define_scheme_primitive("dht-examine", &DHTPersistSCM::do_examine, this, "persist-dht");
     define_scheme_primitive("dht-node-info", &DHTPersistSCM::do_node_info, this, "persist-dht");
-    define_scheme_primitive("dht-load-atomspace", &DHTPersistSCM::do_load_atomspace, this, "persist-dht");
+    define_scheme_primitive("dht-storage-log", &DHTPersistSCM::do_storage_log, this, "persist-dht");
+    define_scheme_primitive("dht-routing-tables-log", &DHTPersistSCM::do_routing_tables_log, this, "persist-dht");
+    define_scheme_primitive("dht-searches-log", &DHTPersistSCM::do_searches_log, this, "persist-dht");
 }
 
 DHTPersistSCM::~DHTPersistSCM()
@@ -139,6 +142,30 @@ std::string DHTPersistSCM::do_node_info(void)
         return "DHT node is not running";
 
     return _backing->dht_node_info();
+}
+
+std::string DHTPersistSCM::do_storage_log(void)
+{
+    if (nullptr == _backing)
+        return "DHT node is not running";
+
+    return _backing->dht_storage_log();
+}
+
+std::string DHTPersistSCM::do_routing_tables_log(void)
+{
+    if (nullptr == _backing)
+        return "DHT node is not running";
+
+    return _backing->dht_routing_tables_log();
+}
+
+std::string DHTPersistSCM::do_searches_log(void)
+{
+    if (nullptr == _backing)
+        return "DHT node is not running";
+
+    return _backing->dht_searches_log();
 }
 
 void DHTPersistSCM::do_load_atomspace(const std::string& asname)

@@ -175,12 +175,37 @@ std::string DHTAtomStorage::dht_node_info(void)
 {
 	std::stringstream ss;
 	dht::NodeInfo ni = _runner.getNodeInfo();
-	ss << "OpenDHT node running on port " << std::to_string(_port) << std::endl;
-	ss << "Id: " << ni.id.toString() << std::endl;
-	ss << "Node Id: " << ni.node_id.toString() << std::endl;
+	ss << "OpenDHT node " << ni.node_id.toString()
+	   << " running on port " << std::to_string(_port) << std::endl;
+	ss << "PKI fingerprint: " << ni.id.toString() << std::endl;
 	ss << "IPv4 stats:\n" << ni.ipv4.toString() << std::endl;
 	ss << "IPv6 stats:\n" << ni.ipv6.toString() << std::endl;
 	return ss.str();
+}
+
+/**
+ * Get the storage log.
+ */
+std::string DHTAtomStorage::dht_storage_log(void)
+{
+	return _runner.getStorageLog();
+}
+
+/**
+ * Get the routine tables log.
+ */
+std::string DHTAtomStorage::dht_routing_tables_log(void)
+{
+	// XXX FIXME also support AF_INET6
+	return _runner.getRoutingTablesLog(AF_INET);
+}
+
+/**
+ * Get the searches log.
+ */
+std::string DHTAtomStorage::dht_searches_log(void)
+{
+	return _runner.getSearchesLog();
 }
 
 /* ================================================================== */
