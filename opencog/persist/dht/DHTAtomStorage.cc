@@ -259,6 +259,8 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 	ss << "Elapsed time: " << std::to_string(elapsed) << " seconds" << std::endl;
 
 	auto ivals = ifut.get();
+	ss << "Found " << std::to_string(ivals.size())
+	   << " values" << std::endl;
 	for (const auto& ival : ivals)
 		ss << prt_dht_value(ival);
 
@@ -272,12 +274,11 @@ std::string DHTAtomStorage::prt_dht_value(
 	switch (ival->type)
 	{
 		case ATOM_ID:
-			ss << "Atom id=" << std::to_string(ival->id)
-			   << " seq=" << std::to_string(ival->seq) << " "
+			ss << "Atom seq=" << std::to_string(ival->seq) << " "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case SPACE_ID:
-			ss << "Member id=" << std::to_string(ival->id)
+			ss << "Member id=" << std::hex << ival->id
 			   << " seq=" << std::to_string(ival->seq) << " "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
