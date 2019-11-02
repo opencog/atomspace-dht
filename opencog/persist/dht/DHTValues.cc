@@ -47,7 +47,9 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 	dht::InfoHash ahash = get_membership(h);
 
 // XXX HACK ALERT -- rate limiting bug!!
-std::this_thread::sleep_for(std::chrono::milliseconds(120));
+// See https://github.com/savoirfairelinux/opendht/issues/460
+// 120 millisecs is not enough.
+std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	// Get a future for the values on this atom. We filter,
 	// because the same membership hash gets used for both
 	// values and for incoming sets. We only want the values.
