@@ -251,28 +251,34 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 
 	auto ivals = ifut.get();
 	for (const auto& ival : ivals)
-	{
-		switch (ival->type)
-		{
-			case ATOM_ID:
-				ss << "Atom: " << ival->unpack<std::string>() << std::endl;
-				break;
-			case SPACE_ID:
-				ss << "Member: " << ival->unpack<std::string>() << std::endl;
-				break;
-			case VALUES_ID:
-				ss << "Value: " << ival->unpack<std::string>() << std::endl;
-				break;
-			case INCOMING_ID:
-				ss << "Incoming: "
-				   << ival->unpack<dht::InfoHash>().toString() << std::endl;
-				break;
-			default:
-				ss << "Raw: " << ival->toString() << std::endl;
-				break;
-		}
-	}
+		ss << prt_dht_value(ival);
 
+	return ss.str();
+}
+
+std::string DHTAtomStorage::prt_dht_value(
+               const std::shared_ptr<dht::Value>& ival)
+{
+	std::stringstream ss;
+	switch (ival->type)
+	{
+		case ATOM_ID:
+			ss << "Atom: " << ival->unpack<std::string>() << std::endl;
+			break;
+		case SPACE_ID:
+			ss << "Member: " << ival->unpack<std::string>() << std::endl;
+			break;
+		case VALUES_ID:
+			ss << "Value: " << ival->unpack<std::string>() << std::endl;
+			break;
+		case INCOMING_ID:
+			ss << "Incoming: "
+			   << ival->unpack<dht::InfoHash>().toString() << std::endl;
+			break;
+		default:
+			ss << "Raw: " << ival->toString() << std::endl;
+			break;
+	}
 	return ss.str();
 }
 

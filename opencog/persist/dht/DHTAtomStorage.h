@@ -55,6 +55,7 @@ class DHTAtomStorage : public BackingStore
 		dht::DhtRunner _runner;
 		dht::InfoHash _atomspace_hash;
 
+		// --------------------------
 		// Storage policies
 		dht::ValueType _atom_policy;
 		dht::ValueType _space_policy;
@@ -78,6 +79,7 @@ class DHTAtomStorage : public BackingStore
 		               const dht::InfoHash& from,
 		               const dht::SockAddr& addr);
 
+		static std::string prt_dht_value(const std::shared_ptr<dht::Value>&);
 		// --------------------------
 		// Fetch and storing of atoms
 

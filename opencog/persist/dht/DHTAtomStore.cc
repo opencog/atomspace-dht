@@ -132,7 +132,7 @@ bool DHTAtomStorage::store_atom(dht::InfoHash key,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
-	// printf("duuude
+	printf("duuude storat %s\n", prt_dht_value(value).c_str());
 	return true;
 }
 
@@ -142,6 +142,8 @@ bool DHTAtomStorage::edit_atom(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
+	printf("duuude ed old %s\n", prt_dht_value(old_val).c_str());
+	printf("duuude ed new %s\n", prt_dht_value(new_val).c_str());
 	return false;
 }
 
