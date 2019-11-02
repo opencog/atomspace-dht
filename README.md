@@ -72,6 +72,11 @@ and install mechanisms are the same.
   places in the code. See
   [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
   for details.
+* There does not seem to be any way of force-pushing local data out
+  onto the net, (for synchronization, e.g. for example, if it is known
+  that the local node is going down. See
+  [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
+  for details.
 
 ## Build Prereqs
 
