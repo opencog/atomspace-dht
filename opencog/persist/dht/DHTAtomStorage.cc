@@ -158,10 +158,22 @@ DHTAtomStorage::DHTAtomStorage(std::string uri)
 DHTAtomStorage::~DHTAtomStorage()
 {
 	_runner.loop();
-sleep(2);
 	_runner.loop();
-sleep(2);
-	_runner.shutdown([=](void) { printf("did shut down\n"); });
+
+	// The condition variable attempts to halt progress
+	// until the shutdown callback is called...
+	std::mutex mtx;
+	std::condition_variable* cv = new std::condition_variable();
+	std::unique_lock<std::mutex> lck(mtx);
+
+	_runner.shutdown([cv](void) { cv->notify_one(); });
+	cv->wait(lck);
+	delete cv;
+
+// Annoyingly, the shutdown is not enough.  The queues
+// still got stuff trickling in...
+printf("duuuude down===============================\n");
+sleep(5);
 	// Wait for dht threads to end. This seems to clobber the
 	// pending job queues...
 	_runner.join();
