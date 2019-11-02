@@ -1,5 +1,5 @@
 /*
- * tests/persist/ipfs/ValueSaveUTest.cxxtest
+ * tests/persist/dht/ValueSaveUTest.cxxtest
  *
  * Test of save and restore of generic values.
  * Ported from tests/persist/sql/multi-driver/ValueSaveUTest.cxxtest
@@ -24,7 +24,7 @@
 
 #include <opencog/atoms/truthvalue/SimpleTruthValue.h>
 
-#include <opencog/persist/ipfs/IPFSAtomStorage.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
 
 #include <opencog/util/Logger.h>
 
@@ -39,7 +39,7 @@ class ValueSaveUTest :  public CxxTest::TestSuite
 
         ValueSaveUTest(void)
         {
-            uri = "ipfs:///atomspace-ipfs-test";
+            uri = "dht:///atomspace-dht-test";
             logger().set_level(Logger::DEBUG);
             logger().set_print_to_stdout_flag(true);
         }
@@ -78,7 +78,7 @@ void ValueSaveUTest::tearDown(void) {}
  */
 void ValueSaveUTest::test_single_atom_save()
 {
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -143,7 +143,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 
 	// ------
 	// First, save the value
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -166,7 +166,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 
 	// ---------------------------------
 	// Now, fetch the value and compare.
-	store = new IPFSAtomStorage(uri);
+	store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -190,7 +190,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 
 void ValueSaveUTest::test_save_restore(bool fkey)
 {
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -242,7 +242,7 @@ void ValueSaveUTest::test_save_restore(bool fkey)
 // as well.  This tests the fetching of nodes.
 void ValueSaveUTest::test_load_by_type()
 {
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -295,7 +295,6 @@ void ValueSaveUTest::test_load_by_type()
 	as->store_atom(al);
 	as->store_atom(av);
 	as->barrier();
-	std::string final_atomspace_cid = store->get_ipfs_cid();
 
 	delete as;
 	delete store;
@@ -303,7 +302,7 @@ void ValueSaveUTest::test_load_by_type()
 	// --------------------
 	// Start it up again.
 
-	store = new IPFSAtomStorage("ipfs:///ipfs/" + final_atomspace_cid);
+	store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -358,7 +357,7 @@ void ValueSaveUTest::test_load_by_type()
 // be fetched.
 void ValueSaveUTest::test_link_by_type()
 {
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -439,7 +438,6 @@ void ValueSaveUTest::test_link_by_type()
 	as->store_atom(cl);
 	as->store_atom(cv);
 	as->barrier();
-	std::string final_atomspace_cid = store->get_ipfs_cid();
 
 	delete as;
 	delete store;
@@ -447,7 +445,7 @@ void ValueSaveUTest::test_link_by_type()
 	// --------------------
 	// Start it up again.
 
-	store = new IPFSAtomStorage("ipfs:///ipfs/" + final_atomspace_cid);
+	store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -562,7 +560,7 @@ void ValueSaveUTest::test_link_by_type()
 // as well, but only on the incoming set!
 void ValueSaveUTest::test_incoming()
 {
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
+	DHTAtomStorage *store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -643,7 +641,6 @@ void ValueSaveUTest::test_incoming()
 	as->store_atom(cl);
 	as->store_atom(cv);
 	as->barrier();
-	std::string final_atomspace_cid = store->get_ipfs_cid();
 
 	delete as;
 	delete store;
@@ -651,7 +648,7 @@ void ValueSaveUTest::test_incoming()
 	// --------------------
 	// Start it up again.
 
-	store = new IPFSAtomStorage("ipfs:///ipfs/" + final_atomspace_cid);
+	store = new DHTAtomStorage(uri);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -751,141 +748,6 @@ void ValueSaveUTest::test_incoming()
 	gpt = gct->getValue(gkey);
 	gpl = gcl->getValue(gkey);
 	gpv = gcv->getValue(gkey);
-
-	TS_ASSERT(*gpf == *pvf);
-	TS_ASSERT(*gpt == *pvt);
-	TS_ASSERT(*gpl == *pvl);
-	TS_ASSERT(*gpv == *pvv);
-
-	// --------------------
-	delete as;
-	delete store;
-}
-
-// ============================================================
-
-// Test the fetch_valuations() method in the atomspace.
-// The fetch should restore only certain values, and NOT the
-// truth values.
-void ValueSaveUTest::test_load_by_key(bool get_all_values)
-{
-	IPFSAtomStorage *store = new IPFSAtomStorage(uri);
-	TS_ASSERT(store->connected())
-
-	AtomSpace* as = new AtomSpace();
-	store->registerWith(as);
-
-	Handle key = as->add_node(PREDICATE_NODE, "some pred key");
-	Handle af = as->add_node(CONCEPT_NODE, "float node");
-	Handle at = as->add_node(CONCEPT_NODE, "string node");
-	Handle al = as->add_node(CONCEPT_NODE, "link depth-1 node");
-	Handle av = as->add_node(CONCEPT_NODE, "link depth-2 node");
-
-	// --------------------
-	// Now set some values
-	ValuePtr pvf = createFloatValue(
-		std::vector<double>({1.1098765432109876, 2.1234567890123456e37,
-		                     3.2109876543210987e-250}));
-	af->setValue(key, pvf);
-
-	TruthValuePtr tf(SimpleTruthValue::createTV(0.11, 100));
-	af->setTruthValue(tf);
-
-	// --------------------
-	ValuePtr pvt = createStringValue(
-		std::vector<std::string>({"aaa", "bb bb bb", "ccc ccc ccc"}));
-	at->setValue(key, pvt);
-
-	TruthValuePtr tt(SimpleTruthValue::createTV(0.22, 200));
-	at->setTruthValue(tt);
-
-	// --------------------
-	ValuePtr pvl = createLinkValue(
-		std::vector<ValuePtr>({pvf, pvt}));
-	al->setValue(key, pvl);
-
-	TruthValuePtr tl(SimpleTruthValue::createTV(0.33, 300));
-	al->setTruthValue(tl);
-
-	// --------------------
-	ValuePtr pvv = createLinkValue(
-		std::vector<ValuePtr>({pvl, pvl, pvf, pvt}));
-	av->setValue(key, pvv);
-
-	TruthValuePtr tv(SimpleTruthValue::createTV(0.44, 400));
-	av->setTruthValue(tv);
-
-	// --------------------
-	// Save, and close things down.
-	as->store_atom(af);
-	as->store_atom(at);
-	as->store_atom(al);
-	as->store_atom(av);
-	as->barrier();
-	std::string final_atomspace_cid = store->get_ipfs_cid();
-
-	delete as;
-	delete store;
-
-	// --------------------
-	// Start it up again.
-
-	store = new IPFSAtomStorage("ipfs:///ipfs/" + final_atomspace_cid);
-	TS_ASSERT(store->connected())
-
-	as = new AtomSpace();
-	store->registerWith(as);
-
-	// --------------------
-	// Fetch by type. This is what we are testing.
-	Handle gkey = as->add_node(PREDICATE_NODE, "some pred key");
-	as->fetch_valuations(gkey, get_all_values);
-
-	Handle gaf = as->add_node(CONCEPT_NODE, "float node");
-	Handle gat = as->add_node(CONCEPT_NODE, "string node");
-	Handle gal = as->add_node(CONCEPT_NODE, "link depth-1 node");
-	Handle gav = as->add_node(CONCEPT_NODE, "link depth-2 node");
-
-	TS_ASSERT(*gaf == *af);
-	TS_ASSERT(*gat == *at);
-	TS_ASSERT(*gal == *al);
-	TS_ASSERT(*gav == *av);
-
-	TruthValuePtr gtf = gaf->getTruthValue();
-	TruthValuePtr gtt = gat->getTruthValue();
-	TruthValuePtr gtl = gal->getTruthValue();
-	TruthValuePtr gtv = gav->getTruthValue();
-
-	if (get_all_values)
-	{
-		TS_ASSERT(*gtf == *tf);
-		TS_ASSERT(*gtt == *tt);
-		TS_ASSERT(*gtl == *tl);
-		TS_ASSERT(*gtv == *tv);
-	}
-	else
-	{
-		TS_ASSERT(*gtf != *tf);
-		TS_ASSERT(*gtt != *tt);
-		TS_ASSERT(*gtl != *tl);
-		TS_ASSERT(*gtv != *tv);
-
-		// We expect the truth values to be untouched.
-		TS_ASSERT(gtf == TruthValue::DEFAULT_TV());
-		TS_ASSERT(gtt == TruthValue::DEFAULT_TV());
-		TS_ASSERT(gtl == TruthValue::DEFAULT_TV());
-		TS_ASSERT(gtv == TruthValue::DEFAULT_TV());
-	}
-
-	ValuePtr gpf = gaf->getValue(gkey);
-	ValuePtr gpt = gat->getValue(gkey);
-	ValuePtr gpl = gal->getValue(gkey);
-	ValuePtr gpv = gav->getValue(gkey);
-
-	TS_ASSERT(gpf != nullptr);
-	TS_ASSERT(gpt != nullptr);
-	TS_ASSERT(gpl != nullptr);
-	TS_ASSERT(gpv != nullptr);
 
 	TS_ASSERT(*gpf == *pvf);
 	TS_ASSERT(*gpt == *pvt);
