@@ -115,7 +115,7 @@ void DHTAtomStorage::init(const char * uri)
 		_runner.run(_port, dht::crypto::generateIdentity(), true);
 
 	// Do NOT fiddle with atomspace contents, if nothing is open!
-	if (_observing_only)
+	if (not _observing_only)
 	{
 		tvpred = createNode(PREDICATE_NODE, "*-TruthValueKey-*");
 		store_recursive(tvpred);
