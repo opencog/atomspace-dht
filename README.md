@@ -36,7 +36,7 @@ In the current implementation:
     + Atom deletion
     + A stable server
  * All seven unit tests have been ported over (from the original
-   SQL backend driver tests) currently two of seven pass.
+   SQL backend driver tests) currently three of seven pass.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
@@ -67,6 +67,9 @@ and install mechanisms are the same.
 * TODO: hash explore utility
 
 ### Issues
+* There does not seem to be any reliable way of deleting data. See
+  [opendht issue #429](https://github.com/savoirfairelinux/opendht/issues/429)
+  for details.
 * Rate limiting causes published data to be discarded.  This is
   currently solved with a `std::this_thread::sleep_for()` in several
   places in the code. See
