@@ -82,6 +82,11 @@ void DHTAtomStorage::init(const char * uri)
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		std::chrono::minutes(100));
 
+	_runner.registerType(_atom_policy);
+	_runner.registerType(_space_policy);
+	_runner.registerType(_values_policy);
+	_runner.registerType(_incoming_policy);
+
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
@@ -173,7 +178,7 @@ DHTAtomStorage::~DHTAtomStorage()
 // Annoyingly, the shutdown is not enough.  The queues
 // still got stuff trickling in...
 printf("duuuude down===============================\n");
-sleep(5);
+sleep(1);
 	// Wait for dht threads to end. This seems to clobber the
 	// pending job queues...
 	_runner.join();
