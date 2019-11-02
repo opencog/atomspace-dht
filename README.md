@@ -22,21 +22,21 @@ OpenDHT is an internet-wide globally-accesible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.0.4
-Most things mostly work. See the [examples](examples). No unit tests,
-yet.
+## Alpha version 0.1.0
+Most things mostly work. See the [examples](examples). Some unit tests
+pass.
 
 ### Status
 In the current implementation:
- * Initial impression: OpenDHT is very highly compatible with the
-   AtomSpace in it's design philosophy!
- * This is sparked by the now-"finished"
-   [atomspace-ipfs](https://github.com/opencog/atomspace-ipfs) driver,
-   which has numerous annoying design faults due to deficiencies in the
-   IPFS API. It appears that OpenDHT provides a far more usable API that
-   is much more closely aligned to what the AtomSpace actually needs.
-   Or so it seems, based on reading header files and the code so far.
-   We shall see.
+ * OpenDHT appears to be highly compatible with the requirements
+   imposed by the AtomSpace backend API. It seems to provide exactly
+   those services that the AtomSpace needs. This makes future
+   development and operation look very promising.
+ * System is almost feature-complete.  Missing are:
+    + Atom deletion
+    + A stable server
+ * All seven unit tests have been ported over (from the original
+   SQL backend driver tests) currently two of seven pass.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
