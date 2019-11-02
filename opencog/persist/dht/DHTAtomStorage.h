@@ -136,10 +136,11 @@ class DHTAtomStorage : public BackingStore
 		DHTAtomStorage(const DHTAtomStorage&) = delete; // disable copying
 		DHTAtomStorage& operator=(const DHTAtomStorage&) = delete; // disable assignment
 		virtual ~DHTAtomStorage();
-		void bootstrap(const std::string& uri);
 		bool connected(void); // connection to DB is alive
 
+		void dht_bootstrap(const std::string& uri);
 		std::string dht_examine(const std::string&);
+		std::string dht_node_info(void);
 		void load_atomspace(AtomSpace*, const std::string&);
 
 		void kill_data(void); // destroy DB contents

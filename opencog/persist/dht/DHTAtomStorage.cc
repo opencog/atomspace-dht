@@ -116,7 +116,7 @@ void DHTAtomStorage::init(const char * uri)
 	store_recursive(tvpred);
 }
 
-void DHTAtomStorage::bootstrap(const std::string& uri)
+void DHTAtomStorage::dht_bootstrap(const std::string& uri)
 {
 #define URIX_LEN (sizeof("dht://") - 1)  // Should be 6
 
@@ -165,6 +165,22 @@ DHTAtomStorage::~DHTAtomStorage()
 bool DHTAtomStorage::connected(void)
 {
 	return _runner.isRunning();
+}
+
+/* ================================================================== */
+/**
+ * Get the node status.
+ */
+std::string DHTAtomStorage::dht_node_info(void)
+{
+	std::stringstream ss;
+	dht::NodeInfo ni = _runner.getNodeInfo();
+	ss << "OpenDHT node running on port " << std::to_string(_port) << std::endl;
+	ss << "Id: " << ni.id.toString() << std::endl;
+	ss << "Node Id: " << ni.node_id.toString() << std::endl;
+	ss << "IPv4 stats:\n" << ni.ipv4.toString() << std::endl;
+	ss << "IPv6 stats:\n" << ni.ipv6.toString() << std::endl;
+	return ss.str();
 }
 
 /* ================================================================== */

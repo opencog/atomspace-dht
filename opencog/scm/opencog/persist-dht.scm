@@ -51,6 +51,12 @@
     20-byte key of a DHT entry.
 ")
 
+(set-procedure-property! dht-node-info 'documentation
+"
+ dht-node-info - Print information about running DHT node.
+    This includes the number of connected nodes.
+")
+
 (set-procedure-property! dht-open 'documentation
 "
  dht-open URL - Open a connection to an IPFS server.
