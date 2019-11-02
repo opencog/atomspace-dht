@@ -62,10 +62,10 @@ void DHTAtomStorage::init(const char * uri)
 	if (pos != std::string::npos) _atomspace_name.resize(pos);
 	_atomspace_name += '/';
 
-	if (_atomspace_name.size() < 2)
-		throw IOException(TRACE_INFO, "Missing AtomSpace name '%s'\n", uri);
-
-	_atomspace_hash = dht::InfoHash::get(_atomspace_name);
+	if (1 < _atomspace_name.size())
+	{
+		_atomspace_hash = dht::InfoHash::get(_atomspace_name);
+	}
 
 	// Policies for storing atoms
 	_atom_policy = dht::ValueType(ATOM_ID, "space policy",
@@ -105,7 +105,7 @@ void DHTAtomStorage::init(const char * uri)
 			break;
 		}
 
-		if (not connected())
+		if (not _runner.isRunning())
 			throw IOException(TRACE_INFO,
 				"Unable to start DHT node, all ports are in use");
 	}
@@ -157,6 +157,10 @@ DHTAtomStorage::~DHTAtomStorage()
 
 /**
  * connected -- Is the DHT node running?
+ * XXX FIXME ... we can have a situation where we are
+ * connected to the DHT pool, and so the runner is
+ * running, but no database is open. This needs a new
+ * AtomSpace API for this fix.
  */
 bool DHTAtomStorage::connected(void)
 {
