@@ -20,11 +20,17 @@ using namespace opencog;
 /// unless the recursive flag is set. If the recursive flag is set, then
 /// the atom, and everything in its incoming set is removed.
 ///
-void DHTAtomStorage::removeAtom(const Handle& h, bool recursive)
+void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 {
 	// Synchronize. The atom that we are deleting might be sitting
 	// in the store queue.
 	barrier();
+printf("duuude gonnna remove %s\n", atom->to_string().c_str());
+	// std::string gstr = encodeAtomToStr(atom);
+	// dht::Value v(_space_policy, gstr, atom->get_hash());
+	// std::shared_ptr<Value> vp(&v);
+	// _runner.cancelPut(_atomspace_hash, vp);
+	_runner.cancelPut(_atomspace_hash, atom->get_hash());
 
 #if 0
 	auto pinc = jatom.find("incoming");
