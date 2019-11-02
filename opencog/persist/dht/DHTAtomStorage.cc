@@ -174,7 +174,9 @@ DHTAtomStorage::~DHTAtomStorage()
 	std::unique_lock<std::mutex> lck(mtx);
 
 	_runner.shutdown([cv](void) { cv->notify_one(); });
-	cv->wait(lck);
+
+	// Sometimes the shutdown hangs. I don't know why.
+	cv->wait_for(lck, std::chrono::seconds(5));
 	delete cv;
 
 // Annoyingly, the shutdown is not enough.  The queues
@@ -270,7 +272,8 @@ std::string DHTAtomStorage::prt_dht_value(
 	switch (ival->type)
 	{
 		case ATOM_ID:
-			ss << "Atom: " << ival->unpack<std::string>() << std::endl;
+			ss << "Atom id=" << std::to_string(ival->id) << " "
+			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case SPACE_ID:
 			ss << "Member: " << ival->unpack<std::string>() << std::endl;

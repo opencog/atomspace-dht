@@ -78,7 +78,7 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 
 	// Publish the generic AtomSpace encoding.
 	std::string gstr = encodeAtomToStr(atom);
-	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr));
+	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
 	// Put the atom into the atomspace.
 	_runner.put(_atomspace_hash, dht::Value(_space_policy, gstr));
