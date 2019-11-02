@@ -70,8 +70,8 @@ void DHTAtomStorage::init(const char * uri)
 	}
 
 	// Policies for storing atoms
-	_atom_policy = dht::ValueType(ATOM_ID, "space policy",
-		std::chrono::minutes(100));
+	_atom_policy = dht::ValueType(ATOM_ID, "atom policy",
+		std::chrono::minutes(100), store_atom, edit_atom);
 
 	_space_policy = dht::ValueType(SPACE_ID, "space policy",
 		std::chrono::minutes(100));

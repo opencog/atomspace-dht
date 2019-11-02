@@ -126,4 +126,23 @@ dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 	return akey;
 }
 
+/* ================================================================== */
+bool DHTAtomStorage::store_atom(dht::InfoHash key,
+                                std::shared_ptr<dht::Value>& value,
+                                const dht::InfoHash& from,
+                                const dht::SockAddr& addr)
+{
+	// printf("duuude
+	return true;
+}
+
+bool DHTAtomStorage::edit_atom(dht::InfoHash key,
+                              const std::shared_ptr<dht::Value>& old_val,
+                              std::shared_ptr<dht::Value>& new_val,
+                              const dht::InfoHash& from,
+                              const dht::SockAddr& addr)
+{
+	return false;
+}
+
 /* ============================= END OF FILE ================= */

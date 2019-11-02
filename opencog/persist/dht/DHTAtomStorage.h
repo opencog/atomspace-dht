@@ -67,6 +67,16 @@ class DHTAtomStorage : public BackingStore
 			VALUES_ID = 4099,
 			INCOMING_ID = 4100,
 		};
+		static bool store_atom(dht::InfoHash key,
+		                std::shared_ptr<dht::Value>& value,
+		                const dht::InfoHash& from,
+		                const dht::SockAddr& addr);
+
+		static bool edit_atom(dht::InfoHash key,
+		               const std::shared_ptr<dht::Value>& old_val,
+		               std::shared_ptr<dht::Value>& new_val,
+		               const dht::InfoHash& from,
+		               const dht::SockAddr& addr);
 
 		// --------------------------
 		// Fetch and storing of atoms
