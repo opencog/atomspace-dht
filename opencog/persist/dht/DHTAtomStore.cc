@@ -71,9 +71,11 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	if (_observing_only)
 		throw IOException(TRACE_INFO, "DHT Node is only observing!");
 
-	std::lock_guard<std::mutex> lck(_publish_mutex);
+	std::unique_lock<std::mutex> lck(_publish_mutex);
 	const auto& pa = _published.find(atom);
 	if (_published.end() != pa) return;
+
+	lck.unlock();
 
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
@@ -81,14 +83,19 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	std::string gstr = encodeAtomToStr(atom);
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
+#if 0
+	// The done_cb seems to be inconsistently called: at low
+	// rates of publication, the callback is invoked. At high
+	// rates, it seems to be lost.
 	auto done_cb = [=](bool success,
 	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
 	{
-		printf("duude done store succ=%d nv=%lu\n%s\n", success,
+		printf("Done store cb success=%d num_nodes=%lu\n%s\n", success,
 			nodes.size(), gstr.c_str());
 		for (auto& n : nodes)
-			printf("duuude done node=%s\n", n->toString().c_str());
+			printf("Done node=%s\n", n->toString().c_str());
 	};
+#endif
 
 	// Put the atom into the atomspace.
 	// These will have a dht-id that is the atom hash, thus allowing
@@ -97,8 +104,9 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	// is a slight chance of collision.  This is solved by having
 	// the edit policy allow duplicates.
 	_runner.put(_atomspace_hash,
-	            dht::Value(_space_policy, gstr, atom->get_hash()),
-	            done_cb);
+	            dht::Value(_space_policy, gstr, atom->get_hash()));
+
+	lck.lock();
 	_published.emplace(atom);
 	_store_count ++;
 }
