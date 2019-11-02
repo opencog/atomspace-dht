@@ -285,9 +285,7 @@ void DHTAtomStorage::unregisterWith(AtomSpace* as)
 
 /**
  * kill_data -- Publish an empty atomspace. Dangerous!
- * This will forget the DHT reference to the atomspace containing
- * all of the atoms, resulting in data loss, unless you've done
- * something to keep ahold of that CID.
+ * This will delete the contents of the atomspace in the DHT.
  *
  * This routine is meant to be used only for running test cases.
  * It is extremely dangerous, as it can lead to total data loss.
@@ -296,6 +294,8 @@ void DHTAtomStorage::kill_data(void)
 {
 	// Special case for TruthValues - must always have this atom.
 	storeAtom(tvpred);
+
+	// XXX not done!
 }
 
 /* ================================================================ */

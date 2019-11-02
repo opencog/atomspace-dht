@@ -50,11 +50,24 @@ class BasicSaveUTest :  public CxxTest::TestSuite
             logger().set_print_to_stdout_flag(true);
 
             uri = "dht:///atomspace-dht-test";
-            boot = "dht://:4444/";
+            boot = "dht://localhost:4444/";
+            // boot = "dht://localhost:4555/";
+
+            // Create a singe DHT node that will act as
+				// as the repo for the duration of the test.
+            astore = new DHTAtomStorage("dht://:4555/atomspace-dht-test");
+            if (!astore->connected())
+            {
+                logger().info("setUp: cannot setup a DHT node");
+                exit(1);
+            }
+            // astore->dht_bootstrap(boot);
+            // printf("Repo:\n%s\n", astore->dht_node_info().c_str());
         }
 
         ~BasicSaveUTest()
         {
+            delete astore;
             // erase the log file if no assertions failed
             if (!CxxTest::TestTracker::tracker().suiteFailed())
                 std::remove(logger().get_filename().c_str());
@@ -150,7 +163,7 @@ void BasicSaveUTest::single_atom_save_restore(std::string id)
         logger().debug("single_atom_save_restore: cannot connect to db");
         return;
     }
-    printf("Single save/restore:\n%s\n", store->dht_node_info().c_str());
+    // printf("Single save/restore:\n%s\n", store->dht_node_info().c_str());
 
     // Create an atom ...
     AtomPtr a(createNode(SCHEMA_NODE, id + "someNode"));
@@ -275,15 +288,6 @@ void BasicSaveUTest::test_single_atom(void)
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-    astore = new DHTAtomStorage(uri);
-    if (!astore->connected())
-    {
-        logger().info("setUp: cannot connect to database");
-        exit(1);
-    }
-    logger().info("Connected to \"%s\"", uri.c_str());
-    astore->dht_bootstrap(boot);
-    printf("Test single:\n%s\n", astore->dht_node_info().c_str());
 
     // Trash the contents of the database.
     astore->kill_data();
@@ -295,7 +299,6 @@ void BasicSaveUTest::test_single_atom(void)
     single_atom_save_restore("$$$ ");
 
     astore->kill_data();
-    delete astore;
     logger().debug("END TEST: %s", __FUNCTION__);
 }
 
@@ -352,7 +355,6 @@ void BasicSaveUTest::test_table()
         logger().debug("test_table: cannot connect to db");
         return;
     }
-    printf("Test storage:\n%s\n", store->dht_node_info().c_str());
 
     AtomSpace *as1 = new AtomSpace();
     AtomTable *table1 = &as1->get_atomtable();
@@ -375,7 +377,6 @@ void BasicSaveUTest::test_table()
     store = new DHTAtomStorage(uri);
     store->dht_bootstrap(boot);
     TSM_ASSERT("Not connected to database", store->connected());
-    printf("Test loading:\n%s\n", store->dht_node_info().c_str());
 
     AtomSpace *as2 = new AtomSpace();
     AtomTable *table2 = &as2->get_atomtable();
@@ -383,6 +384,7 @@ void BasicSaveUTest::test_table()
 
     store->loadAtomSpace(*table2);
     // table2->print();
+    printf("BasicSaveUTest::test_table: Done loading table\n");
 
     idx = 0;
     check_table(idx++, table2, "aaa ");
