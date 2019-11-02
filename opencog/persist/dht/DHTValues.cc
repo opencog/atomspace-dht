@@ -35,7 +35,7 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	// Attach the value to the atom
 	// XXX TODO publish each value in it's own entry...
 	dht::InfoHash muid = get_membership(atom);
-	_runner.put(muid, dht::Value(_values_policy, atom->valuesToString()));
+	_runner.put(muid, dht::Value(_values_policy, encodeValuesToAlist(atom)));
 
 	_value_stores ++;
 }
@@ -46,6 +46,8 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 {
 	dht::InfoHash ahash = get_membership(h);
 
+// XXX HACK ALERT -- rate limiting bug!!
+std::this_thread::sleep_for(std::chrono::milliseconds(120));
 	// Get a future for the values on this atom. We filter,
 	// because the same membership hash gets used for both
 	// values and for incoming sets. We only want the values.
@@ -67,6 +69,39 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 	}
 
 	return h;
+}
+
+/* ================================================================== */
+
+/// Convert value (or Atom) into a string.
+std::string DHTAtomStorage::encodeValueToStr(const ValuePtr& v)
+{
+	if (nameserver().isA(v->get_type(), FLOAT_VALUE))
+	{
+		// The FloatValue to_string() print prints out a high-precision
+		// form of the value, as compared to SimpleTruthValue, which
+		// only prints 6 digits and breaks the unit tests.
+		FloatValuePtr fv(FloatValueCast(v));
+		return fv->FloatValue::to_string();
+	}
+	return v->to_short_string();
+}
+
+/* ================================================================== */
+
+std::string DHTAtomStorage::encodeValuesToAlist(const Handle& h)
+{
+	std::stringstream rv;
+
+	rv << "(";
+	for (const Handle& k: h->getKeys())
+	{
+		ValuePtr p = h->getValue(k);
+		rv << "(" << k->to_short_string()
+		   << " . " << encodeValueToStr(p) + ")";
+	}
+	rv << ")";
+	return rv.str();
 }
 
 /* ================================================================== */

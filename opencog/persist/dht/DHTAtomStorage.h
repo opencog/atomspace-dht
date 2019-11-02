@@ -94,8 +94,9 @@ class DHTAtomStorage : public BackingStore
 		// --------------------------
 		// Fetch and storing of atoms
 
-		std::string encodeValueToStr(const ValuePtr&);
-		std::string encodeAtomToStr(const Handle& h) {
+		static std::string encodeValueToStr(const ValuePtr&);
+		static std::string encodeValuesToAlist(const Handle&);
+		static std::string encodeAtomToStr(const Handle& h) {
 			return h->to_short_string(); }
 		Handle decodeStrAtom(std::string& s) {
 			size_t junk = 0;
