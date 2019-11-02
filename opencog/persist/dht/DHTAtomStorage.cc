@@ -82,11 +82,6 @@ void DHTAtomStorage::init(const char * uri)
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		std::chrono::minutes(100));
 
-	_runner.registerType(_atom_policy);
-	_runner.registerType(_space_policy);
-	_runner.registerType(_values_policy);
-	_runner.registerType(_incoming_policy);
-
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
@@ -118,6 +113,13 @@ void DHTAtomStorage::init(const char * uri)
 	}
 	else
 		_runner.run(_port, dht::crypto::generateIdentity(), true);
+
+	// Register the policies. This segfaults, if done before the
+	// _runner.run() call above.
+	_runner.registerType(_atom_policy);
+	_runner.registerType(_space_policy);
+	_runner.registerType(_values_policy);
+	_runner.registerType(_incoming_policy);
 
 	// Do NOT fiddle with atomspace contents, if nothing is open!
 	if (not _observing_only)
