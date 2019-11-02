@@ -272,11 +272,13 @@ std::string DHTAtomStorage::prt_dht_value(
 	switch (ival->type)
 	{
 		case ATOM_ID:
-			ss << "Atom id=" << std::to_string(ival->id) << " "
+			ss << "Atom id=" << std::to_string(ival->id)
+			   << " seq=" << std::to_string(ival->seq) << " "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case SPACE_ID:
-			ss << "Member id=: " << std::to_string(ival->id) << " "
+			ss << "Member id=" << std::to_string(ival->id)
+			   << " seq=" << std::to_string(ival->seq) << " "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case VALUES_ID:
