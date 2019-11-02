@@ -164,7 +164,7 @@ bool DHTAtomStorage::store_atom(dht::InfoHash key,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
-	printf("duuude storat %s\n", prt_dht_value(value).c_str());
+	// printf("duuude storat %s\n", prt_dht_value(value).c_str());
 	return true;
 }
 
@@ -174,8 +174,8 @@ bool DHTAtomStorage::edit_atom(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	printf("duuude edat old %s\n", prt_dht_value(old_val).c_str());
-	printf("duuude edat new %s\n", prt_dht_value(new_val).c_str());
+	// printf("duuude edat old %s\n", prt_dht_value(old_val).c_str());
+	// printf("duuude edat new %s\n", prt_dht_value(new_val).c_str());
 	return true;
 }
 
@@ -184,7 +184,7 @@ bool DHTAtomStorage::store_space(dht::InfoHash key,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
-	printf("duuude storspa:\n%s", prt_dht_value(value).c_str());
+	// printf("duuude storspa:\n%s", prt_dht_value(value).c_str());
 	return true;
 }
 
@@ -194,8 +194,8 @@ bool DHTAtomStorage::edit_space(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
-	printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
+	// printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
+	// printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
 	return false;
 }
 
