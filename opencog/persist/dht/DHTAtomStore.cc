@@ -84,12 +84,10 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	auto done_cb = [=](bool success,
 	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
 	{
-		printf("duude done store succ=%d nv=%lu\n", success,
-			nodes.size());
+		printf("duude done store succ=%d nv=%lu\n%s\n", success,
+			nodes.size(), gstr.c_str());
 		for (auto& n : nodes)
-		{
 			printf("duuude done node=%s\n", n->toString().c_str());
-		}
 	};
 
 	// Put the atom into the atomspace.
