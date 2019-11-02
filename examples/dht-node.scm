@@ -32,7 +32,8 @@
 ;
 ; Examine some of them:
 (display (dht-examine "0000000000000000000000000000000000000000"))
-(display (dht-examine "51fd892f0ee03a96be14322b6c9b02db697c5074"))
+(display (dht-examine "ea89a943a6d23e8a4418d7896e25f6ce968df52a"))
+(display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
 
 ; Examine the routing tables:
 (display (dht-routing-tables-log))
