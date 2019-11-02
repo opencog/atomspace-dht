@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include <opendht/node.h>
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
@@ -26,10 +27,20 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	// in the store queue.
 	barrier();
 printf("duuude gonnna remove %s\n", atom->to_string().c_str());
-	std::string gstr = encodeAtomToStr(atom);
+
+	auto done_cb = [=](bool success,
+	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
+	{
+		printf("duude done remove succ=%d nv=%lu\n", success,
+		   nodes.size());
+		for (auto& n : nodes)
+			printf("duuude done rem node=%s\n", n->toString().c_str());
+	};
+
+	std::string gstr = "(cog-remove " + encodeAtomToStr(atom) + ")";
 	_runner.put(_atomspace_hash,
 	            dht::Value(_space_policy, gstr, atom->get_hash()),
-					(dht::DoneCallback) {}, std::chrono::steady_clock::time_point::max(), false);
+	            done_cb);
 
 #if 0
 	auto pinc = jatom.find("incoming");

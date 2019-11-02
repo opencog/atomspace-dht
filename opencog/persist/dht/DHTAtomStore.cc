@@ -7,8 +7,7 @@
  */
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <algorithm>
+#include <opendht/node.h>
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
@@ -82,6 +81,17 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	std::string gstr = encodeAtomToStr(atom);
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
+	auto done_cb = [=](bool success,
+	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
+	{
+		printf("duude done store succ=%d nv=%lu\n", success,
+			nodes.size());
+		for (auto& n : nodes)
+		{
+			printf("duuude done node=%s\n", n->toString().c_str());
+		}
+	};
+
 	// Put the atom into the atomspace.
 	// These will have a dht-id that is the atom hash, thus allowing
 	// multiple dht-values on the atomspace, but each value having
@@ -90,7 +100,7 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	// the edit policy allow duplicates.
 	_runner.put(_atomspace_hash,
 	            dht::Value(_space_policy, gstr, atom->get_hash()),
-	            (dht::DoneCallback) {}, std::chrono::steady_clock::time_point::max(), true);
+	            done_cb);
 	_published.emplace(atom);
 	_store_count ++;
 }
