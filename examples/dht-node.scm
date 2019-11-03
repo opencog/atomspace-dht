@@ -14,6 +14,11 @@
 ;
 ;  * Views of the data can help with debugging.
 ;
+;  * (TODO) With the ability to listen to updates, such a node could
+;    act as a bridge to file-backed storage (e.g. to the SQL backend).
+;    Similarly, the file-backed storage could be a seeder for DHT nodes
+;    that have expired thier data.
+;
 (use-modules (srfi srfi-1))
 (use-modules (opencog))
 (use-modules (opencog persist))
