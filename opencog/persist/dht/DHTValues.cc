@@ -63,13 +63,19 @@ std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::cout << "Done waiting for values" << std::endl;
 
 	auto dvals = afut.get();
+	unsigned long timestamp = 0;
+	std::string alist;
 	for (const auto& dval : dvals)
 	{
 		// std::cout << "Got value: " << dval->toString() << std::endl;
-		std::string alist = dval->unpack<std::string>();
-		std::cout << "Got svalue: " << alist << std::endl;
-		decodeAlist(h, alist);
+		if (timestamp < dval->id)
+		{
+			timestamp = dval->id;
+			alist = dval->unpack<std::string>();
+		}
 	}
+	std::cout << "Latest svalue: " << alist << std::endl;
+	decodeAlist(h, alist);
 
 	return h;
 }
