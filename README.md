@@ -25,14 +25,14 @@ storage of data.
 ## Alpha version 0.1.2
 Most things mostly work. See the [examples](examples). Some unit tests
 pass. There are several show-stopper or near-show-stopper issues
-preventing further development see the issues list below.
+preventing further development; see the issues list below.
 
 ### Status
 In the current implementation:
  * OpenDHT appears to be compatible with the requirements imposed by
    the AtomSpace backend API. It seems to provide most of the services
    that the AtomSpace needs. This makes future development and
-   operation look very promising.
+   operation look promising.
  * Despite this, there are several serious issues that are roadblocks
    to further development. These are listed below.
  * The implementation is almost feature-complete.  Missing are:
@@ -49,7 +49,9 @@ In the current implementation:
 6 - MultiPersistUTest
 ```
  * The failing tests are:
-   + `7 - MultiUserUTest` crashes with bizarre realloc bug.
+   + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
+     report is
+     [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
    + `4 - FetchUTest` has errors w/ resetting truth values back to
      default.
    + `5 - DeleteUTest` does not pass due to missing delete abilities.
@@ -81,9 +83,9 @@ and install mechanisms are the same.
   are deleted and then restored can be placed in proper
   chronological order. CRDT seems like overkill.
 * TODO: Enhancement: listen for new values on specific atoms
-  or atom types
+  or atom types.
 * TODO: Enhancement: listen for atomspace updates.
-* TODO: Enhancement: implement a CRDT type for CountTruthValue
+* TODO: Enhancement: implement a CRDT type for `CountTruthValue`.
 * TODO: Defer fetches until barrier. The futures can be created
   and then queued, until the time that they really need to be
   resolved.
