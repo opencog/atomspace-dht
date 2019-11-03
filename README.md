@@ -80,6 +80,10 @@ and install mechanisms are the same.
   that the local node is going down. See
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
   for details.
+* There does not seem to be any way of keeping only the latest values;
+  a whole cruft of them accumulate. See
+  [opendht issue #462](https://github.com/savoirfairelinux/opendht/issues/462)
+  for details.
 
 ## Build Prereqs
 

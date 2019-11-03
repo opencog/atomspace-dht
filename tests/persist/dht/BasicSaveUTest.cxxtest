@@ -30,6 +30,7 @@ class BasicSaveUTest :  public CxxTest::TestSuite
         AtomSpace *as;
         std::string uri;
         std::string boot;
+        DHTAtomStorage *astore;
 
         Handle n1[10];
         Handle n2[10];
@@ -61,7 +62,7 @@ class BasicSaveUTest :  public CxxTest::TestSuite
                 logger().info("setUp: cannot setup a DHT node");
                 exit(1);
             }
-            // astore->dht_bootstrap(boot);
+            // astore->dht_bootstrap("dht://localhost:4444/");
             // printf("Repo:\n%s\n", astore->dht_node_info().c_str());
         }
 
@@ -76,7 +77,6 @@ class BasicSaveUTest :  public CxxTest::TestSuite
         void setUp(void);
         void tearDown(void);
 
-        DHTAtomStorage *astore;
         void single_atom_save_restore(std::string id);
         void add_to_table(int, AtomTable *, std::string id);
         void check_table(int, AtomTable *, std::string id);

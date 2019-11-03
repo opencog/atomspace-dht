@@ -32,35 +32,49 @@ using namespace opencog;
 
 class ValueSaveUTest :  public CxxTest::TestSuite
 {
-    private:
-        std::string uri;
+	private:
+		std::string uri;
+		std::string boot;
+		DHTAtomStorage *astore;
 
-    public:
+	public:
 
-        ValueSaveUTest(void)
-        {
-            uri = "dht:///atomspace-dht-test";
-            logger().set_level(Logger::DEBUG);
-            logger().set_print_to_stdout_flag(true);
-        }
+		ValueSaveUTest(void)
+		{
+			logger().set_level(Logger::DEBUG);
+			logger().set_print_to_stdout_flag(true);
 
-        ~ValueSaveUTest()
-        {
-            // erase the log file if no assertions failed
-            if (!CxxTest::TestTracker::tracker().suiteFailed())
-                std::remove(logger().get_filename().c_str());
-        }
+			uri = "dht:///atomspace-dht-test";
+			boot = "dht://localhost:4555/";
 
-        void setUp(void);
-        void tearDown(void);
+			// Create a singe DHT node that will act as
+			// as the repo for the duration of the test.
+			astore = new DHTAtomStorage("dht://:4555/atomspace-dht-test");
+			if (!astore->connected())
+			{
+				logger().error("ValueSaveUTest: cannot setup a DHT node");
+				exit(1);
+			}
+		}
 
-        void test_single_atom_save();
-        void test_save_restore(bool);
-        void check_one(ValuePtr, bool);
-        void test_load_by_type();
-        void test_link_by_type();
-        void test_incoming();
-        void test_load_by_key(bool);
+		~ValueSaveUTest()
+		{
+			delete astore;
+			// erase the log file if no assertions failed
+			if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+		}
+
+		void setUp(void);
+		void tearDown(void);
+
+		void test_single_atom_save();
+		void test_save_restore(bool);
+		void check_one(ValuePtr, bool);
+		void test_load_by_type();
+		void test_link_by_type();
+		void test_incoming();
+		void test_load_by_key(bool);
 };
 
 /*
@@ -79,6 +93,7 @@ void ValueSaveUTest::tearDown(void) {}
 void ValueSaveUTest::test_single_atom_save()
 {
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -144,6 +159,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 	// ------
 	// First, save the value
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -167,6 +183,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 	// ---------------------------------
 	// Now, fetch the value and compare.
 	store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -191,6 +208,7 @@ void ValueSaveUTest::check_one(ValuePtr pap, bool fetchkey)
 void ValueSaveUTest::test_save_restore(bool fkey)
 {
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -243,6 +261,7 @@ void ValueSaveUTest::test_save_restore(bool fkey)
 void ValueSaveUTest::test_load_by_type()
 {
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -303,6 +322,7 @@ void ValueSaveUTest::test_load_by_type()
 	// Start it up again.
 
 	store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -358,6 +378,7 @@ void ValueSaveUTest::test_load_by_type()
 void ValueSaveUTest::test_link_by_type()
 {
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -446,6 +467,7 @@ void ValueSaveUTest::test_link_by_type()
 	// Start it up again.
 
 	store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
@@ -561,6 +583,7 @@ void ValueSaveUTest::test_link_by_type()
 void ValueSaveUTest::test_incoming()
 {
 	DHTAtomStorage *store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	AtomSpace* as = new AtomSpace();
@@ -649,6 +672,7 @@ void ValueSaveUTest::test_incoming()
 	// Start it up again.
 
 	store = new DHTAtomStorage(uri);
+	store->dht_bootstrap(boot);
 	TS_ASSERT(store->connected())
 
 	as = new AtomSpace();
