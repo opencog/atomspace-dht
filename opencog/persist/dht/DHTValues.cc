@@ -25,6 +25,9 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	if (_observing_only)
 		throw IOException(TRACE_INFO, "DHT Node is only observing!");
 
+// XXX FIXME -- if there's some existing TV on the atom in the DHT
+// but its the default TV in the atomspace, then we've got to clobber
+// whatever is in the DHT.
 if (0 == atom->getKeys().size())
 std::cout << "duude no keys on " << atom->to_short_string() << std::endl;
 
