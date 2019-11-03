@@ -54,6 +54,8 @@ class MultiUserUTest :  public CxxTest::TestSuite
         std::atomic<int> nstarted;
 
         std::string uri;
+        std::string boot;
+        DHTAtomStorage *astore;
 
 #define NCLAUSE 8
 #define NATOMS (NUSERS * NCLAUSE)
@@ -80,6 +82,8 @@ class MultiUserUTest :  public CxxTest::TestSuite
         MultiUserUTest(void);
         ~MultiUserUTest()
         {
+            delete astore;
+
             // erase the log file if no assertions failed
             if (!CxxTest::TestTracker::tracker().suiteFailed())
                 std::remove(logger().get_filename().c_str());
@@ -107,6 +111,18 @@ MultiUserUTest:: MultiUserUTest(void)
     logger().set_level(Logger::DEBUG);
     logger().set_print_to_stdout_flag(true);
 
+    uri = "dht:///atomspace-dht-test";
+    boot = "dht://localhost:4555/";
+
+    // Create a singe DHT node that will act as
+    // as the repo for the duration of the test.
+    astore = new DHTAtomStorage("dht://:4555/");
+    if (!astore->connected())
+    {
+        logger().error("DeleteUTest: cannot setup a DHT node");
+        exit(1);
+    }
+
     n_threads = NUSERS;
 
     n1 = new NodePtr[NATOMS];
@@ -123,8 +139,6 @@ MultiUserUTest:: MultiUserUTest(void)
     hl = new Handle[NATOMS];
     hl2 = new Handle[NATOMS];
     hl3 = new Handle[NATOMS];
-
-    uri = "dht:///atomspace-dht-test";
 }
 
 /*
@@ -139,6 +153,7 @@ void MultiUserUTest::connect_to_db(int i)
     _as[i] = new AtomSpace();
     _pm[i] = new DHTPersistSCM(_as[i]);
     _pm[i]->do_open(uri);
+    _pm[i]->do_bootstrap(boot);
 }
 
 void MultiUserUTest::tearDown(void)
@@ -425,6 +440,7 @@ void MultiUserUTest::do_test_multiuser(void)
     DHTPersistSCM* pm = new DHTPersistSCM(aspace);
 
     pm->do_open(uri);
+    pm->do_bootstrap(boot);
     for (int off=0; off<n_threads; off++)
         for (int i=0; i<NCLAUSE; i++) {
             fetch_space(NCLAUSE*off+i, aspace);

@@ -29,6 +29,8 @@ class DeleteUTest :  public CxxTest::TestSuite
     private:
         AtomSpace *_as;
         std::string uri;
+        std::string boot;
+        DHTAtomStorage *astore;
 
         NodePtr n1[10];
         NodePtr n2[10];
@@ -50,6 +52,8 @@ class DeleteUTest :  public CxxTest::TestSuite
         DeleteUTest(void);
         ~DeleteUTest()
         {
+            delete astore;
+
             // erase the log file if no assertions failed
             if (!CxxTest::TestTracker::tracker().suiteFailed())
                 std::remove(logger().get_filename().c_str());
@@ -77,10 +81,21 @@ class DeleteUTest :  public CxxTest::TestSuite
 
 DeleteUTest:: DeleteUTest(void)
 {
-    uri = "dht:///atomspace-dht-test";
     logger().set_level(Logger::DEBUG);
     logger().set_print_to_stdout_flag(true);
     logger().set_sync_flag(true);
+
+    uri = "dht:///atomspace-dht-test";
+    boot = "dht://localhost:4555/";
+
+    // Create a singe DHT node that will act as
+    // as the repo for the duration of the test.
+    astore = new DHTAtomStorage("dht://:4555/");
+    if (!astore->connected())
+    {
+        logger().error("DeleteUTest: cannot setup a DHT node");
+        exit(1);
+    }
 }
 
 /*
@@ -377,6 +392,7 @@ void DeleteUTest::test_remove(void)
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);
+    _pm->do_bootstrap(boot);
 
     int idx = 0;
     add_to_space(idx++, _as, "AA-aa-wow ");
@@ -460,6 +476,7 @@ void DeleteUTest::test_recurse(void)
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);
+    _pm->do_bootstrap(boot);
 
     int idx = 0;
     add_to_space(idx++, _as, "AA-aa-wow ");

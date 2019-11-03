@@ -31,6 +31,8 @@ class MultiPersistUTest :  public CxxTest::TestSuite
         AtomSpace *_as;
         DHTPersistSCM *_pm;
         std::string uri;
+        std::string boot;
+        DHTAtomStorage *astore;
 
 #define NTHREADS 6
 #define NHACK 10
@@ -58,6 +60,8 @@ class MultiPersistUTest :  public CxxTest::TestSuite
         MultiPersistUTest(void);
         ~MultiPersistUTest()
         {
+            delete astore;
+
             // erase the log file if no assertions failed
             if (!CxxTest::TestTracker::tracker().suiteFailed())
                 std::remove(logger().get_filename().c_str());
@@ -82,6 +86,18 @@ MultiPersistUTest:: MultiPersistUTest(void)
     logger().set_level(Logger::DEBUG);
     logger().set_print_to_stdout_flag(true);
 
+    uri = "dht:///atomspace-dht-test";
+    boot = "dht://localhost:4555/";
+
+    // Create a singe DHT node that will act as
+    // as the repo for the duration of the test.
+    astore = new DHTAtomStorage("dht://:4555/");
+    if (!astore->connected())
+    {
+        logger().error("DeleteUTest: cannot setup a DHT node");
+        exit(1);
+    }
+
     n_threads = NTHREADS;
 
     n1 = new NodePtr[NATOMS];
@@ -98,8 +114,6 @@ MultiPersistUTest:: MultiPersistUTest(void)
     hl = new Handle[NATOMS];
     hl2 = new Handle[NATOMS];
     hl3 = new Handle[NATOMS];
-
-    uri = "dht:///atomspace-dht-test";
 }
 
 /*
@@ -110,6 +124,7 @@ void MultiPersistUTest::setUp(void)
     _as = new AtomSpace();
     _pm = new DHTPersistSCM(_as);
     _pm->do_open(uri);
+    _pm->do_bootstrap(boot);
 }
 
 void MultiPersistUTest::tearDown(void)
