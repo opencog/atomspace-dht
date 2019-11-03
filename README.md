@@ -18,13 +18,13 @@ in ordinary graph databases, including an advanced query language
 and "active" Atoms.
 
 ### OpenDHT
-OpenDHT is an internet-wide globally-accesible storage system, providing
+OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
 ## Alpha version 0.1.2
 Most things mostly work. See the [examples](examples). Some unit tests
-pass. There are several show-stopper or near-showstopper issues
+pass. There are several show-stopper or near-show-stopper issues
 preventing further development see the issues list below.
 
 ### Status
@@ -34,10 +34,10 @@ In the current implementation:
    that the AtomSpace needs. This makes future development and
    operation look very promising.
  * Despite this, there are several serious issues that are roadblocks
-   to further development. These are listed belw.
+   to further development. These are listed below.
  * The implementation is almost feature-complete.  Missing are:
     + Ability to delete Atoms.
-    + Rate-limiting issues leading to misssing data.
+    + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
  * All seven unit tests have been ported over (from the original
    SQL backend driver tests) currently four of seven pass. The below
@@ -64,9 +64,9 @@ and install mechanisms are the same.
 
 ### Design Notes
 * Every Atom gets a unique hash. This is called the GUID.
-  Every GUID is published, because, givin only a GUID,
+  Every GUID is published, because, given only a GUID,
   there needs to be a way of finding out what the Atom is.
-  This is needed for IncmingSet fetch, for example.
+  This is needed for IncomingSet fetch, for example.
 * Every (Atom, AtomSpace-name) pair gets a unique hash.
   The current values on that atom, as well as it's incoming set
   are stored under that hash.
@@ -100,14 +100,14 @@ show-stoppers:
   places in the code. See
   [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
   for details. This is a serious issue, and makes the unit tests
-  fairly unreliable, as they become timing-dependent and racey.
+  fairly unreliable, as they become timing-dependent and racy.
   (This is effectively a show-stopper.)
 * There does not seem to be any way of force-pushing local data out
   onto the net, (for synchronization, e.g. for example, if it is known
   that the local node is going down. See
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
-  for details. This is effectively a showstopper, as it makes it
-  impossbile to safely terminate a running node with local data in it.
+  for details. This is effectively a show-stopper, as it makes it
+  impossible to safely terminate a running node with local data in it.
 * There does not seem to be any reliable way of deleting data. See
   [opendht issue #429](https://github.com/savoirfairelinux/opendht/issues/429)
   for details. A hacky work-around might be to publish timestamps
