@@ -25,6 +25,9 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	if (_observing_only)
 		throw IOException(TRACE_INFO, "DHT Node is only observing!");
 
+if (0 == atom->getKeys().size())
+std::cout << "duude no keys on " << atom->to_short_string() << std::endl;
+
 	// If there are no keys, there's nothing to do.
 	if (0 == atom->getKeys().size()) return;
 
@@ -33,8 +36,10 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 		store_recursive(key);
 
 	// Attach the value to the atom
-	// XXX TODO publish each value in it's own entry...
 	dht::InfoHash muid = get_membership(atom);
+std::cout << "duude muid= " << muid.toString() << " " <<
+atom->to_short_string() << std::endl;
+std::cout << "vals=" << encodeValuesToAlist(atom) << std::endl;
 	_runner.put(muid,
 		dht::Value(_values_policy, encodeValuesToAlist(atom), time(0)));
 

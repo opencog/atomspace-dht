@@ -22,19 +22,23 @@ OpenDHT is an internet-wide globally-accesible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.1
+## Alpha version 0.1.2
 Most things mostly work. See the [examples](examples). Some unit tests
-pass.
+pass. There are several show-stopper or near-showstopper issues
+preventing further development see the issues list below.
 
 ### Status
 In the current implementation:
- * OpenDHT appears to be highly compatible with the requirements
-   imposed by the AtomSpace backend API. It seems to provide exactly
-   those services that the AtomSpace needs. This makes future
-   development and operation look very promising.
- * System is almost feature-complete.  Missing are:
-    + Atom deletion
-    + A stable server
+ * OpenDHT appears to be compatible with the requirements imposed by
+   the AtomSpace backend API. It seems to provide most of the services
+   that the AtomSpace needs. This makes future development and
+   operation look very promising.
+ * Despite this, there are several serious issues that are roadblocks
+   to further development. These are listed belw.
+ * The implementation is almost feature-complete.  Missing are:
+    + Ability to delete Atoms.
+    + Rate-limiting issues leading to misssing data.
+    + Inability to flush pending output to the network.
  * All seven unit tests have been ported over (from the original
    SQL backend driver tests) currently four of seven pass. The below
    (usually) pass; when they fail, its due to rate-limiting.
@@ -44,7 +48,11 @@ In the current implementation:
 3 - PersistUTest
 6 - MultiPersistUTest
 ```
- * `7 - MultiUserUTest` crashes with bizarre realloc bug.
+ * The failing tests are:
+   + `7 - MultiUserUTest` crashes with bizarre realloc bug.
+   + `4 - FetchUTest` has errors w/ resetting truth values back to
+     default.
+   + `5 - DeleteUTest` does not pass due to missing delete abilities.
 
 
 ### Architecture
@@ -68,27 +76,43 @@ and install mechanisms are the same.
 * How can we find all members of the incoming set of an Atom?
   Easy, we generate the hash for that atom, and then look at
   all the DHT entries on it.
-* TODO: listen for new values on specific atoms or atom types
-* TODO: list for atomspace updates.
-* TODO: implement a CRDT type for CountTruthValue
-* TODO: flush writes before closing.
-* TODO: defer fetches until barrier.
-* TODO: hash explore utility
+* How to delete entries? Seems that every Atom will need to be
+  tagged with a version number (a timestamp) so that Atoms that
+  are deleted and then restored can be placed in proper
+  chronological order. CRDT seems like overkill.
+* TODO: Enhancement: listen for new values on specific atoms
+  or atom types
+* TODO: Enhancement: listen for atomspace updates.
+* TODO: Enhancement: implement a CRDT type for CountTruthValue
+* TODO: Defer fetches until barrier. The futures can be created
+  and then queued, until the time that they really need to be
+  resolved.
+* TODO: Enhancement: provide utilities that return hashes of the
+  Atoms, Incoming Sets, values, so that manual exploration of the
+  DHT contents is easier.
 
 ### Issues
-* There does not seem to be any reliable way of deleting data. See
-  [opendht issue #429](https://github.com/savoirfairelinux/opendht/issues/429)
-  for details.
+The following are serious issues, some of which are nearly
+show-stoppers:
+
 * Rate limiting causes published data to be discarded.  This is
   currently solved with a `std::this_thread::sleep_for()` in several
   places in the code. See
   [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
-  for details.
+  for details. This is a serious issue, and makes the unit tests
+  fairly unreliable, as they become timing-dependent and racey.
+  (This is effectively a show-stopper.)
 * There does not seem to be any way of force-pushing local data out
   onto the net, (for synchronization, e.g. for example, if it is known
   that the local node is going down. See
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
-  for details.
+  for details. This is effectively a showstopper, as it makes it
+  impossbile to safely terminate a running node with local data in it.
+* There does not seem to be any reliable way of deleting data. See
+  [opendht issue #429](https://github.com/savoirfairelinux/opendht/issues/429)
+  for details. A hacky work-around might be to publish timestamps
+  along with the delete orders, so that the latest status can be
+  known. This hack should work, although its ugly.
 * There does not seem to be any way of keeping only the latest values;
   a whole cruft of them accumulate. See
   [opendht issue #462](https://github.com/savoirfairelinux/opendht/issues/462)
