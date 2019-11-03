@@ -56,7 +56,7 @@ class BasicSaveUTest :  public CxxTest::TestSuite
 
             // Create a singe DHT node that will act as
 				// as the repo for the duration of the test.
-            astore = new DHTAtomStorage("dht://:4555/atomspace-dht-test");
+            astore = new DHTAtomStorage("dht://:4555/");
             if (!astore->connected())
             {
                 logger().error("BasicSaveUTest: cannot setup a DHT node");
@@ -291,7 +291,6 @@ void BasicSaveUTest::test_single_atom(void)
 
 
     // Trash the contents of the database.
-    astore->kill_data();
     single_atom_save_restore("aaa ");
     single_atom_save_restore("bbb ");
     single_atom_save_restore("ccc ");
@@ -299,7 +298,6 @@ void BasicSaveUTest::test_single_atom(void)
     single_atom_save_restore("eee ");
     single_atom_save_restore("$$$ ");
 
-    astore->kill_data();
     logger().debug("END TEST: %s", __FUNCTION__);
 }
 

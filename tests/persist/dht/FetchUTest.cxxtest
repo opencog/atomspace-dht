@@ -26,7 +26,9 @@ class FetchUTest :  public CxxTest::TestSuite
 {
 	private:
 		std::string uri;
+		std::string boot;
 		std::string dht_open;
+		DHTAtomStorage *astore;
 
 		AtomSpace *_as;
 		SchemeEval *eval;
@@ -36,6 +38,8 @@ class FetchUTest :  public CxxTest::TestSuite
 		FetchUTest(void);
 		~FetchUTest()
 		{
+			delete astore;
+
 			// erase the log file if no assertions failed
 			if (!CxxTest::TestTracker::tracker().suiteFailed())
 				std::remove(logger().get_filename().c_str());
@@ -56,7 +60,19 @@ FetchUTest::FetchUTest(void)
 	logger().set_print_to_stdout_flag(true);
 
 	uri = "dht:///atomspace-dht-test";
-	dht_open = "(dht-open \"" + uri + "\")\n";
+	boot = "dht://localhost:4555/";
+
+	// Create a singe DHT node that will act as
+	// as the repo for the duration of the test.
+	astore = new DHTAtomStorage("dht://:4555/");
+	if (!astore->connected())
+	{
+		logger().error("FetchUTest: cannot setup a DHT node");
+		exit(1);
+	}
+
+	dht_open = "(dht-open \"" + uri + "\")\n" +
+	           "(dht-bootstrap \"" + boot + "\")\n";
 }
 
 /*

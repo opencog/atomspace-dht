@@ -176,6 +176,8 @@ DHTAtomStorage::~DHTAtomStorage()
 	_runner.shutdown([cv](void) { cv->notify_one(); });
 
 	// Sometimes the shutdown hangs. I don't know why.
+	// See https://github.com/savoirfairelinux/opendht/issues/461
+	// for details.
 	cv->wait_for(lck, std::chrono::seconds(5));
 	delete cv;
 

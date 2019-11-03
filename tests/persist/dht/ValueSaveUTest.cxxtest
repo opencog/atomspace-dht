@@ -49,7 +49,7 @@ class ValueSaveUTest :  public CxxTest::TestSuite
 
 			// Create a singe DHT node that will act as
 			// as the repo for the duration of the test.
-			astore = new DHTAtomStorage("dht://:4555/atomspace-dht-test");
+			astore = new DHTAtomStorage("dht://:4555/");
 			if (!astore->connected())
 			{
 				logger().error("ValueSaveUTest: cannot setup a DHT node");
