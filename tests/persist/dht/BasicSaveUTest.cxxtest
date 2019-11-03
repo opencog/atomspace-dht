@@ -59,7 +59,7 @@ class BasicSaveUTest :  public CxxTest::TestSuite
             astore = new DHTAtomStorage("dht://:4555/atomspace-dht-test");
             if (!astore->connected())
             {
-                logger().info("setUp: cannot setup a DHT node");
+                logger().error("BasicSaveUTest: cannot setup a DHT node");
                 exit(1);
             }
             // astore->dht_bootstrap("dht://localhost:4444/");

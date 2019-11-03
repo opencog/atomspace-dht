@@ -66,9 +66,11 @@ void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 	auto sfut = _runner.get(_atomspace_hash);
 	std::cout << "Start waiting for atomspace" << std::endl;
 	sfut.wait();
-	std::cout << "Done waiting for atomspace" << std::endl;
+	auto toms = sfut.get();
+	std::cout << "Done waiting for atomspace, got "
+	          << std::to_string(toms.size()) << std::endl;
 
-	for (auto ato: sfut.get())
+	for (auto ato: toms)
 	{
 		std::string sname = ato->unpack<std::string>();
 		std::cout << "Load Atom " << sname << std::endl;
