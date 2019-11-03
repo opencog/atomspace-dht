@@ -159,7 +159,7 @@ dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 
 /* ================================================================== */
 
-bool DHTAtomStorage::store_atom(dht::InfoHash key,
+bool DHTAtomStorage::cy_store_atom(dht::InfoHash key,
                                 std::shared_ptr<dht::Value>& value,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
@@ -168,7 +168,7 @@ bool DHTAtomStorage::store_atom(dht::InfoHash key,
 	return true;
 }
 
-bool DHTAtomStorage::edit_atom(dht::InfoHash key,
+bool DHTAtomStorage::cy_edit_atom(dht::InfoHash key,
                               const std::shared_ptr<dht::Value>& old_val,
                               std::shared_ptr<dht::Value>& new_val,
                               const dht::InfoHash& from,
@@ -179,7 +179,7 @@ bool DHTAtomStorage::edit_atom(dht::InfoHash key,
 	return true;
 }
 
-bool DHTAtomStorage::store_space(dht::InfoHash key,
+bool DHTAtomStorage::cy_store_values(dht::InfoHash key,
                                 std::shared_ptr<dht::Value>& value,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
@@ -188,7 +188,7 @@ bool DHTAtomStorage::store_space(dht::InfoHash key,
 	return true;
 }
 
-bool DHTAtomStorage::edit_space(dht::InfoHash key,
+bool DHTAtomStorage::cy_edit_values(dht::InfoHash key,
                               const std::shared_ptr<dht::Value>& old_val,
                               std::shared_ptr<dht::Value>& new_val,
                               const dht::InfoHash& from,

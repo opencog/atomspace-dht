@@ -35,7 +35,8 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	// Attach the value to the atom
 	// XXX TODO publish each value in it's own entry...
 	dht::InfoHash muid = get_membership(atom);
-	_runner.put(muid, dht::Value(_values_policy, encodeValuesToAlist(atom)));
+	_runner.put(muid,
+		dht::Value(_values_policy, encodeValuesToAlist(atom), time(0)));
 
 	_value_stores ++;
 }
