@@ -98,6 +98,9 @@ and install mechanisms are the same.
 * TODO: Enhancement: provide utilities that return hashes of the
   Atoms, Incoming Sets, values, so that manual exploration of the
   DHT contents is easier.
+* TODO: Measure total RAM usage.  This risks being quite the
+  memory hog, if datasets with hundreds of millions of atoms are
+  published.
 
 ### Issues
 The following are serious issues, some of which are nearly
@@ -125,6 +128,21 @@ show-stoppers:
   a whole cruft of them accumulate. See
   [opendht issue #462](https://github.com/savoirfairelinux/opendht/issues/462)
   for details.
+
+### Architecture concerns
+There are numerous concerns with using a DHT backend.
+* The representation is likely to be RAM intensive, requiring KBytes
+  per atom, and thus causing trouble when datasets exceeed tens of
+  millions of Atoms.
+* There is no backup-to-disk; thus, a total data loss is risked if
+  there are large system outages.  This is a big concern, as the
+  initial networks are unlikely to have more than a few dozen nodes.
+  (The data should not be mixed into the global DHT... I think!?)
+* How will performance compare with traditional distributed databases
+  (e.g. with Postgres?)
+* How do we avoid accumulating large amounts of cruft? Long lifetimes
+  threaten this.  I guess that, in the end, there always needs to be
+  a seeder, e.g. working off of Postres? As otherwise, the data expires.
 
 ## Build Prereqs
 
