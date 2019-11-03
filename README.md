@@ -42,8 +42,8 @@ In the current implementation:
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
  * All seven unit tests have been ported over (from the original
-   SQL backend driver tests) currently four of seven pass. The below
-   (usually) pass; when they fail, its due to rate-limiting.
+   SQL backend driver tests). Currently four of seven pass. The
+   tests below (usually) pass; when they fail, its due to rate-limiting.
 ```
 1 - BasicSaveUTest
 2 - ValueSaveUTest
@@ -84,6 +84,10 @@ and install mechanisms are the same.
   tagged with a version number (a timestamp) so that Atoms that
   are deleted and then restored can be placed in proper
   chronological order. CRDT seems like overkill.
+* TODO: Optionally use crypto signatures to verify that the data
+  comes from legitimate, cooperating sources.
+* TODO: Support read-write overlays on top of read-only datasets.
+  This seems like it should be easy...
 * TODO: Enhancement: listen for new values on specific atoms
   or atom types.
 * TODO: Enhancement: listen for atomspace updates.
