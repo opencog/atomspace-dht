@@ -36,7 +36,7 @@ In the current implementation:
     + Atom deletion
     + A stable server
  * All seven unit tests have been ported over (from the original
-   SQL backend driver tests) currently three of seven pass.
+   SQL backend driver tests) currently four of seven pass.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
