@@ -139,7 +139,7 @@ std::string DHTPersistSCM::do_examine(const std::string& id)
 std::string DHTPersistSCM::do_node_info(void)
 {
     if (nullptr == _backing)
-        return "DHT node is not running";
+        return "DHT node is not running\n";
 
     return _backing->dht_node_info();
 }
@@ -147,7 +147,7 @@ std::string DHTPersistSCM::do_node_info(void)
 std::string DHTPersistSCM::do_storage_log(void)
 {
     if (nullptr == _backing)
-        return "DHT node is not running";
+        return "DHT node is not running\n";
 
     return _backing->dht_storage_log();
 }
@@ -155,7 +155,7 @@ std::string DHTPersistSCM::do_storage_log(void)
 std::string DHTPersistSCM::do_routing_tables_log(void)
 {
     if (nullptr == _backing)
-        return "DHT node is not running";
+        return "DHT node is not running\n";
 
     return _backing->dht_routing_tables_log();
 }
@@ -163,7 +163,7 @@ std::string DHTPersistSCM::do_routing_tables_log(void)
 std::string DHTPersistSCM::do_searches_log(void)
 {
     if (nullptr == _backing)
-        return "DHT node is not running";
+        return "DHT node is not running\n";
 
     return _backing->dht_searches_log();
 }
