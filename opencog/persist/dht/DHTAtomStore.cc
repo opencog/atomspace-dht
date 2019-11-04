@@ -176,15 +176,53 @@ bool DHTAtomStorage::cy_edit_atom(dht::InfoHash key,
 {
 	// printf("duuude edat old %s\n", prt_dht_value(old_val).c_str());
 	// printf("duuude edat new %s\n", prt_dht_value(new_val).c_str());
+
+	// All immutable atoms have a value->id == 1, always, and so we
+	// return true so that OpenDHT will always accept and keep
+	// the atom.
 	return true;
 }
+
+bool DHTAtomStorage::cy_store_space(dht::InfoHash key,
+                                std::shared_ptr<dht::Value>& value,
+                                const dht::InfoHash& from,
+                                const dht::SockAddr& addr)
+{
+	printf("duuude storspa:\n%s", prt_dht_value(value).c_str());
+	return true;
+}
+
+bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
+                              const std::shared_ptr<dht::Value>& old_val,
+                              std::shared_ptr<dht::Value>& new_val,
+                              const dht::InfoHash& from,
+                              const dht::SockAddr& addr)
+{
+	printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
+	printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
+
+	// All atoms belonging to the atomspace have a value->id equal to
+	// thier 64-bit atomspace hash. Although 64-bits is large, and even
+	// with the birthday paradox, there still is a 1 in 2^32 chance
+	// two distinct atoms will have the same id.  So we return true
+	// here, to keep both of them.  But only if they actually are
+	// different. If they are the same, we keep only one copy.
+	if (*old_val == *new_val)
+	{
+printf("they are identical!\n");
+		return false;
+	}
+
+	return true;
+}
+
 
 bool DHTAtomStorage::cy_store_values(dht::InfoHash key,
                                 std::shared_ptr<dht::Value>& value,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
-	// printf("duuude storspa:\n%s", prt_dht_value(value).c_str());
+	printf("duuude storval:\n%s", prt_dht_value(value).c_str());
 	return true;
 }
 
@@ -194,8 +232,10 @@ bool DHTAtomStorage::cy_edit_values(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	// printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
-	// printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
+	printf("duuude edval old:\n%s", prt_dht_value(old_val).c_str());
+	printf("duuude edval new:\n%s", prt_dht_value(new_val).c_str());
+	if (*old_val == *new_val)
+printf("they vals they are identical!\n");
 	return false;
 }
 

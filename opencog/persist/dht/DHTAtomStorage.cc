@@ -74,10 +74,10 @@ void DHTAtomStorage::init(const char * uri)
 		std::chrono::minutes(100), cy_store_atom, cy_edit_atom);
 
 	_space_policy = dht::ValueType(SPACE_ID, "space policy",
-		std::chrono::minutes(100));
+		std::chrono::minutes(100), cy_store_space, cy_edit_space);
 
 	_values_policy = dht::ValueType(VALUES_ID, "values policy",
-		std::chrono::minutes(100));
+		std::chrono::minutes(100), cy_store_values, cy_edit_values);
 
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		std::chrono::minutes(100));
