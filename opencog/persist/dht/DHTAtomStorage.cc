@@ -53,7 +53,7 @@ void DHTAtomStorage::init(const char * uri)
 	//    dht:///atomspace-name
 	//    dht://:port/atomspace-name
 
-#define DEFAULT_ATOMSPACE_PORT 4242
+#define DEFAULT_ATOMSPACE_PORT 4343
 	_port = DEFAULT_ATOMSPACE_PORT;
 	if ('/' == uri[URIX_LEN])
 	{
@@ -88,7 +88,7 @@ void DHTAtomStorage::init(const char * uri)
 	clear_stats();
 
 	// Launch a dht node on a new thread, using a generated
-	// RSA key pair, and listen on port 4242. If the defalut port
+	// RSA key pair, and listen on port 4343. If the defalut port
 	// is in use, try a larger one. This can happen in if more
 	// than one user on the machine is accessing the DHT; also
 	// the unit tests trigger this.
