@@ -8,7 +8,7 @@
 (use-modules (opencog persist-dht))
 
 ; Use the atomspace called "test-atomspace" for this demo.
-; This will run an OpenDHT node on localhost at port 4242
+; This will run an OpenDHT node on localhost at port 4343
 (dht-open "dht:///test-atomspace")
 
 ; Run the DHT node on a non-default port
@@ -26,14 +26,20 @@
 ; Store a single atom
 (store-atom (Concept "foo" (stv 0.6 0.8)))
 
-; The hash of this atom should be globally unique, it should be
-; 2220eca6560c36cde76315204130dbb182756a9b and can be examined
-; directly from the DHT, using the `dht-examine` command:
-(display (dht-examine "2220eca6560c36cde76315204130dbb182756a9b"))
+; Obtain the DHT key-hash for this atom.  For this Atom in an AtomSpace
+; with this particular name, this will be globally unique, and it
+; should be equal to 2220eca6560c36cde76315204130dbb182756a9b.
+(display (dht-atom-hash (ConceptNode "foo")))
+
+; The Values and Incoming Set attached to it can be examined:
+(display (dht-examine (dht-atom-hash (ConceptNode "foo"))))
 
 ; Similarly, the hash of this atomspace is also unique; it should be
-; d2bf1fd0312cbf309df74c537bea16769b419f44.  Printing this should
-; show the current contents of the AtomSpace, as it exists in the DHT.
+; d2bf1fd0312cbf309df74c537bea16769b419f44.
+(display (dht-atomspace-hash))
+
+; Printing this should show the current contents of the AtomSpace,
+; as it exists in the DHT.
 (display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
 
 ; View stats
@@ -59,7 +65,31 @@
 (store-atom e)
 
 ; Just for grins, show the atomspace contents now:
-(display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
+(display (dht-examine (dht-atomspace-hash)))
 
-; Close the connection to the dht table.
+; Take a closer look at (Concept "foo")
+(display (dht-examine (dht-atom-hash (ConceptNode "foo"))))
+
+; Notice that it had an antry labelled "Incoming".  It should have
+; printed like so:
+; Incoming: 50a541b715203c5e94845aad68c5bd5f92068991
+; What is this mystery value?  Let's find out:
+(display (dht-examine "50a541b715203c5e94845aad68c5bd5f92068991"))
+
+; Oh. It was the (ListLink (ConceptNode "foo") (ConceptNode "bar"))
+; But where did this key come from?
+(dht-immutable-hash (ListLink (ConceptNode "foo") (ConceptNode "bar")))
+
+; The immutable hash is different from the atom-hash:
+(dht-atom-hash (ListLink (ConceptNode "foo") (ConceptNode "bar")))
+
+; The immutable hash stores the globally-unique scheme string
+; representation of the Atom. This string representation is
+; independent of the AtomSpace; all AtomSpaces use the same string.
+; The mutable hash stores the Values and IncomingSet of an Atom,
+; as these exist in some particular AtomSpace.  The Values and the
+; IncomingSet change over time, and they will be different, in general,
+; for different AtomSpaces.
+
+; We are done. Close the connection to the dht table.
 (dht-close)
