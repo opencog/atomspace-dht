@@ -295,8 +295,7 @@ std::string DHTAtomStorage::prt_dht_value(
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case SPACE_ID:
-			ss << "Member id=" << std::hex << ival->id
-			   << " seq=" << std::to_string(ival->seq) << " "
+			ss << "Member id=" << std::hex << ival->id << " "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case VALUES_ID:
