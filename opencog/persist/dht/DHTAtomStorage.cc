@@ -87,9 +87,14 @@ void DHTAtomStorage::init(const char * uri)
 	bulk_store = false;
 	clear_stats();
 
+	// Run a private NetID only for AtomSpace data!
+	_config.dht_config.node_config.network = 42;
+	_config.dht_config.id = dht::crypto::generateIdentity();
+	_config.threaded = true;
+
 	// Launch a dht node on a new thread, using a generated
 	// RSA key pair, and listen on port 4343. If the defalut port
-	// is in use, try a larger one. This can happen in if more
+	// is in use, try a larger one. This can happen if more
 	// than one user on the machine is accessing the DHT; also
 	// the unit tests trigger this.
 	if (DEFAULT_ATOMSPACE_PORT == _port)
@@ -98,7 +103,7 @@ void DHTAtomStorage::init(const char * uri)
 		{
 			try
 			{
-				_runner.run(_port, dht::crypto::generateIdentity(), true);
+				_runner.run(_port, _config);
 			}
 			catch (const dht::DhtException& ex)
 			{
@@ -113,7 +118,7 @@ void DHTAtomStorage::init(const char * uri)
 				"Unable to start DHT node, all ports are in use");
 	}
 	else
-		_runner.run(_port, dht::crypto::generateIdentity(), true);
+		_runner.run(_port, _config);
 
 	// Register the policies. This segfaults, if done before the
 	// _runner.run() call above.

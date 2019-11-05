@@ -52,6 +52,7 @@ class DHTAtomStorage : public BackingStore
 
 		Handle tvpred; // the key to a very special valuation.
 
+		dht::DhtRunner::Config _config;
 		dht::DhtRunner _runner;
 		dht::InfoHash _atomspace_hash;
 
