@@ -39,8 +39,20 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 	for (auto ato: sfut.get())
 	{
 		std::string sname = ato->unpack<std::string>();
+
+		// Currently, the format is the string "add" or "drop",
+		// followed by a timestamp, followed by the scheme string.
+		// Ignore anything that doesn't start with "add"
+#define ADD_ATOM "add "
+	   if (sname.compare(0, sizeof(ADD_ATOM)-1, ADD_ATOM))
+			continue;
+
 		std::cout << "Load Atom " << sname << std::endl;
-		Handle h(decodeStrAtom(sname));
+		// pos is always 22 because the prefix is "add 1572978874.801600 "
+		// at least it will be for the next bijillion seconds.
+		// size_t pos = sname.find('(');
+		size_t pos = sizeof("add 1572978874.801600");
+		Handle h(decodeStrAtom(sname, pos));
 		as->add_atom(fetch_values(std::move(h)));
 		_load_count++;
 	}
@@ -73,10 +85,16 @@ void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 	for (auto ato: toms)
 	{
 		std::string sname = ato->unpack<std::string>();
-		std::cout << "Load Atom " << sname << std::endl;
-		Handle h(decodeStrAtom(sname));
+
+		// See comments above.
+	   if (sname.compare(0, sizeof(ADD_ATOM)-1, ADD_ATOM))
+			continue;
+
+		size_t pos = sizeof("add 1572978874.801600");
+		Handle h(decodeStrAtom(sname, pos));
 		if (h->get_type() != atom_type) continue;
 
+		std::cout << "Load Atom " << sname << std::endl;
 		table.add(fetch_values(std::move(h)), false);
 		_load_count++;
 	}
