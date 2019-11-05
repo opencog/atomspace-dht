@@ -178,7 +178,8 @@ DHTAtomStorage::~DHTAtomStorage()
 	// Sometimes the shutdown hangs. I don't know why.
 	// See https://github.com/savoirfairelinux/opendht/issues/461
 	// for details.
-	cv->wait_for(lck, std::chrono::seconds(5));
+	// cv->wait_for(lck, std::chrono::seconds(5));
+	cv->wait(lck);
 	delete cv;
 
 // Annoyingly, the shutdown is not enough.  The queues

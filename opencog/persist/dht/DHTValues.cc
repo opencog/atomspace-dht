@@ -40,11 +40,11 @@ std::cout << "duude no keys on " << atom->to_short_string() << std::endl;
 
 	// Attach the value to the atom
 	dht::InfoHash muid = get_membership(atom);
-std::cout << "duude muid= " << muid.toString() << " " <<
-atom->to_short_string() << std::endl;
-std::cout << "vals=" << encodeValuesToAlist(atom) << std::endl;
+	// std::cout << "muid= " << muid.toString() << " "
+	//           << atom->to_short_string() << std::endl;
+	// std::cout << "vals=" << encodeValuesToAlist(atom) << std::endl;
 	_runner.put(muid,
-		dht::Value(_values_policy, encodeValuesToAlist(atom), time(0)));
+		dht::Value(_values_policy, encodeValuesToAlist(atom), 1));
 
 	_value_stores ++;
 }
