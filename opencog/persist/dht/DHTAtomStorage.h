@@ -149,11 +149,6 @@ class DHTAtomStorage : public BackingStore
 		void decodeAlist(Handle&, std::string&);
 
 		// --------------------------
-		// Incoming set management
-		void store_incoming_of(const Handle &, const Handle&);
-		void remove_incoming_of(const Handle &, const std::string&);
-
-		// --------------------------
 		// Performance statistics
 		std::atomic<size_t> _num_get_atoms;
 		std::atomic<size_t> _num_got_nodes;

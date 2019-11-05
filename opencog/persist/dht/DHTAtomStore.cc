@@ -30,6 +30,9 @@ using namespace opencog;
  */
 void DHTAtomStorage::store_recursive(const Handle& h)
 {
+	if (_observing_only)
+		throw IOException(TRACE_INFO, "DHT Node is only observing!");
+
 	if (h->is_node())
 	{
 		publish_to_atomspace(h);
@@ -37,15 +40,20 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 	}
 
 	// Resursive store; add leaves first.
-	for (const Handle& ho: h->getOutgoingSet())
-		store_recursive(ho);
+	for (const Handle& held: h->getOutgoingSet())
+		store_recursive(held);
 
 	// Only after adding leaves, add the atom.
 	publish_to_atomspace(h);
 
 	// Finally, update the incoming sets.
-	for (const Handle& ho: h->getOutgoingSet())
-		store_incoming_of(ho,h);
+	dht::InfoHash holderguid = get_guid(h);
+	for (const Handle& held: h->getOutgoingSet())
+	{
+		dht::InfoHash memuid = get_membership(held);
+		_runner.put(memuid, dht::Value(_incoming_policy, holderguid),
+		            holder->get_hash());
+	}
 }
 
 /**

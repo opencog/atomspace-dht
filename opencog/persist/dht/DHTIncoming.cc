@@ -14,32 +14,6 @@
 using namespace opencog;
 
 /* ================================================================== */
-
-/// Store `holder` into the incoming set of atom.
-void DHTAtomStorage::store_incoming_of(const Handle& atom,
-                                       const Handle& holder)
-{
-	if (_observing_only)
-		throw IOException(TRACE_INFO, "DHT Node is only observing!");
-
-	dht::InfoHash memuid = get_membership(atom);
-	dht::InfoHash hoguid = get_guid(holder);
-
-	// Declare an incoming value
-	_runner.put(memuid, dht::Value(_incoming_policy, hoguid));
-}
-
-/* ================================================================== */
-
-/// Remove `holder` from the incoming set of atom.
-void DHTAtomStorage::remove_incoming_of(const Handle& atom,
-                                        const std::string& holder)
-{
-	// std::cout << "Remove from " << atom->to_short_string()
-	//           << " in CID " << holder << std::endl;
-}
-
-/* ================================================================ */
 /**
  * Retreive the entire incoming set of the indicated atom.
  * This fetches the Atoms in the incoming set; the ValueSaveUTest

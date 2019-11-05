@@ -48,35 +48,20 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 		removeAtom(hin, true);
 	}
 
-#if 0
 
 	// Remove this atom from the incoming sets of those that
 	// it contains.
-	if (h->is_link())
+	if (atom->is_link())
 	{
-		std::string acid;
+		dht::InfoHash holderguid = get_guid(atom);
+		for (const Handle& held: atom->getOutgoingSet())
 		{
-			std::lock_guard<std::mutex> lck(_guid_mutex);
-			auto pcid = _guid_map.find(h);
-			if (_guid_map.end() == pcid)
-				throw RuntimeException(TRACE_INFO,
-					"Error: missing CID for %s", h->to_string().c_str());
-			acid = pcid->second; // acid = _guid_map[h];
+			dht::InfoHash memuid = get_membership(held);
+			_runner.put(memuid, dht::Value(_incoming_policy, 0),
+			            holder->get_hash());
 		}
-		for (const Handle& hoth: h->getOutgoingSet())
-			remove_incoming_of(hoth, acid);
 	}
 
-	// Drop the atom from out caches
-	{
-		std::lock_guard<std::mutex> lck(_json_mutex);
-		_json_map.erase(h);
-	}
-	{
-		std::lock_guard<std::mutex> lck(_guid_mutex);
-		_guid_map.erase(h);
-	}
-#endif
 	// Now actually remove.
 	// The space policy is using the 64-bit AtomSpace ID as the
 	// DHT Value::id. Due to the birthday paradox, there is a very
@@ -93,6 +78,12 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 	{
 		std::unique_lock<std::mutex> lck(_publish_mutex);
 		_published.erase(atom);
+	}
+
+	// Drop the atom from out caches
+	{
+		std::lock_guard<std::mutex> lck(_membership_mutex);
+		_membership_map.erase(atom);
 	}
 
 	// Bug with stats: should not increment on recursion.
