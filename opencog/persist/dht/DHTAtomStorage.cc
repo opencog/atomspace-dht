@@ -223,10 +223,13 @@ double DHTAtomStorage::now(void)
  */
 std::string DHTAtomStorage::dht_node_info(void)
 {
+	int net = _config.dht_config.node_config.network;
 	std::stringstream ss;
 	dht::NodeInfo ni = _runner.getNodeInfo();
-	ss << "OpenDHT node " << ni.node_id.toString()
-	   << " running on port " << std::to_string(_port) << std::endl;
+	ss << "OpenDHT node " << ni.node_id.toString() << std::endl;
+	ss << "Belongs to network " << std::to_string(net)
+		<< ((0==net) ? " (public)" : " (private)")
+	   << " on port " << std::to_string(_port) << std::endl;
 	ss << "PKI fingerprint: " << ni.id.toString() << std::endl;
 	ss << "IPv4 stats:\n" << ni.ipv4.toString() << std::endl;
 	ss << "IPv6 stats:\n" << ni.ipv6.toString() << std::endl;
