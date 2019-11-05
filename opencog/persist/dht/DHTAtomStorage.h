@@ -103,6 +103,7 @@ class DHTAtomStorage : public BackingStore
 		               const dht::SockAddr& addr);
 
 		static std::string prt_dht_value(const std::shared_ptr<dht::Value>&);
+		double now(void);
 		// --------------------------
 		// Fetch and storing of atoms
 

@@ -209,6 +209,14 @@ bool DHTAtomStorage::connected(void)
 	return _runner.isRunning();
 }
 
+/// Return the time right now, as double-precision.
+double DHTAtomStorage::now(void)
+{
+	using flt = std::chrono::duration<double, std::ratio<1,1>>;
+	auto stamp = std::chrono::system_clock::now();
+	return std::chrono::duration_cast<flt>(stamp.time_since_epoch()).count();
+}
+
 /* ================================================================== */
 /**
  * Get the node status.

@@ -81,27 +81,12 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 // atoms and values. So use a hard-coded stall. See issue
 // https://github.com/savoirfairelinux/opendht/issues/460
 std::this_thread::sleep_for(std::chrono::milliseconds(120));
+
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
 	// is kept around.
 	std::string gstr = encodeAtomToStr(atom);
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
-
-#if 0
-	// The done_cb will not be called, if other nodes dropped our
-	// data due to rate-limiting.  The done_cb seems to run only
-	// when a reply to an announce is received.  It also does not
-	// seem to be 1-1 with the published data? i.e. multiple
-	// publishes get mashed together?
-	auto done_cb = [=](bool success,
-	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
-	{
-		printf("Done store cb success=%d num_nodes=%lu\n%s\n", success,
-			nodes.size(), gstr.c_str());
-		for (auto& n : nodes)
-			printf("Done node=%s\n", n->toString().c_str());
-	};
-#endif
 
 	// Put the atom into the atomspace.
 	// These will have a dht-id that is the atom hash, thus allowing
@@ -109,8 +94,13 @@ std::this_thread::sleep_for(std::chrono::milliseconds(120));
 	// a distinct dht-id.  Now, the atom-hashes are 64-bit, so there
 	// is a slight chance of collision.  This is solved by having
 	// the edit policy allow duplicates.
+	//
+	// We also have to mark the atom with a timestamp, to guarantee
+	// forward progress in the case that it is deleted later, and then
+	// added again.
+	std::string astr = "add " + std::to_string(now()) + " " + gstr;
 	_runner.put(_atomspace_hash,
-	            dht::Value(_space_policy, gstr, atom->get_hash()));
+	            dht::Value(_space_policy, astr, atom->get_hash()));
 
 	lck.lock();
 	_published.emplace(atom);

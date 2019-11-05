@@ -33,11 +33,8 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 	// small chance that two different Atoms will collide. In this
 	// case, we want to broadcast the string, to disambiguate
 	// which one is to be removed.
-	// XXX FIXME, except that this is currently not working, because
-	// of https://github.com/savoirfairelinux/opendht/issues/462
-	// Thus, there will be collisions...
-	std::string gstr = "(cog-remove " + encodeAtomToStr(atom) + ")";
-	gstr = "";
+	std::string gstr = "drop " + std::to_string(now())
+		+ " " + encodeAtomToStr(atom);
 	_runner.put(_atomspace_hash,
 	            dht::Value(_space_policy, gstr, atom->get_hash()));
 
