@@ -42,6 +42,8 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 	            dht::Value(_space_policy, gstr, atom->get_hash()),
 	            done_cb);
 
+	std::unique_lock<std::mutex> lck(_publish_mutex);
+	_published.erase(atom);
 #if 0
 	auto pinc = jatom.find("incoming");
 	if (jatom.end() != pinc)

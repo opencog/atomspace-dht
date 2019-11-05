@@ -201,8 +201,8 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	// printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
-	// printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
+	printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
+	printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
 
 	std::string satom = new_val->unpack<std::string>();
 #define REMOVE_ATOM "(cog-remove "
