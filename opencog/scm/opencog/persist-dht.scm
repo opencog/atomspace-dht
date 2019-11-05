@@ -12,8 +12,8 @@
 	"opencog_persist_dht_init")
 
 (export dht-bootstrap dht-clear-stats dht-close dht-open dht-stats
-	dht-examine dht-node-info dht-storage-log dht-routing-tables-log
-	dht-searches-log
+	dht-examine dht-atomspace-hash dht-immutable-hash dht-atom-hash
+	dht-node-info dht-storage-log dht-routing-tables-log dht-searches-log
 	dht-load-atomspace)
 
 (set-procedure-property! dht-bootstrap 'documentation
@@ -46,17 +46,60 @@
     no longer be stored to or fetched from the database.
 ")
 
+(set-procedure-property! dht-atom-hash 'documentation
+"
+ dht-atom-hash ATOM - Return string holding the DHT hash-key of ATOM.
+    The returned string will be a 40-character hex string encoding the
+    20-byte hash-key of the DHT entry for the ATOM in the currently
+    open AtomSpace. All of the ATOM's Incoming Set and Values are
+    attached to this key.
+
+    Example: Print the incoming set and values on an Atom:
+       (display (dht-examine (dht-atom-hash (Concept "foo"))))
+")
+
+(set-procedure-property! dht-atomspace-hash 'documentation
+"
+ dht-atomspace-hash - Return string holding the AtomSpace DHT hash-key.
+    The returned string will be a 40-character hex string encoding the
+    20-byte hash-key of the DHT entry for the currently open AtomSpace.
+
+    Example: Print all of the Atoms in the AtomSpace
+       (display (dht-examine (dht-atomspace-hash)))
+")
+
 (set-procedure-property! dht-examine 'documentation
 "
- dht-examine ID - Print information about a DHT entry
-    The DHT should be a 40-character hex string encoding the
-    20-byte key of a DHT entry.
+ dht-examine HASH-KEY - Return string describing a DHT entry.
+    The HASH-KEY should be a 40-character hex string encoding the
+    20-byte hash-key of a DHT entry.
+
+    Example: Print all of the Atoms in the AtomSpace:
+       (display (dht-examine (dht-atomspace-hash)))
+
+    Example: Print the incoming set and values on an Atom:
+       (display (dht-examine (dht-atom-hash (Concept "foo"))))
+")
+
+(set-procedure-property! dht-immutable-hash 'documentation
+"
+ dht-immutable-hash ATOM - Return string w/DHT hash-key encoding of ATOM.
+    The returned string will be a 40-character hex string encoding the
+    20-byte hash-key of the DHT entry for the ATOM in its immutable
+    form: that is, the scheme string representation of the Atom, as
+    it is without any attached Values or IncomingSet. This entry
+    exists outside of any particular AtomSpace, as it is globally unique
+    (precisely because it has no attached Values or IncomingSet.)
+    As such, it can be used as the globally-unique handle for the ATOM.
+
+    Example: Print the scheme representation of an Atom:
+       (display (dht-examine (dht-immutable-hash (Concept "foo"))))
 ")
 
 (set-procedure-property! dht-node-info 'documentation
 "
- dht-node-info - Print information about running DHT node.
-    This includes the number of connected nodes.
+ dht-node-info - Return string describing the running DHT node.
+    This includes information about the number of connected nodes.
 ")
 
 (set-procedure-property! dht-open 'documentation
@@ -87,17 +130,17 @@
 
 (set-procedure-property! dht-storage-log 'documentation
 "
- dht-storage-log - Print the DHT Node storage log.
+ dht-storage-log - Return a string describing the DHT Node storage log.
 ")
 
 (set-procedure-property! dht-routing-tables-log 'documentation
 "
- dht-routing-tables-log - Print the DHT Node routing tables log.
+ dht-routing-tables-log - Return string w/the DHT Node routing tables log.
 ")
 
 (set-procedure-property! dht-searches-log 'documentation
 "
- dht-searches-log - Print the DHT Node searches log.
+ dht-searches-log - Return string w/the DHT Node searches log.
 ")
 
 (set-procedure-property! dht-load-atomspace 'documentation

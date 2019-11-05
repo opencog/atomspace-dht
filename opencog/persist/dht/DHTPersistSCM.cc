@@ -54,6 +54,9 @@ void DHTPersistSCM::init(void)
     define_scheme_primitive("dht-load-atomspace", &DHTPersistSCM::do_load_atomspace, this, "persist-dht");
 
     define_scheme_primitive("dht-examine", &DHTPersistSCM::do_examine, this, "persist-dht");
+    define_scheme_primitive("dht-atomspace-hash", &DHTPersistSCM::do_atomspace_hash, this, "persist-dht");
+    define_scheme_primitive("dht-immutable-hash", &DHTPersistSCM::do_immutable_hash, this, "persist-dht");
+    define_scheme_primitive("dht-atom-hash", &DHTPersistSCM::do_atom_hash, this, "persist-dht");
     define_scheme_primitive("dht-node-info", &DHTPersistSCM::do_node_info, this, "persist-dht");
     define_scheme_primitive("dht-storage-log", &DHTPersistSCM::do_storage_log, this, "persist-dht");
     define_scheme_primitive("dht-routing-tables-log", &DHTPersistSCM::do_routing_tables_log, this, "persist-dht");
@@ -134,6 +137,33 @@ std::string DHTPersistSCM::do_examine(const std::string& id)
             "dht-examine: Error: DHT is not running");
 
     return _backing->dht_examine(id);
+}
+
+std::string DHTPersistSCM::do_atomspace_hash(void)
+{
+    if (nullptr == _backing)
+        throw RuntimeException(TRACE_INFO,
+            "dht-atomspace-hash: Error: DHT is not running");
+
+    return _backing->dht_atomspace_hash();
+}
+
+std::string DHTPersistSCM::do_immutable_hash(const Handle& h)
+{
+    if (nullptr == _backing)
+        throw RuntimeException(TRACE_INFO,
+            "dht-immutable-hash: Error: DHT is not running");
+
+    return _backing->dht_immutable_hash(h);
+}
+
+std::string DHTPersistSCM::do_atom_hash(const Handle& h)
+{
+    if (nullptr == _backing)
+        throw RuntimeException(TRACE_INFO,
+            "dht-atom-hash: Error: DHT is not running");
+
+    return _backing->dht_atom_hash(h);
 }
 
 std::string DHTPersistSCM::do_node_info(void)

@@ -301,6 +301,21 @@ std::string DHTAtomStorage::prt_dht_value(
 	return ss.str();
 }
 
+std::string DHTAtomStorage::dht_atomspace_hash(void)
+{
+	return _atomspace_hash.toString();
+}
+
+std::string DHTAtomStorage::dht_immutable_hash(const Handle& atom)
+{
+	return get_guid(atom).toString();
+}
+
+std::string DHTAtomStorage::dht_atom_hash(const Handle& atom)
+{
+	return get_membership(atom).toString();
+}
+
 /* ================================================================== */
 /// Drain the pending store queue. This is a fencing operation; the
 /// goal is to make sure that all writes that occurred before the

@@ -120,7 +120,11 @@ std::this_thread::sleep_for(std::chrono::milliseconds(120));
 /* ================================================================== */
 
 /**
- * Return the globally-unique hash corresponding to the Atom.
+ * Return the globally-unique hash corresponding to the (immutable)
+ * Atom. This is the Atom as it stands naked, without any values, or
+ * incoming set, or AtomSpace that it belongs to. Its just the pure
+ * Atom.
+ *
  * XXX TODO this should use all of the hashing and alpha-equivalence
  * rules that ContentHash Atom::compute_hash() const uses.
  * !! Perhaps we should extend class Atom to provide both 20-byte

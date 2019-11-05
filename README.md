@@ -24,7 +24,7 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.2
+## Alpha version 0.1.3
 Most things mostly work. See the [examples](examples). Some unit tests
 pass. There are several show-stopper or near-show-stopper issues
 preventing further development; see the issues list below.

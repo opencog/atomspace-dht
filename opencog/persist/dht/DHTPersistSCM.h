@@ -42,6 +42,9 @@ public:
 	void do_load(void);
 	void do_store(void);
 	std::string do_examine(const std::string&);
+	std::string do_atomspace_hash(void);
+	std::string do_immutable_hash(const Handle&);
+	std::string do_atom_hash(const Handle&);
 	std::string do_node_info(void);
 	std::string do_storage_log(void);
 	std::string do_routing_tables_log(void);

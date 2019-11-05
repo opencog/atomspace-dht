@@ -175,11 +175,15 @@ class DHTAtomStorage : public BackingStore
 		bool connected(void); // connection to DB is alive
 
 		void dht_bootstrap(const std::string& uri);
+		std::string dht_atomspace_hash(void);
+		std::string dht_immutable_hash(const Handle&);
+		std::string dht_atom_hash(const Handle&);
 		std::string dht_examine(const std::string&);
 		std::string dht_node_info(void);
 		std::string dht_storage_log(void);
 		std::string dht_routing_tables_log(void);
 		std::string dht_searches_log(void);
+
 		void load_atomspace(AtomSpace*, const std::string&);
 
 		void kill_data(void); // destroy DB contents
