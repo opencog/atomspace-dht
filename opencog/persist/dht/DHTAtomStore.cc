@@ -51,8 +51,8 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 	for (const Handle& held: h->getOutgoingSet())
 	{
 		dht::InfoHash memuid = get_membership(held);
-		_runner.put(memuid, dht::Value(_incoming_policy, holderguid),
-		            holder->get_hash());
+		_runner.put(memuid,
+			dht::Value(_incoming_policy, holderguid, h->get_hash()));
 	}
 }
 
@@ -233,7 +233,6 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
 	return false;
 }
 
-
 bool DHTAtomStorage::cy_store_values(dht::InfoHash key,
                                 std::shared_ptr<dht::Value>& value,
                                 const dht::InfoHash& from,
@@ -255,6 +254,32 @@ bool DHTAtomStorage::cy_edit_values(dht::InfoHash key,
 	// All values are given the value->id==1 and so all value updates
 	// go through this callback.  Returning `true` here will cause
 	// the old_val to be dropped and replaced by `new_val`.
+	return true;
+}
+
+bool DHTAtomStorage::cy_store_incoming(dht::InfoHash key,
+                                std::shared_ptr<dht::Value>& value,
+                                const dht::InfoHash& from,
+                                const dht::SockAddr& addr)
+{
+	// printf("duuude storinco:\n%s", prt_dht_value(value).c_str());
+	return true;
+}
+
+bool DHTAtomStorage::cy_edit_incoming(dht::InfoHash key,
+                              const std::shared_ptr<dht::Value>& old_val,
+                              std::shared_ptr<dht::Value>& new_val,
+                              const dht::InfoHash& from,
+                              const dht::SockAddr& addr)
+{
+	printf("duuude edinco old:\n%s", prt_dht_value(old_val).c_str());
+	printf("duuude edinco new:\n%s", prt_dht_value(new_val).c_str());
+
+	// All incoming sets are given the value->id==64-bit hash of the
+	// hoder. So all holder updates go through this callback.  Returning
+	// `true` here will cause the old_val to be dropped and replaced by
+	// `new_val`. There should only ever be two possible vales: the guid
+	// of the holder, or zero (deleted/discarded).
 	return true;
 }
 

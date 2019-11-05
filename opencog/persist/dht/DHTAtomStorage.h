@@ -102,6 +102,17 @@ class DHTAtomStorage : public BackingStore
 		               const dht::InfoHash& from,
 		               const dht::SockAddr& addr);
 
+		static bool cy_store_incoming(dht::InfoHash key,
+		                std::shared_ptr<dht::Value>& value,
+		                const dht::InfoHash& from,
+		                const dht::SockAddr& addr);
+
+		static bool cy_edit_incoming(dht::InfoHash key,
+		               const std::shared_ptr<dht::Value>& old_val,
+		               std::shared_ptr<dht::Value>& new_val,
+		               const dht::InfoHash& from,
+		               const dht::SockAddr& addr);
+
 		static std::string prt_dht_value(const std::shared_ptr<dht::Value>&);
 		double now(void);
 		// --------------------------

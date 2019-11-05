@@ -35,7 +35,7 @@ dht::ValueType DHTAtomStorage::_values_policy =
 
 dht::ValueType DHTAtomStorage::_incoming_policy =
 	dht::ValueType(INCOMING_ID, "incoming policy",
-		std::chrono::minutes(100));
+		std::chrono::minutes(100), cy_store_incoming, cy_edit_incoming);
 
 /* ================================================================ */
 // Constructors

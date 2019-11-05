@@ -53,12 +53,11 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 	// it contains.
 	if (atom->is_link())
 	{
-		dht::InfoHash holderguid = get_guid(atom);
 		for (const Handle& held: atom->getOutgoingSet())
 		{
 			dht::InfoHash memuid = get_membership(held);
-			_runner.put(memuid, dht::Value(_incoming_policy, 0),
-			            holder->get_hash());
+			_runner.put(memuid,
+				dht::Value(_incoming_policy, 0, atom->get_hash()));
 		}
 	}
 
