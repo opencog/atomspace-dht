@@ -20,8 +20,22 @@
 
 using namespace opencog;
 
-// Number of write-back queues
-#define NUM_WB_QUEUES 6
+	// Policies for storing atoms
+dht::ValueType DHTAtomStorage::_atom_policy =
+	dht::ValueType(ATOM_ID, "atom policy",
+		std::chrono::minutes(100), cy_store_atom, cy_edit_atom);
+
+dht::ValueType DHTAtomStorage::_space_policy =
+	dht::ValueType(SPACE_ID, "space policy",
+		std::chrono::minutes(100), cy_store_space, cy_edit_space);
+
+dht::ValueType DHTAtomStorage::_values_policy =
+	dht::ValueType(VALUES_ID, "values policy",
+		std::chrono::minutes(100), cy_store_values, cy_edit_values);
+
+dht::ValueType DHTAtomStorage::_incoming_policy =
+	dht::ValueType(INCOMING_ID, "incoming policy",
+		std::chrono::minutes(100));
 
 /* ================================================================ */
 // Constructors
@@ -68,19 +82,6 @@ void DHTAtomStorage::init(const char * uri)
 		_atomspace_hash = dht::InfoHash::get(_atomspace_name);
 		_observing_only = false;
 	}
-
-	// Policies for storing atoms
-	_atom_policy = dht::ValueType(ATOM_ID, "atom policy",
-		std::chrono::minutes(100), cy_store_atom, cy_edit_atom);
-
-	_space_policy = dht::ValueType(SPACE_ID, "space policy",
-		std::chrono::minutes(100), cy_store_space, cy_edit_space);
-
-	_values_policy = dht::ValueType(VALUES_ID, "values policy",
-		std::chrono::minutes(100), cy_store_values, cy_edit_values);
-
-	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
-		std::chrono::minutes(100));
 
 	bulk_load = false;
 	bulk_store = false;

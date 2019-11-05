@@ -204,6 +204,17 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
 	// printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
 	// printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
 
+	std::string satom = new_val->unpack<std::string>();
+#define REMOVE_ATOM "(cog-remove "
+	if (0 == satom.compare(0, sizeof(REMOVE_ATOM)-1, REMOVE_ATOM))
+	{
+		// Asking for atom to be deleted from the atomspace.
+		// Honor the request.
+		new_val = std::make_shared<dht::Value>(_space_policy, "", old_val->id);
+printf("deleted this: %s\n", satom.c_str());
+		return true;
+	}
+
 	// All atoms belonging to the atomspace have a value->id equal to
 	// thier 64-bit atomspace hash. Although 64-bits is large, and even
 	// with the birthday paradox, there still is a 1 in 2^32 chance
