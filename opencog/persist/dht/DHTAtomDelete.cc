@@ -28,20 +28,21 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	barrier();
 printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 
-	auto done_cb = [=](bool success,
-	                   const std::vector<std::shared_ptr<dht::Node>>& nodes)
-	{
-		printf("duude done remove succ=%d nv=%lu\n", success,
-		   nodes.size());
-		for (auto& n : nodes)
-			printf("duuude done rem node=%s\n", n->toString().c_str());
-	};
-
+	// The space policy is using the 64-bit AtomSpace ID as the
+	// DHT Value::id. Due to the birthday paradox, there is a very
+	// small chance that two different Atoms will collide. In this
+	// case, we want to broadcast the string, to disambiguate
+	// which one is to be removed.
+	// XXX FIXME, except that this is currently not working, because
+	// of https://github.com/savoirfairelinux/opendht/issues/462
+	// Thus, there will be collisions...
 	std::string gstr = "(cog-remove " + encodeAtomToStr(atom) + ")";
+	gstr = "";
 	_runner.put(_atomspace_hash,
-	            dht::Value(_space_policy, gstr, atom->get_hash()),
-	            done_cb);
+	            dht::Value(_space_policy, gstr, atom->get_hash()));
 
+	// Update the index, so that if the Atom is recreated later,
+	// it appears to be brand-new.
 	std::unique_lock<std::mutex> lck(_publish_mutex);
 	_published.erase(atom);
 #if 0

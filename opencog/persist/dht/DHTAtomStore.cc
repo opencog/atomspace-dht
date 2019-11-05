@@ -204,14 +204,18 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
 	printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
 	printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
 
+#if BIRTHDAY_NOT_WORKING
 	std::string satom = new_val->unpack<std::string>();
+
+	// See the comment in DHTAtomStorage::removeAtom() about the
+	// birthday paradox. This code won't work until an OpenDHT bug is
+	// fixed.
 #define REMOVE_ATOM "(cog-remove "
 	if (0 == satom.compare(0, sizeof(REMOVE_ATOM)-1, REMOVE_ATOM))
 	{
 		// Asking for atom to be deleted from the atomspace.
 		// Honor the request.
 		new_val = std::make_shared<dht::Value>(_space_policy, "", old_val->id);
-printf("deleted this: %s\n", satom.c_str());
 		return true;
 	}
 
@@ -221,6 +225,10 @@ printf("deleted this: %s\n", satom.c_str());
 	// two distinct atoms will have the same id.  So we return `false`
 	// here, to keep both of them.
 	return false;
+#endif
+
+	// Due to above bug, we only allow one value. So always return true.
+	return true;
 }
 
 
