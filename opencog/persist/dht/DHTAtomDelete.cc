@@ -28,51 +28,27 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	barrier();
 printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 
-	// The space policy is using the 64-bit AtomSpace ID as the
-	// DHT Value::id. Due to the birthday paradox, there is a very
-	// small chance that two different Atoms will collide. In this
-	// case, we want to broadcast the string, to disambiguate
-	// which one is to be removed.
-	std::string gstr = "drop " + std::to_string(now())
-		+ " " + encodeAtomToStr(atom);
-	_runner.put(_atomspace_hash,
-	            dht::Value(_space_policy, gstr, atom->get_hash()));
+	// First, check to see if there's an incoming set, or not.
+	dht::InfoHash mhash = get_membership(atom);
+	auto afut = _runner.get(mhash,
+		dht::Value::TypeFilter(_incoming_policy));
+	afut.wait();
+	auto dinset = afut.get();
 
-	// Update the index, so that if the Atom is recreated later,
-	// it appears to be brand-new.
-	std::unique_lock<std::mutex> lck(_publish_mutex);
-	_published.erase(atom);
-#if 0
-	auto pinc = jatom.find("incoming");
-	if (jatom.end() != pinc)
+	// Fail if a non-trivial incoming set.
+	// Note that this is racey: the incoing set can change,
+	// even as we are checking it. Right now, this is not
+	// controlled, and might maybe lead to inconsistent state.
+	if (not recursive and 0 < dinset.size()) return;
+
+	// We're recursive; so recurse.
+	for (const auto& dinc : dinset)
 	{
-		auto iset = *pinc; // iset = jatom["incoming"];
-
-		// Fail if a non-trivial incoming set.
-		if (not recursive and 0 < iset.size()) return;
-
-		// We're recursive; so recurse.
-		for (auto guid: iset)
-		{
-			// Given only the GUID of the atom, get the handle.
-			// Use the cache, if possible.
-			Handle hin;
-			{
-				std::lock_guard<std::mutex> lck(_inv_mutex);
-				auto inp = _guid_inv_map.find(guid);
-				if (_guid_inv_map.end() == inp)
-				{
-std::cout << "Quasi-error: expected to find atom but did not!" << std::endl;
-					hin = fetch_atom(guid);
-				}
-				else
-				{
-					hin = inp->second;
-				}
-			}
-			removeAtom(hin, true);
-		}
+		Handle hin(fetch_atom(dinc->unpack<dht::InfoHash>()));
+		removeAtom(hin, true);
 	}
+
+#if 0
 
 	// Remove this atom from the incoming sets of those that
 	// it contains.
@@ -100,35 +76,24 @@ std::cout << "Quasi-error: expected to find atom but did not!" << std::endl;
 		std::lock_guard<std::mutex> lck(_guid_mutex);
 		_guid_map.erase(h);
 	}
-
-	// Now actually remove.
-	std::string new_as_id;
-	ipfs::Client* conn = conn_pool.pop();
-	{
-		std::string name = h->to_short_string();
-		try
-		{
-			// Update the cid under a lock, as atomspace modifications
-			// can occur from multiple threads.  It's not actually the
-			// cid that matters, its the patch itself.
-			std::lock_guard<std::mutex> lck(_atomspace_cid_mutex);
-			conn->ObjectPatchRmLink(_atomspace_cid, name, &new_as_id);
-			_atomspace_cid = new_as_id;
-		}
-		catch (const std::exception& ex)
-		{
-			std::cout << "Error: Atomspace " << _atomspace_cid
-			          << " does not contain " << name << std::endl;
-
-			conn_pool.push(conn);
-			throw RuntimeException(TRACE_INFO,
-				"Error: Atomspace did not contain atom; how did that happen?\n");
-		}
-		std::cout << "Atomspace after removal of " << name
-		          << " is " << _atomspace_cid << std::endl;
-	}
-	conn_pool.push(conn);
 #endif
+	// Now actually remove.
+	// The space policy is using the 64-bit AtomSpace ID as the
+	// DHT Value::id. Due to the birthday paradox, there is a very
+	// small chance that two different Atoms will collide. In this
+	// case, we want to broadcast the string, to disambiguate
+	// which one is to be removed.
+	std::string gstr = "drop " + std::to_string(now())
+		+ " " + encodeAtomToStr(atom);
+	_runner.put(_atomspace_hash,
+	            dht::Value(_space_policy, gstr, atom->get_hash()));
+
+	// Update the index, so that if the Atom is recreated later,
+	// it appears to be brand-new.
+	{
+		std::unique_lock<std::mutex> lck(_publish_mutex);
+		_published.erase(atom);
+	}
 
 	// Bug with stats: should not increment on recursion.
 	_num_atom_deletes++;
