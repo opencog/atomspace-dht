@@ -16,6 +16,30 @@
 	dht-node-info dht-storage-log dht-routing-tables-log dht-searches-log
 	dht-load-atomspace)
 
+; --------------------------------------------------------------
+
+(set-procedure-property! dht-atom-hash 'documentation
+"
+ dht-atom-hash ATOM - Return string holding the DHT hash-key of ATOM.
+    The returned string will be a 40-character hex string encoding the
+    20-byte hash-key of the DHT entry for the ATOM in the currently
+    open AtomSpace. All of the ATOM's Incoming Set and Values are
+    attached to this key.
+
+    Example: Print the incoming set and values on an Atom:
+       (display (dht-examine (dht-atom-hash (Concept \"foo\"))))
+")
+
+(set-procedure-property! dht-atomspace-hash 'documentation
+"
+ dht-atomspace-hash - Return string holding the AtomSpace DHT hash-key.
+    The returned string will be a 40-character hex string encoding the
+    20-byte hash-key of the DHT entry for the currently open AtomSpace.
+
+    Example: Print all of the Atoms in the AtomSpace
+       (display (dht-examine (dht-atomspace-hash)))
+")
+
 (set-procedure-property! dht-bootstrap 'documentation
 "
  dht-bootstrap URI - Provide a DHT peer to connect to.
@@ -46,28 +70,6 @@
     no longer be stored to or fetched from the database.
 ")
 
-(set-procedure-property! dht-atom-hash 'documentation
-"
- dht-atom-hash ATOM - Return string holding the DHT hash-key of ATOM.
-    The returned string will be a 40-character hex string encoding the
-    20-byte hash-key of the DHT entry for the ATOM in the currently
-    open AtomSpace. All of the ATOM's Incoming Set and Values are
-    attached to this key.
-
-    Example: Print the incoming set and values on an Atom:
-       (display (dht-examine (dht-atom-hash (Concept "foo"))))
-")
-
-(set-procedure-property! dht-atomspace-hash 'documentation
-"
- dht-atomspace-hash - Return string holding the AtomSpace DHT hash-key.
-    The returned string will be a 40-character hex string encoding the
-    20-byte hash-key of the DHT entry for the currently open AtomSpace.
-
-    Example: Print all of the Atoms in the AtomSpace
-       (display (dht-examine (dht-atomspace-hash)))
-")
-
 (set-procedure-property! dht-examine 'documentation
 "
  dht-examine HASH-KEY - Return string describing a DHT entry.
@@ -78,7 +80,7 @@
        (display (dht-examine (dht-atomspace-hash)))
 
     Example: Print the incoming set and values on an Atom:
-       (display (dht-examine (dht-atom-hash (Concept "foo"))))
+       (display (dht-examine (dht-atom-hash (Concept \"foo\"))))
 ")
 
 (set-procedure-property! dht-immutable-hash 'documentation
@@ -93,7 +95,7 @@
     As such, it can be used as the globally-unique handle for the ATOM.
 
     Example: Print the scheme representation of an Atom:
-       (display (dht-examine (dht-immutable-hash (Concept "foo"))))
+       (display (dht-examine (dht-immutable-hash (Concept \"foo\"))))
 ")
 
 (set-procedure-property! dht-node-info 'documentation
