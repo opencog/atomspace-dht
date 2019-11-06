@@ -26,7 +26,6 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	// Synchronize. The atom that we are deleting might be sitting
 	// in the store queue.
 	barrier();
-printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 
 	// First, check to see if there's an incoming set, or not.
 	dht::InfoHash mhash = get_membership(atom);

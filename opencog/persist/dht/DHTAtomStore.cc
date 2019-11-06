@@ -274,8 +274,8 @@ bool DHTAtomStorage::cy_edit_incoming(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
-	printf("duuude edinco old:\n%s", prt_dht_value(old_val).c_str());
-	printf("duuude edinco new:\n%s", prt_dht_value(new_val).c_str());
+	// printf("duuude edinco old:\n%s", prt_dht_value(old_val).c_str());
+	// printf("duuude edinco new:\n%s", prt_dht_value(new_val).c_str());
 
 	// All incoming sets are given the value->id==64-bit hash of the
 	// hoder. So all holder updates go through this callback.  Returning
