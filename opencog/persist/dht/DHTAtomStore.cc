@@ -153,6 +153,7 @@ dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 	const auto& ip = _membership_map.find(h);
 	if (_membership_map.end() != ip)
 		return ip->second;
+
 	std::string astr = _atomspace_name + encodeAtomToStr(h);
 	dht::InfoHash akey = dht::InfoHash::get(astr);
 	_membership_map[h] = akey;

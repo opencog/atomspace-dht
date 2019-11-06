@@ -23,6 +23,8 @@ using namespace opencog;
 ///
 void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 {
+	static dht::InfoHash zerohash;
+
 	// Synchronize. The atom that we are deleting might be sitting
 	// in the store queue.
 	barrier();
@@ -34,22 +36,25 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	afut.wait();
 	auto dinset = afut.get();
 
-	// Fail if a non-trivial incoming set.
-	// Note that this is racey: the incoing set can change,
+	// Fail if not recursive and have a non-trivial incoming set.
+	// Note that this is racey: the incoming set can change,
 	// even as we are checking it. Right now, this is not
 	// controlled, and might maybe lead to inconsistent state.
-	if (not recursive and 0 < dinset.size()) return;
-
-	// We're recursive; so recurse.
 	for (const auto& dinc : dinset)
 	{
-		Handle hin(fetch_atom(dinc->unpack<dht::InfoHash>()));
+		dht::InfoHash inhash = dinc->unpack<dht::InfoHash>();
+		if (inhash == zerohash) continue;
+
+		// Fail if not recursive.
+		if (not recursive) return;
+
+		// We're recursive; so recurse.
+		Handle hin(fetch_atom(inhash));
 		removeAtom(hin, true);
 	}
 
 	// Remove this atom from the incoming sets of those that
 	// it contains.
-	static dht::InfoHash zerohash;
 	if (atom->is_link())
 	{
 		for (const Handle& held: atom->getOutgoingSet())
