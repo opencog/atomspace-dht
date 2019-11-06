@@ -24,7 +24,7 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.3
+## Alpha version 0.1.4
 Most things mostly work. See the [examples](examples). Some unit tests
 pass. There are several show-stopper or near-show-stopper issues
 preventing further development; see the issues list below.
@@ -38,7 +38,6 @@ In the current implementation:
  * Despite this, there are several serious issues that are roadblocks
    to further development. These are listed below.
  * The implementation is almost feature-complete.  Missing are:
-    + Ability to delete Atoms.
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
  * All seven unit tests have been ported over (from the original
@@ -56,7 +55,7 @@ In the current implementation:
      [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
    + `4 - FetchUTest` has errors w/ resetting truth values back to
      default.
-   + `5 - DeleteUTest` does not pass due to missing delete abilities.
+   + `5 - DeleteUTest` does not pass due to ?
 
 
 ### Architecture
