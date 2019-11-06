@@ -392,7 +392,6 @@ void DHTAtomStorage::clear_stats(void)
 	_num_get_inlinks = 0;
 	_num_node_inserts = 0;
 	_num_link_inserts = 0;
-	_num_atom_removes = 0;
 	_num_atom_deletes = 0;
 }
 
@@ -414,10 +413,9 @@ void DHTAtomStorage::print_stats(void)
 	size_t value_stores = _value_stores;
 	printf("dht-stats: value updates = %zu\n", value_stores);
 
-	size_t num_atom_removes = _num_atom_removes;
 	size_t num_atom_deletes = _num_atom_deletes;
-	printf("dht-stats: atom remove requests = %zu total atom deletes = %zu\n",
-	       num_atom_removes, num_atom_deletes);
+	printf("dht-stats: total atom deletes = %zu\n",
+	       num_atom_deletes);
 	printf("\n");
 
 	size_t num_get_atoms = _num_get_atoms;

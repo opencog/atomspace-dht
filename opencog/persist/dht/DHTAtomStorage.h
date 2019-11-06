@@ -155,6 +155,7 @@ class DHTAtomStorage : public BackingStore
 		// Values
 		void store_atom_values(const Handle &);
 		Handle fetch_values(Handle&&);
+		void delete_atom_values(const Handle&);
 
 		ValuePtr decodeStrValue(std::string&, size_t&);
 		void decodeAlist(Handle&, std::string&);
@@ -168,7 +169,6 @@ class DHTAtomStorage : public BackingStore
 		std::atomic<size_t> _num_get_inlinks;
 		std::atomic<size_t> _num_node_inserts;
 		std::atomic<size_t> _num_link_inserts;
-		std::atomic<size_t> _num_atom_removes;
 		std::atomic<size_t> _num_atom_deletes;
 		std::atomic<size_t> _load_count;
 		std::atomic<size_t> _store_count;

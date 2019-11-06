@@ -71,6 +71,9 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	_runner.put(_atomspace_hash,
 	            dht::Value(_space_policy, gstr, atom->get_hash()));
 
+	// Trash the values, too
+	delete_atom_values(atom);
+
 	// Update the index, so that if the Atom is recreated later,
 	// it appears to be brand-new.
 	{
@@ -86,7 +89,6 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 
 	// Bug with stats: should not increment on recursion.
 	_num_atom_deletes++;
-	_num_atom_removes++;
 }
 
 /* ============================= END OF FILE ================= */

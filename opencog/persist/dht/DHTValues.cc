@@ -49,6 +49,21 @@ std::cout << "duude no keys on " << atom->to_short_string() << std::endl;
 	_value_stores ++;
 }
 
+/* ================================================================== */
+
+/// Delete ALL of the values associated with the atom.
+void DHTAtomStorage::delete_atom_values(const Handle& atom)
+{
+	if (_observing_only)
+		throw IOException(TRACE_INFO, "DHT Node is only observing!");
+
+	// Attach the value to the atom
+	dht::InfoHash muid = get_membership(atom);
+	_runner.put(muid, dht::Value(_values_policy, "", 1));
+
+	_value_stores ++;
+}
+
 /* ================================================================ */
 
 Handle DHTAtomStorage::fetch_values(Handle&& h)
