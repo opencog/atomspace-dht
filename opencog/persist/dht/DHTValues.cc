@@ -71,7 +71,7 @@ void DHTAtomStorage::delete_atom_values(const Handle& atom)
 
 Handle DHTAtomStorage::fetch_values(Handle&& h)
 {
-	dht::InfoHash ahash = get_membership(h);
+	dht::InfoHash muid = get_membership(h);
 
 // XXX HACK ALERT -- rate limiting bug!!
 // See https://github.com/savoirfairelinux/opendht/issues/460
@@ -80,7 +80,7 @@ std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	// Get a future for the values on this atom. We filter,
 	// because the same membership hash gets used for both
 	// values and for incoming sets. We only want the values.
-	auto afut = _runner.get(ahash,
+	auto afut = _runner.get(muid,
 		dht::Value::TypeFilter(_values_policy));
 
 	// Block until we've got it.

@@ -28,6 +28,7 @@ class DeleteUTest :  public CxxTest::TestSuite
 {
     private:
         AtomSpace *_as;
+        DHTPersistSCM *_pm;
         std::string uri;
         std::string boot;
         DHTAtomStorage *astore;
@@ -255,9 +256,19 @@ void DeleteUTest::fetch_space(int idx, AtomSpace *space)
     hvec.push_back(hb3);
     hvec.push_back(hb4);
 
+    std::string ref = _pm->do_atom_hash(hl[idx]);
+    std::string valus = _pm->do_examine(ref);
+    printf("Pre fetch memuid=%s\n", ref.c_str());
+    printf("Pre fetch have vals=%s\n", valus.c_str());
+
     AtomPtr alb = createLink(hvec, hl[idx]->get_type());
     Handle hlb(alb->get_handle());
-    space->fetch_atom(hlb);
+
+    Handle flb = space->fetch_atom(hlb);
+    ref = _pm->do_atom_hash(hl[idx]);
+    valus = _pm->do_examine(ref);
+    printf("Post fetch have vals=%s\n", valus.c_str());
+
 
     HandleSeq hv2({hlb, hb2});
     AtomPtr alb2 = createLink(hv2, hl2[idx]->get_type());
@@ -367,6 +378,11 @@ void DeleteUTest::delete_links(int idx, AtomSpace *as)
 	as->remove_atom(hl3[idx]);
 	as->remove_atom(hl2[idx]);
 	as->remove_atom(hl[idx]);
+
+	std::string ref = _pm->do_atom_hash(hl[idx]);
+	std::string valus = _pm->do_examine(ref);
+	printf("After delete memuid=%s\n", ref.c_str());
+	printf("After delete have vals=%s\n", valus.c_str());
 }
 
 // This removes all the links, and one node, from atomspace,
@@ -388,7 +404,7 @@ void DeleteUTest::test_remove(void)
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-    DHTPersistSCM* _pm = new DHTPersistSCM(_as);
+    _pm = new DHTPersistSCM(_as);
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);
@@ -463,6 +479,7 @@ void DeleteUTest::test_remove(void)
     _pm->do_close();
 
     delete _pm;
+    _pm = nullptr;
     logger().debug("END TEST: %s", __FUNCTION__);
 }
 
@@ -472,7 +489,7 @@ void DeleteUTest::test_recurse(void)
 {
     logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-    DHTPersistSCM* _pm = new DHTPersistSCM(_as);
+    _pm = new DHTPersistSCM(_as);
     TSM_ASSERT("Persist Module not loaded", _pm);
 
     _pm->do_open(uri);
@@ -561,6 +578,7 @@ void DeleteUTest::test_recurse(void)
     _pm->do_close();
 
     delete _pm;
+    _pm  = nullptr;
     logger().debug("END TEST: %s", __FUNCTION__);
 }
 

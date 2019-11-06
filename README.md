@@ -24,7 +24,7 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.4
+## Alpha version 0.1.5
 Most things mostly work. See the [examples](examples). Some unit tests
 pass. There are several show-stopper or near-show-stopper issues
 preventing further development; see the issues list below.
@@ -48,14 +48,13 @@ In the current implementation:
 2 - ValueSaveUTest
 3 - PersistUTest
 4 - FetchUTest
+5 - DeleteUTest
 6 - MultiPersistUTest
 ```
  * The failing tests are:
    + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
      report is
      [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
-   + `5 - DeleteUTest` does not pass due to ???
-
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
