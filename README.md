@@ -47,15 +47,14 @@ In the current implementation:
 1 - BasicSaveUTest
 2 - ValueSaveUTest
 3 - PersistUTest
+4 - FetchUTest
 6 - MultiPersistUTest
 ```
  * The failing tests are:
    + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
      report is
      [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
-   + `4 - FetchUTest` has errors w/ resetting truth values back to
-     default.
-   + `5 - DeleteUTest` does not pass due to ?
+   + `5 - DeleteUTest` does not pass due to ???
 
 
 ### Architecture
