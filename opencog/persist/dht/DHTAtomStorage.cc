@@ -302,7 +302,7 @@ std::string DHTAtomStorage::prt_dht_value(
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case VALUES_ID:
-			ss << "Value time=" << std::to_string(ival->id) << " "
+			ss << "Value: "
 			   << ival->unpack<std::string>() << std::endl;
 			break;
 		case INCOMING_ID:
