@@ -208,8 +208,10 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
 
 	std::string snew = new_val->unpack<std::string>();
 
-#define REMOVE_ATOM "drop "
-	if (0 == snew.compare(0, sizeof(REMOVE_ATOM)-1, REMOVE_ATOM))
+#define ADD_ATOM "add "
+#define DROP_ATOM "drop "
+	if (0 == snew.compare(0, sizeof(DROP_ATOM)-1, DROP_ATOM) or
+	    0 == snew.compare(0, sizeof(DROP_ATOM)-1, DROP_ATOM))
 	{
 		// If DHT thinks that it is altering the same Atom,
 		// then we let it. Otherwise, we don't.  This is in order
