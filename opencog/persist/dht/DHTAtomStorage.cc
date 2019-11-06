@@ -318,6 +318,8 @@ std::string DHTAtomStorage::prt_dht_value(
 
 std::string DHTAtomStorage::dht_atomspace_hash(void)
 {
+	if (_atomspace_name.size() <= 1)
+		throw IOException(TRACE_INFO, "AtomSpace DHT has not been opened.\n");
 	return _atomspace_hash.toString();
 }
 
@@ -328,6 +330,8 @@ std::string DHTAtomStorage::dht_immutable_hash(const Handle& atom)
 
 std::string DHTAtomStorage::dht_atom_hash(const Handle& atom)
 {
+	if (_atomspace_name.size() <= 1)
+		throw IOException(TRACE_INFO, "AtomSpace DHT has not been opened.\n");
 	return get_membership(atom).toString();
 }
 
