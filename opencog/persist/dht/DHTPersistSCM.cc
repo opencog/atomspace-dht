@@ -107,7 +107,7 @@ void DHTPersistSCM::do_close(void)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-             "dht-close: Error: Database not open");
+             "dht-close: Error: AtomSpace not connected to DHT!");
 
     DHTAtomStorage *backing = _backing;
     _backing = nullptr;
@@ -125,7 +125,7 @@ void DHTPersistSCM::do_bootstrap(const std::string& uri)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-bookstrap: Error: DHT is not running");
+            "dht-bookstrap: Error: AtomSpace not connected to DHT!");
 
     _backing->dht_bootstrap(uri);
 }
@@ -134,7 +134,7 @@ std::string DHTPersistSCM::do_examine(const std::string& id)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-examine: Error: DHT is not running");
+            "dht-examine: Error: AtomSpace not connected to DHT!");
 
     return _backing->dht_examine(id);
 }
@@ -143,7 +143,7 @@ std::string DHTPersistSCM::do_atomspace_hash(void)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-atomspace-hash: Error: DHT is not running");
+            "dht-atomspace-hash: Error: AtomSpace not connected to DHT!");
 
     return _backing->dht_atomspace_hash();
 }
@@ -152,7 +152,7 @@ std::string DHTPersistSCM::do_immutable_hash(const Handle& h)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-immutable-hash: Error: DHT is not running");
+            "dht-immutable-hash: Error: AtomSpace not connected to DHT!");
 
     return _backing->dht_immutable_hash(h);
 }
@@ -161,7 +161,7 @@ std::string DHTPersistSCM::do_atom_hash(const Handle& h)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-atom-hash: Error: DHT is not running");
+            "dht-atom-hash: Error: AtomSpace not connected to DHT!");
 
     return _backing->dht_atom_hash(h);
 }
@@ -202,7 +202,7 @@ void DHTPersistSCM::do_load_atomspace(const std::string& asname)
 {
     if (nullptr == _backing)
         throw RuntimeException(TRACE_INFO,
-            "dht-load-atomspace: Error: Database not open");
+            "dht-load-atomspace: Error: AtomSpace not connected to DHT!");
 
     _backing->load_atomspace(_as, asname);
 }
@@ -210,7 +210,7 @@ void DHTPersistSCM::do_load_atomspace(const std::string& asname)
 void DHTPersistSCM::do_stats(void)
 {
     if (nullptr == _backing) {
-        printf("dht-stats: Database not open\n");
+        printf("dht-stats: AtomSpace not connected to DHT!\n");
         return;
     }
 
@@ -221,7 +221,7 @@ void DHTPersistSCM::do_stats(void)
 void DHTPersistSCM::do_clear_stats(void)
 {
     if (nullptr == _backing) {
-        printf("dht-stats: Database not open\n");
+        printf("dht-stats: AtomSpace not connected to DHT!\n");
         return;
     }
 
