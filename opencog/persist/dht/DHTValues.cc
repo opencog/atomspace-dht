@@ -25,24 +25,27 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	if (_observing_only)
 		throw IOException(TRACE_INFO, "DHT Node is only observing!");
 
-// XXX FIXME -- if there's some existing TV on the atom in the DHT
-// but its the default TV in the atomspace, then we've got to clobber
-// whatever is in the DHT.
-if (0 == atom->getKeys().size())
-std::cout << "duude no keys on " << atom->to_short_string() << std::endl;
+	dht::InfoHash muid = get_membership(atom);
 
-	// If there are no keys, there's nothing to do.
-	if (0 == atom->getKeys().size()) return;
+	// If there are no keys currently on the atom, but there are values
+	// in the DHT, then we need to clobber them.  Try to avoid putting,
+	// by doing a get first.  Maybe we can get more efficient by caching?
+	if (0 == atom->getKeys().size())
+	{
+		auto afut = _runner.get(muid,
+			dht::Value::TypeFilter(_values_policy));
+		afut.wait();
+		auto dvals = afut.get();
+		if (0 < dvals.size())
+			delete_atom_values(atom);
+		return;
+	}
 
 	// Make sure all of the keys appear in the AtomSpace
 	for (const Handle& key : atom->getKeys())
 		store_recursive(key);
 
 	// Attach the value to the atom
-	dht::InfoHash muid = get_membership(atom);
-	// std::cout << "muid= " << muid.toString() << " "
-	//           << atom->to_short_string() << std::endl;
-	// std::cout << "vals=" << encodeValuesToAlist(atom) << std::endl;
 	_runner.put(muid,
 		dht::Value(_values_policy, encodeValuesToAlist(atom), 1));
 
