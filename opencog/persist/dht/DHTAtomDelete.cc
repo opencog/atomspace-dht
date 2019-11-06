@@ -48,16 +48,16 @@ printf("duuude gonnna remove %s\n", atom->to_string().c_str());
 		removeAtom(hin, true);
 	}
 
-
 	// Remove this atom from the incoming sets of those that
 	// it contains.
+	static dht::InfoHash zerohash;
 	if (atom->is_link())
 	{
 		for (const Handle& held: atom->getOutgoingSet())
 		{
 			dht::InfoHash memuid = get_membership(held);
 			_runner.put(memuid,
-				dht::Value(_incoming_policy, 0, atom->get_hash()));
+				dht::Value(_incoming_policy, zerohash, atom->get_hash()));
 		}
 	}
 
