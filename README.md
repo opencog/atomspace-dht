@@ -79,10 +79,11 @@ and install mechanisms are the same.
 * How can we find all members of the incoming set of an Atom?
   Easy, we generate the hash for that atom, and then look at
   all the DHT entries on it.
-* How to delete entries? Seems that every Atom will need to be
-  tagged with a version number (a timestamp) so that Atoms that
-  are deleted and then restored can be placed in proper
-  chronological order. CRDT seems like overkill.
+* How to delete entries? Atoms in the AtomSpace are tagged with
+  a timestamp and an add/drop verb, so that precedence is known.
+  An alternate design using CRDT seems like overkill.
+* TODO: gets()'s need to be queued so that they can run async,
+  and then call handlers when completed.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
 * TODO: Support read-write overlays on top of read-only datasets.
@@ -94,9 +95,6 @@ and install mechanisms are the same.
 * TODO: Defer fetches until barrier. The futures can be created
   and then queued, until the time that they really need to be
   resolved.
-* TODO: Enhancement: provide utilities that return hashes of the
-  Atoms, Incoming Sets, values, so that manual exploration of the
-  DHT contents is easier.
 * TODO: Measure total RAM usage.  This risks being quite the
   memory hog, if datasets with hundreds of millions of atoms are
   published.
@@ -118,15 +116,6 @@ show-stoppers:
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
   for details. This is effectively a show-stopper, as it makes it
   impossible to safely terminate a running node with local data in it.
-* There does not seem to be any reliable way of deleting data. See
-  [opendht issue #429](https://github.com/savoirfairelinux/opendht/issues/429)
-  for details. A hacky work-around might be to publish timestamps
-  along with the delete orders, so that the latest status can be
-  known. This hack should work, although its ugly.
-* There does not seem to be any way of keeping only the latest values;
-  a whole cruft of them accumulate. See
-  [opendht issue #462](https://github.com/savoirfairelinux/opendht/issues/462)
-  for details.
 
 ### Architecture concerns
 There are numerous concerns with using a DHT backend.
