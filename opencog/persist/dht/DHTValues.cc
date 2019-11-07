@@ -50,7 +50,7 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	_runner.put(muid,
 		dht::Value(_values_policy, encodeValuesToAlist(atom), 1));
 
-	_value_stores ++;
+	_value_updates ++;
 }
 
 /* ================================================================== */
@@ -65,7 +65,7 @@ void DHTAtomStorage::delete_atom_values(const Handle& atom)
 	dht::InfoHash muid = get_membership(atom);
 	_runner.put(muid, dht::Value(_values_policy, "", 1));
 
-	_value_stores ++;
+	_value_deletes ++;
 }
 
 /* ================================================================ */
@@ -103,6 +103,7 @@ std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 	std::cout << "Latest svalue: " << alist << std::endl;
 	decodeAlist(h, alist);
+	_value_fetches++;
 
 	return h;
 }

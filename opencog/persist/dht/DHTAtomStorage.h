@@ -172,7 +172,20 @@ class DHTAtomStorage : public BackingStore
 		std::atomic<size_t> _num_atom_deletes;
 		std::atomic<size_t> _load_count;
 		std::atomic<size_t> _store_count;
-		std::atomic<size_t> _value_stores;
+		std::atomic<size_t> _value_updates;
+		std::atomic<size_t> _value_deletes;
+		std::atomic<size_t> _value_fetches;
+
+		// These have to be static, as they are incremented
+		// from static functions.
+		static std::atomic<size_t> _immutable_stores;
+		static std::atomic<size_t> _immutable_edits;
+		static std::atomic<size_t> _space_stores;
+		static std::atomic<size_t> _space_edits;
+		static std::atomic<size_t> _value_stores;
+		static std::atomic<size_t> _value_edits;
+		static std::atomic<size_t> _incoming_stores;
+		static std::atomic<size_t> _incoming_edits;
 		time_t _stats_time;
 
 	public:

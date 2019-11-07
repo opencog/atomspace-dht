@@ -403,6 +403,18 @@ void DHTAtomStorage::clear_stats(void)
 	_num_node_inserts = 0;
 	_num_link_inserts = 0;
 	_num_atom_deletes = 0;
+	_value_updates = 0;
+	_value_deletes = 0;
+	_value_fetches = 0;
+
+	_immutable_stores = 0;
+	_immutable_edits = 0;
+	_space_stores = 0;
+	_space_edits = 0;
+	_value_stores = 0;
+	_value_edits = 0;
+	_incoming_stores = 0;
+	_incoming_edits = 0;
 }
 
 void DHTAtomStorage::print_stats(void)
@@ -420,8 +432,11 @@ void DHTAtomStorage::print_stats(void)
 	printf("dht-stats: total loads = %zu total stores = %zu ratio=%f\n",
 	       load_count, store_count, frac);
 
-	size_t value_stores = _value_stores;
-	printf("dht-stats: value updates = %zu\n", value_stores);
+	size_t value_updates = _value_updates;
+	size_t value_deletes = _value_deletes;
+	size_t value_fetches = _value_fetches;
+	printf("dht-stats: value updates = %zu deletes = %zu fetches = %zu\n",
+	       value_updates, value_deletes, value_fetches);
 
 	size_t num_atom_deletes = _num_atom_deletes;
 	printf("dht-stats: total atom deletes = %zu\n",
@@ -448,6 +463,20 @@ void DHTAtomStorage::print_stats(void)
 	frac = tot_link / ((double) tot_node);
 	printf("total stores for node=%lu link=%lu ratio=%f\n",
 	       tot_node, tot_link, frac);
+
+	size_t immutable_stores = _immutable_stores;
+	size_t immutable_edits = _immutable_edits;
+	size_t space_stores = _space_stores;
+	size_t space_edits = _space_edits;
+	size_t value_stores = _value_stores;
+	size_t value_edits = _value_edits;
+	size_t incoming_stores = _incoming_stores;
+	size_t incoming_edits = _incoming_edits;
+
+	printf("immutable stores = %zu edits = %zu\n", immutable_stores, immutable_edits);
+	printf("space stores     = %zu edits = %zu\n", space_stores, space_edits);
+	printf("value stores     = %zu edits = %zu\n", value_stores, value_edits);
+	printf("incoming stores  = %zu edits = %zu\n", incoming_stores, incoming_edits);
 
 	printf("\n");
 }

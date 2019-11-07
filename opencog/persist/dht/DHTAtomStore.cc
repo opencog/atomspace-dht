@@ -170,6 +170,7 @@ bool DHTAtomStorage::cy_store_atom(dht::InfoHash key,
                                 const dht::SockAddr& addr)
 {
 	// printf("duuude storat %s\n", prt_dht_value(value).c_str());
+	_immutable_stores++;
 	return true;
 }
 
@@ -181,12 +182,14 @@ bool DHTAtomStorage::cy_edit_atom(dht::InfoHash key,
 {
 	// printf("duuude edat old %s\n", prt_dht_value(old_val).c_str());
 	// printf("duuude edat new %s\n", prt_dht_value(new_val).c_str());
+	_immutable_edits++;
 
 	// All immutable atoms have a value->id == 1, always, and so we
 	// return true so that OpenDHT will always accept and keep
 	// the atom. This has the side-effect of dropping old_val and
-	// replacing it by new_val. That is, only one value is ever kept
-	// (and that one value should be the scheme-string representation
+	// replacing it by new_val. That is, only one dht::Value is ever
+	// kept.  That is, both the old_val and the new_val should be
+	// identical, both should be the scheme-string representation
 	// of the atom.
 	return true;
 }
@@ -197,6 +200,7 @@ bool DHTAtomStorage::cy_store_space(dht::InfoHash key,
                                 const dht::SockAddr& addr)
 {
 	// printf("duuude storspa:\n%s", prt_dht_value(value).c_str());
+	_space_stores++;
 	return true;
 }
 
@@ -208,6 +212,7 @@ bool DHTAtomStorage::cy_edit_space(dht::InfoHash key,
 {
 	// printf("duuude edspa old:\n%s", prt_dht_value(old_val).c_str());
 	// printf("duuude edspa new:\n%s", prt_dht_value(new_val).c_str());
+	_space_edits++;
 
 	std::string snew = new_val->unpack<std::string>();
 
@@ -243,6 +248,7 @@ bool DHTAtomStorage::cy_store_values(dht::InfoHash key,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
+	_value_stores++;
 	// printf("duuude storval:\n%s", prt_dht_value(value).c_str());
 	return true;
 }
@@ -253,6 +259,7 @@ bool DHTAtomStorage::cy_edit_values(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
+	_value_edits++;
 	// printf("duuude edval old:\n%s", prt_dht_value(old_val).c_str());
 	// printf("duuude edval new:\n%s", prt_dht_value(new_val).c_str());
 
@@ -267,6 +274,7 @@ bool DHTAtomStorage::cy_store_incoming(dht::InfoHash key,
                                 const dht::InfoHash& from,
                                 const dht::SockAddr& addr)
 {
+	_incoming_stores++;
 	// printf("duuude storinco:\n%s", prt_dht_value(value).c_str());
 	return true;
 }
@@ -277,6 +285,7 @@ bool DHTAtomStorage::cy_edit_incoming(dht::InfoHash key,
                               const dht::InfoHash& from,
                               const dht::SockAddr& addr)
 {
+	_incoming_edits++;
 	// printf("duuude edinco old:\n%s", prt_dht_value(old_val).c_str());
 	// printf("duuude edinco new:\n%s", prt_dht_value(new_val).c_str());
 
