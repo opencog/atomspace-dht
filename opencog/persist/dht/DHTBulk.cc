@@ -111,7 +111,7 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 	{
 		storeAtom(h);
 		cnt++;
-		if (0 == cnt%100)
+		if (0 == cnt%500)
 		{
 			time_t secs = time(0);
 			time_t elap = secs - bulk_start;
