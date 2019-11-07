@@ -440,6 +440,7 @@ void DHTAtomStorage::print_stats(void)
 	size_t load_count = _load_count;
 	size_t store_count = _store_count;
 	double frac = store_count / ((double) load_count);
+	printf("\n");
 	printf("dht-stats: total loads = %zu total stores = %zu ratio=%f\n",
 	       load_count, store_count, frac);
 
@@ -484,10 +485,11 @@ void DHTAtomStorage::print_stats(void)
 	size_t incoming_stores = _incoming_stores;
 	size_t incoming_edits = _incoming_edits;
 
-	printf("immutable stores = %zu edits = %zu\n", immutable_stores, immutable_edits);
-	printf("space stores     = %zu edits = %zu\n", space_stores, space_edits);
-	printf("value stores     = %zu edits = %zu\n", value_stores, value_edits);
-	printf("incoming stores  = %zu edits = %zu\n", incoming_stores, incoming_edits);
+	printf("\n");
+	printf("dht immutable stores = %zu edits = %zu\n", immutable_stores, immutable_edits);
+	printf("dht space stores     = %zu edits = %zu\n", space_stores, space_edits);
+	printf("dht value stores     = %zu edits = %zu\n", value_stores, value_edits);
+	printf("dht incoming stores  = %zu edits = %zu\n", incoming_stores, incoming_edits);
 
 	printf("\n");
 }
