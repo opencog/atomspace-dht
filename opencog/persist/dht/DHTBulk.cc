@@ -94,7 +94,7 @@ void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 		Handle h(decodeStrAtom(sname, pos));
 		if (h->get_type() != atom_type) continue;
 
-		std::cout << "Load Atom " << sname << std::endl;
+		// std::cout << "Load Atom " << sname << std::endl;
 		table.add(fetch_values(std::move(h)), false);
 		_load_count++;
 	}
