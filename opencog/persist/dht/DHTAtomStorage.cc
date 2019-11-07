@@ -89,8 +89,14 @@ void DHTAtomStorage::init(const char * uri)
 
 	// Run a private NetID only for AtomSpace data!
 	_config.dht_config.node_config.network = 42;
-	_config.dht_config.id = dht::crypto::generateIdentity();
 	_config.threaded = true;
+
+	// Calling dht::crypto::generateIdentity() results in an insane
+	// crash in the crypto library libnettle. See
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041
+	// for details. It appears that gnutls is not thread-safe,
+	// or something. The bug is crazy.
+	//_config.dht_config.id = dht::crypto::generateIdentity();
 
 	// Launch a dht node on a new thread, using a generated
 	// RSA key pair, and listen on port 4343. If the defalut port
