@@ -1,15 +1,9 @@
 /*
- * tests/persist/sql/multi-driver/LargeZipfTest.cxxtest
+ * tests/persist/dht/LargeZipfTest.cxxtest
  *
  * Emulate word-pair dataset with Zipfian incoming sets.
  * This creates nodes with large incoming sets; database should
  * not choke on these.
- *
- * If this test is failing for you, then be sure to read the README in
- * this directory, and also ../../opencong/persist/README, and then
- * create and configure the SQL database as described there. Next,
- * edit ../../lib/test-opencog.conf to add the database credentials
- * (the username and passwd).
  *
  * Copyright (C) 2008, 2009, 2013, 2019 Linas Vepstas <linasvepstas@gmail.com>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -22,13 +16,10 @@
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atoms/truthvalue/CountTruthValue.h>
-#include <opencog/persist/sql/multi-driver/SQLAtomStorage.h>
-#include <opencog/persist/sql/multi-driver/SQLPersistSCM.h>
+#include <opencog/persist/dht/DHTAtomStorage.h>
+#include <opencog/persist/dht/DHTPersistSCM.h>
 
 #include <opencog/util/Logger.h>
-#include <opencog/util/Config.h>
-
-#include "mkuri.h"
 
 using namespace opencog;
 
@@ -37,9 +28,6 @@ class LargeZipfTest :  public CxxTest::TestSuite
 	private:
 		AtomSpace *_as;
 		std::string uri;
-		const char * dbname;
-		const char * username;
-		const char * passwd;
 
 #define NWORDS 35000
 		Handle hword[NWORDS];
@@ -59,22 +47,6 @@ class LargeZipfTest :  public CxxTest::TestSuite
 
 		void setUp(void);
 		void tearDown(void);
-		void kill_data(void);
-
-		void friendlyFailMessage()
-		{
-			TS_FAIL("The LargeZipfTest failed.\n"
-				"This is probably because you do not have SQL installed\n"
-				"or configured the way that OpenCog expects.\n\n"
-				"SQL persistance is optional for OpenCog, so if you don't\n"
-				"want it or need it, just ignore this test failure.\n"
-				"Otherwise, please be sure to read opencong/persist/sql/README,\n"
-				"and create/configure the SQL database as described there.\n"
-				"Next, edit lib/atomspace-test.conf appropriately, so as\n"
-				"to indicate the location of your database. If this is\n"
-				"done correctly, then this test will pass.\n");
-			exit(1);
-		}
 
 		int filler_up(AtomSpace *);
 		void fetch_space(AtomSpace *);
@@ -82,35 +54,15 @@ class LargeZipfTest :  public CxxTest::TestSuite
 		void check_empty(AtomSpace *);
 		void atomCompare(AtomPtr, AtomPtr, std::string);
 
-		void do_test_atomspace(void);
-		void test_odbc_atomspace(void);
-		void test_pq_atomspace(void);
+		void test_atomspace(void);
 };
 
 LargeZipfTest:: LargeZipfTest(void)
 {
-	try
-	{
-		config().load("atomspace-test.conf");
-	}
-	catch (RuntimeException &e)
-	{
-		std::cerr << e.get_message() << std::endl;
-	}
+	uri = "dht:///atomspace-dht-test";
 	// logger().set_level(Logger::DEBUG);
 	logger().set_level(Logger::INFO);
 	logger().set_print_to_stdout_flag(true);
-
-	try {
-		// Get the database logins & etc from the config file.
-		dbname = config().get("TEST_DB_NAME", "opencog_test").c_str();
-		username = config().get("TEST_DB_USERNAME", "opencog_tester").c_str();
-		passwd = config().get("TEST_DB_PASSWD", "cheese").c_str();
-	}
-	catch (InvalidParamException &e)
-	{
-		friendlyFailMessage();
-	}
 }
 
 /*
@@ -124,34 +76,6 @@ void LargeZipfTest::setUp(void)
 void LargeZipfTest::tearDown(void)
 {
 	delete _as;
-
-	kill_data();
-}
-
-// ============================================================
-
-void LargeZipfTest::kill_data(void)
-{
-#if HAVE_ODBC_STORAGE
-	if ("" == uri) uri = mkuri("odbc", dbname, username, passwd);
-#endif
-#if HAVE_PGSQL_STORAGE
-	if ("" == uri) uri = mkuri("postgres", dbname, username, passwd);
-#endif
-	SQLAtomStorage* astore = new SQLAtomStorage(uri);
-	if (!astore->connected())
-	{
-		logger().info("setUp: SQLAtomStorage cannot connect to database");
-		friendlyFailMessage();
-		exit(1);
-	}
-	logger().info("Delete data in \"%s\" as \"%s\" passwd \"%s\"", dbname, username, passwd);
-
-	// Trash the contents of the database.
-	astore->kill_data();
-
-	// Destructor also logs out of database (avoid warning in DB log file)
-	delete astore;
 }
 
 // ============================================================
@@ -305,40 +229,14 @@ int LargeZipfTest::filler_up(AtomSpace *space)
 
 // ============================================================
 
-void LargeZipfTest::test_odbc_atomspace(void)
-{
-#ifdef HAVE_ODBC_STORAGE
-	uri = mkuri("odbc", dbname, username, passwd);
-	do_test_atomspace();
-#endif
-}
-
-void LargeZipfTest::test_pq_atomspace(void)
-{
-#ifdef HAVE_PGSQL_STORAGE
-	uri = mkuri("postgres", dbname, username, passwd);
-	do_test_atomspace();
-#endif
-}
-
-void LargeZipfTest::do_test_atomspace(void)
+void LargeZipfTest::test_atomspace(void)
 {
 	logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
-	kill_data();
-
-	SQLPersistSCM* _pm = new SQLPersistSCM(_as);
+	DHTPersistSCM* _pm = new DHTPersistSCM(_as);
 	TSM_ASSERT("Persist Module not loaded", _pm);
 
-	try {
-		_pm->do_open(uri);
-	}
-	catch (RuntimeException &e)
-	{
-		logger().info("setUp: SQLPersistSCM cannot connect to database");
-		friendlyFailMessage();
-		exit(1);
-	};
+	_pm->do_open(uri);
 
 	/* Create a large number of atoms */
 	filler_up(_as);
@@ -372,7 +270,6 @@ void LargeZipfTest::do_test_atomspace(void)
 	/* Kill data for good */
 	_as->clear();
 	TSM_ASSERT("Non-empty atomspace", 0 == _as->get_size());
-	kill_data();
 
 	/* Verify that the atoms are no longer being found. */
 	check_empty(_as);

@@ -46,8 +46,8 @@ In the current implementation:
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
     + Assorted desirable enhancements missing.
- * All eight unit tests have been ported over (from the original
-   SQL backend driver tests). Currently six of eight pass. The
+ * All nine unit tests have been ported over (from the original
+   SQL backend driver tests). Currently six of nine pass. The
    tests below (usually) pass. Sometimes `ValueSaveUTest` fails
    because data gets lost; this is due to rate-limiting and/or
    flush problems in OpenDHT.
@@ -62,10 +62,13 @@ In the current implementation:
  * The consistently failing tests are:
    + `7 - MultiUserUTest` fails because sometimes data gets lost; this
           is probably due to rate-limiting and/or flush side-effects.
-   + `8 - LargeUTest` attempts a "large" atomspace (of only 35K Atoms,
+   + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
           so actually, it's small, but bigger than the other tests).
           Runs impossibly slowly, (> 10 hours) and hits hard-coded
           limits on OpenDHT.
+   + `9 - LargeZipfUTest` attempts a "large" atomspace w/ Zipfian
+          incoming set sizes.  Runs impossibly slowly, likely to break
+          hard-coded limits on OpenDHT.
 
 ### Architecture
 This implementation provides a full, complete implementation of the
