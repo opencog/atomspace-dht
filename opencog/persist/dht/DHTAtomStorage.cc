@@ -20,29 +20,6 @@
 
 using namespace opencog;
 
-// Policies for storing atoms
-
-// For now, hardcode to one week. In fact, atoms should probably be
-// permanent, and the rest should be configureable on a per-atomspace
-// basis. Which means these should be operator-newed...
-#define DATA_LIFETIME 24*7
-
-dht::ValueType DHTAtomStorage::_atom_policy =
-	dht::ValueType(ATOM_ID, "atom policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_atom, cy_edit_atom);
-
-dht::ValueType DHTAtomStorage::_space_policy =
-	dht::ValueType(SPACE_ID, "space policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_space, cy_edit_space);
-
-dht::ValueType DHTAtomStorage::_values_policy =
-	dht::ValueType(VALUES_ID, "values policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_values, cy_edit_values);
-
-dht::ValueType DHTAtomStorage::_incoming_policy =
-	dht::ValueType(INCOMING_ID, "incoming policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_incoming, cy_edit_incoming);
-
 /* ================================================================ */
 // Constructors
 
@@ -92,6 +69,25 @@ void DHTAtomStorage::init(const char * uri)
 	bulk_load = false;
 	bulk_store = false;
 	clear_stats();
+
+	// Policies for storing atoms
+
+	// For now, hardcode to one week. In fact, atoms should probably be
+	// permanent, and the rest should be configureable on a per-atomspace
+	// basis. Which means that we may need to adjust these dynamically...
+#define DATA_LIFETIME 24*7
+
+	_atom_policy = dht::ValueType(ATOM_ID, "atom policy",
+		std::chrono::hours(DATA_LIFETIME), cy_store_atom, cy_edit_atom);
+
+	_space_policy = dht::ValueType(SPACE_ID, "space policy",
+		std::chrono::hours(DATA_LIFETIME), cy_store_space, cy_edit_space);
+
+	_values_policy = dht::ValueType(VALUES_ID, "values policy",
+		std::chrono::hours(DATA_LIFETIME), cy_store_values, cy_edit_values);
+
+	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
+		std::chrono::hours(DATA_LIFETIME), cy_store_incoming, cy_edit_incoming);
 
 	// Run a private NetID only for AtomSpace data!
 	_config.dht_config.node_config.network = 42;
