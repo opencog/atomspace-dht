@@ -7,7 +7,7 @@ The code here is a backend driver to the AtomSpace graph database,
 enabling AtomSpace contents to be shared via the OpenDHT content
 distribution network.  The goal is to allow efficient decentralized,
 distributed operation over the global internet, allowing many
-AtomSpace processes to access and perform updates to large datasets.
+AtomSpace processes to access and perform updates to huge datasets.
 
 ### The AtomSpace
 The [AtomSpace](https://wiki.opencog.org/w/AtomSpace) is a
@@ -24,12 +24,15 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Beta version 0.1.6
-All core functions are implemented. They mostly work.  See the
-[examples](examples). Most unit tests usually pass. Many desiarable
-enhancements are missing; performance is a huge issue. There are
+## Proof-of-concept version 0.2.0
+All core functions are implemented. They work, on a small scale, for
+small datasets.  See the [examples](examples) for a walk-through. Most
+unit tests usually pass (several generic OpenDHT issues, unrelated to
+this backend, prevent a full pass). Many desirable enhancements are
+missing; performance is terrible, and that is a huge issue. There are
 several show-stopper or near-show-stopper issues preventing further
-development; see the issues list below.
+development; see the issues list below, and also the architecture
+concerns list.
 
 ### Status
 In the current implementation:
@@ -39,14 +42,15 @@ In the current implementation:
    operation look promising.
  * Despite this, there are several serious issues that are roadblocks
    to further development. These are listed below.
- * The implementation is almost feature-complete.  Missing are:
+ * The implementation is feature-complete.  Missing are:
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
     + Assorted desirable enhancements missing.
  * All eight unit tests have been ported over (from the original
    SQL backend driver tests). Currently six of eight pass. The
-   tests below (usually) pass; sometimes ValueUTest fails; this is
-   due to rate-limiting and/or flush problems.
+   tests below (usually) pass. Sometimes `ValueSaveUTest` fails
+   because data gets lost; this is due to rate-limiting and/or
+   flush problems in OpenDHT.
 ```
 1 - BasicSaveUTest
 2 - ValueSaveUTest
@@ -55,12 +59,16 @@ In the current implementation:
 5 - DeleteUTest
 6 - MultiPersistUTest
 ```
- * The failing tests are:
-   + `7 - MultiUserUTest` fails for unknown reasons.
-   + `8 - LargeUTest` large atomspaces. Runs impossibly slowly.
+ * The consistently failing tests are:
+   + `7 - MultiUserUTest` fails because sometimes data gets lost; this
+          is probably due to rate-limiting and/or flush side-effects.
+   + `8 - LargeUTest` attempts a "large" atomspace (of only 35K Atoms,
+          so actually, it's small, but bigger than the other tests).
+          Runs impossibly slowly, (> 10 hours) and hits hard-coded
+          limits on OpenDHT.
 
 ### Architecture
-This implementation will provide a full, complete implementation of the
+This implementation provides a full, complete implementation of the
 standard `BackingStore` API from the Atomspace. Its a backend driver.
 
 The git repo layout is the same as that of the AtomSpace repo. Build
@@ -100,18 +108,24 @@ and install mechanisms are the same.
 * TODO: Measure total RAM usage.  This risks being quite the
   memory hog, if datasets with hundreds of millions of atoms are
   published.
+* TODO: Create a "seeder", that maintains the AtomSpace in Postgres,
+  listens for load requests and responds by seeding those Atoms into
+  DHT if they are not already there.  Likewise, in a read-write mode,
+  it listens for updates, and stores them back into the database.
+  Ideally, this seeder can use the existing AtomSpace Postgres backend
+  code with zero modifications, and just act as a bridge between two
+  backends.
 
 ### Issues
-The following are serious issues, some of which are nearly
-show-stoppers:
+The following are serious issues, some of which are show-stoppers:
 
 * Rate limiting causes published data to be discarded.  This is
   currently solved with a `std::this_thread::sleep_for()` in several
   places in the code. See
   [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
-  for details. This is a serious issue, and makes the unit tests
-  fairly unreliable, as they become timing-dependent and racy.
-  (This is effectively a show-stopper.)
+  for details. This is a show-stopper issue, and makes some of the unit
+  tests unreliable, sometimes passing, sometimes failing.  Dropped data
+  is a show-stopper; data storage MUST be reliable!
 * There does not seem to be any way of force-pushing local data out
   onto the net, (for synchronization, e.g. for example, if it is known
   that the local node is going down. See
@@ -125,20 +139,34 @@ show-stoppers:
   [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
   It appears that gnutls is not thread-safe... or something weird.
 
+These all appear to be "early adopter" pains. There are likely to be many
+other issues; see below.
+
 ### Architecture concerns
 There are numerous concerns with using a DHT backend.
 * The representation is likely to be RAM intensive, requiring KBytes
   per atom, and thus causing trouble when datasets exceeed tens of
-  millions of Atoms.
+  millions of Atoms. The OpenDHT backend might not be able to hold
+  very much.
 * There is no backup-to-disk; thus, a total data loss is risked if
   there are large system outages.  This is a big concern, as the
   initial networks are unlikely to have more than a few dozen nodes.
-  (The data should not be mixed into the global DHT... I think!?)
+  (The data should not be mixed into the global DHT...)
 * How will performance compare with traditional distributed databases
-  (e.g. with Postgres?)
-* How do we avoid accumulating large amounts of cruft? Long lifetimes
-  threaten this.  I guess that, in the end, there always needs to be
-  a seeder, e.g. working off of Postres? As otherwise, the data expires.
+  (e.g. with Postgres?) Currently, OpenDHT has hard-coded performance
+  limits, intended to block DDOS attacks, but also limiting legitimate
+  users.
+* There appears to be other hard-coded limits in the OpenDHT code,
+  preventing large datasets from being stored. This includes limits
+  on the number of values per key. It might be possible to work around
+  this, but only with a fair amount of extra code and extra complexity.
+* If many users use a shared network and publish hundreds or thousands
+  of datasets, then how do we avoid accumulating large amounts of cruft,
+  and sweep away expired/obsolete/forgotten datasets? Long lifetimes
+  for Atoms threaten this.  I guess that, in the end, for each dataset,
+  there always needs to be a seeder, e.g. working off of Postres? As
+  otherwise, we want to keep Atom lifetimes small-ish, so that junk on
+  the net eventally expires.
 
 ## Build Prereqs
 
