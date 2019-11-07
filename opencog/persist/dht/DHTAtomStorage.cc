@@ -20,6 +20,15 @@
 
 using namespace opencog;
 
+std::atomic<size_t> DHTAtomStorage::_immutable_stores = 0;
+std::atomic<size_t> DHTAtomStorage::_immutable_edits = 0;
+std::atomic<size_t> DHTAtomStorage::_space_stores = 0;
+std::atomic<size_t> DHTAtomStorage::_space_edits = 0;
+std::atomic<size_t> DHTAtomStorage::_value_stores = 0;
+std::atomic<size_t> DHTAtomStorage::_value_edits = 0;
+std::atomic<size_t> DHTAtomStorage::_incoming_stores = 0;
+std::atomic<size_t> DHTAtomStorage::_incoming_edits = 0;
+
 /* ================================================================ */
 // Constructors
 
@@ -128,7 +137,7 @@ void DHTAtomStorage::init(const char * uri)
 	else
 		_runner.run(_port, _config);
 
-	// Register the policies. This segfaults, if done before the
+	// Register the policies. These segfault, if done before the
 	// _runner.run() call above.
 	_runner.registerType(_atom_policy);
 	_runner.registerType(_space_policy);

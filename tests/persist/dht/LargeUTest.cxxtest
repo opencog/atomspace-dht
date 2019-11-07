@@ -25,10 +25,6 @@ class LargeUTest :  public CxxTest::TestSuite
 {
 	private:
 		AtomSpace *_as;
-		std::string uri;
-		const char * dbname;
-		const char * username;
-		const char * passwd;
 
 // 75000 * 7 == half-a-million atoms
 // 19000 * 7 == 133K atoms
