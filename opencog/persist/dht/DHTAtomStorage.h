@@ -146,12 +146,6 @@ class DHTAtomStorage : public BackingStore
 		void store_recursive(const Handle&);
 
 		// --------------------------
-		// Bulk load and store
-		bool bulk_load;
-		bool bulk_store;
-		time_t bulk_start;
-
-		// --------------------------
 		// Values
 		void store_atom_values(const Handle &);
 		Handle fetch_values(Handle&&);

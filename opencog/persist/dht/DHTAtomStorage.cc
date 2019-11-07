@@ -75,8 +75,6 @@ void DHTAtomStorage::init(const char * uri)
 		_observing_only = false;
 	}
 
-	bulk_load = false;
-	bulk_store = false;
 	clear_stats();
 
 	// Policies for storing atoms

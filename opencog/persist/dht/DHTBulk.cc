@@ -27,8 +27,7 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 {
 	size_t start_count = _load_count;
 	printf("Loading all atoms from %s\n", spacename.c_str());
-	bulk_load = true;
-	bulk_start = time(0);
+	time_t bulk_start = time(0);
 
 	dht::InfoHash space_hash = dht::InfoHash::get(spacename);
 	auto sfut = _runner.get(space_hash);
@@ -61,7 +60,6 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 	double rate = ((double) _load_count) / secs;
 	printf("Finished loading %zu atoms in total in %d seconds (%d per second)\n",
 		(_load_count - start_count), (int) secs, (int) rate);
-	bulk_load = false;
 
 	// synchrnonize!
 	as->barrier();
@@ -105,26 +103,31 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 {
 	logger().info("Bulk store of AtomSpace\n");
 
-	_store_count = 0;
-	bulk_start = time(0);
-	bulk_store = true;
+	size_t cnt = 0;
+	time_t bulk_start = time(0);
+
+	auto storat = [&](const Handle& h)->void
+	{
+		storeAtom(h);
+		cnt++;
+		if (0 == cnt%100)
+		{
+			time_t secs = time(0) - bulk_start;
+			double rate = ((double) cnt) / secs;
+			printf("\tStored %zu atoms in %d seconds (%d per second)\n",
+			       cnt, (int) secs, (int) rate);
+		}
+	};
 
 	// Try to knock out the nodes first, then the links.
-	table.foreachHandleByType(
-		[&](const Handle& h)->void { storeAtom(h); },
-		NODE, true);
-
-	table.foreachHandleByType(
-		[&](const Handle& h)->void { storeAtom(h); },
-		LINK, true);
+	table.foreachHandleByType(storat, NODE, true);
+	table.foreachHandleByType(storat, LINK, true);
 
 	barrier();
-	bulk_store = false;
-
 	time_t secs = time(0) - bulk_start;
-	double rate = ((double) _store_count) / secs;
-	printf("\tFinished storing %lu atoms total, in %d seconds (%d per second)\n",
-		(unsigned long) _store_count, (int) secs, (int) rate);
+	double rate = ((double) cnt) / secs;
+	printf("\tFinished storing %zu atoms total, in %d seconds (%d per second)\n",
+		cnt, (int) secs, (int) rate);
 }
 
 void DHTAtomStorage::loadAtomSpace(AtomTable &table)
