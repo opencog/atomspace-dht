@@ -105,6 +105,7 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 
 	size_t cnt = 0;
 	time_t bulk_start = time(0);
+	time_t last = bulk_start;
 
 	auto storat = [&](const Handle& h)->void
 	{
@@ -112,10 +113,13 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 		cnt++;
 		if (0 == cnt%100)
 		{
-			time_t secs = time(0) - bulk_start;
+			time_t secs = time(0);
+			time_t elap = secs - bulk_start;
+			secs = secs - last;
+			last = bulk_start;
 			double rate = ((double) cnt) / secs;
-			printf("\tStored %zu atoms in %d seconds (%d per second)\n",
-			       cnt, (int) secs, (int) rate);
+			printf("\tStored %zu atoms in %d seconds (%d per second) %d secs elapsed\n",
+			       cnt, (int) secs, (int) rate, (int) elap);
 		}
 	};
 
