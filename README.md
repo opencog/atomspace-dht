@@ -24,10 +24,12 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
-## Alpha version 0.1.5
-Most things mostly work. See the [examples](examples). Some unit tests
-pass. There are several show-stopper or near-show-stopper issues
-preventing further development; see the issues list below.
+## Beta version 0.1.6
+All core functions are implemented. They mostly work.  See the
+[examples](examples). Most unit tests usually pass. Many desiarable
+enhancements are missing; performance is a huge issue. There are
+several show-stopper or near-show-stopper issues preventing further
+development; see the issues list below.
 
 ### Status
 In the current implementation:
@@ -40,9 +42,11 @@ In the current implementation:
  * The implementation is almost feature-complete.  Missing are:
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
+    + Assorted desirable enhancements missing.
  * All seven unit tests have been ported over (from the original
-   SQL backend driver tests). Currently four of seven pass. The
-   tests below (usually) pass; when they fail, its due to rate-limiting.
+   SQL backend driver tests). Currently six of seven pass. The
+   tests below (usually) pass; sometimes ValueUTest fails; this is
+   due to rate-limiting and/or flush problems.
 ```
 1 - BasicSaveUTest
 2 - ValueSaveUTest
@@ -51,7 +55,7 @@ In the current implementation:
 5 - DeleteUTest
 6 - MultiPersistUTest
 ```
- * The failing tests are:
+ * The only test that always fails is:
    + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
      report is
      [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
@@ -81,7 +85,8 @@ and install mechanisms are the same.
   a timestamp and an add/drop verb, so that precedence is known.
   An alternate design using CRDT seems like overkill.
 * TODO: gets()'s need to be queued so that they can run async,
-  and then call handlers when completed.
+  and then call handlers when completed. I think futures w/callbacks
+  will solve this.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
 * TODO: Support read-write overlays on top of read-only datasets.
