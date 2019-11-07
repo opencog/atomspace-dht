@@ -29,9 +29,9 @@ class LargeZipfTest :  public CxxTest::TestSuite
 		AtomSpace *_as;
 		std::string uri;
 
-#define NWORDS 35000
+#define NWORDS 5000
 		Handle hword[NWORDS];
-#define NPAIRS 257000
+#define NPAIRS 45000
 		Handle hpair[NPAIRS];
 		int npairs; // actual number of pairs created.
 
@@ -217,8 +217,8 @@ int LargeZipfTest::filler_up(AtomSpace *space)
 			{
 				again = 0;
 				rpt *= 2;
-				wmax /= 2;
 			}
+			wmax = NWORDS / (double) (w1 + 1);
 			if (NWORDS <= w1) break;
 		}
 	}
