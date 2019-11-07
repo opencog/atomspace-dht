@@ -10,6 +10,7 @@
 #include <opencog/atoms/value/LinkValue.h>
 #include <opencog/atoms/value/StringValue.h>
 #include <opencog/atoms/base/Valuation.h>
+#include <opencog/atoms/truthvalue/CountTruthValue.h>
 #include <opencog/atoms/truthvalue/SimpleTruthValue.h>
 #include <opencog/atoms/truthvalue/TruthValue.h>
 
@@ -225,6 +226,25 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 				"Malformed SimpleTruthValue: %s", stv.substr(pos).c_str());
 		pos = vos + 1;
 		return ValueCast(createSimpleTruthValue(strength, confidence));
+	}
+
+#define CTV "(CountTruthValue "
+	if (0 == stv.compare(pos, sizeof(CTV)-1, CTV))
+	{
+		size_t vos = pos + sizeof(CTV) - 1;
+		size_t elen;
+		double strength = stod(stv.substr(vos), &elen);
+		vos += elen;
+		double confidence = stod(stv.substr(vos), &elen);
+		vos += elen;
+		double count = stod(stv.substr(vos), &elen);
+		vos += elen;
+		vos = stv.find(')', vos);
+		if (std::string::npos == vos)
+			throw SyntaxException(TRACE_INFO,
+				"Malformed CountTruthValue: %s", stv.substr(pos).c_str());
+		pos = vos + 1;
+		return ValueCast(createCountTruthValue(strength, confidence, count));
 	}
 
 	// XXX FIXME this mishandles escaped quotes
