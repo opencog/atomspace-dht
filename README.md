@@ -135,6 +135,8 @@ The following are serious issues, some of which are show-stoppers:
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
   for details. This is effectively a show-stopper, as it makes it
   impossible to safely terminate a running node with local data in it.
+* Hard-coded limits on various OpenDHT structures. See
+  [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
 * There is some insane gnutls/libnettle bug when it interacts with
   BoehmGC.  It's provoked when running `MultiUserUTest` when the
   line that creates `dht::crypto::generateIdentity();` is enabled.
