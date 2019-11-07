@@ -36,6 +36,7 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 	if (h->is_node())
 	{
 		publish_to_atomspace(h);
+		_num_node_inserts++;
 		return;
 	}
 
@@ -54,6 +55,7 @@ void DHTAtomStorage::store_recursive(const Handle& h)
 		_runner.put(memuid,
 			dht::Value(_incoming_policy, holderguid, h->get_hash()));
 	}
+	_num_link_inserts++;
 }
 
 /**
