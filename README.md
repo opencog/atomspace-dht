@@ -55,12 +55,9 @@ In the current implementation:
 5 - DeleteUTest
 6 - MultiPersistUTest
 ```
- * The only test that always fails is:
-   + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
-     report is
-     [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
-     It appears that gnutls is not thread-safe, nor is OpenDHT...
-   + `8 - LargeUTest` large atomspaces. Runs impossibley slowly.
+ * The failing tests are:
+   + `7 - MultiUserUTest` fails for unknown reasons.
+   + `8 - LargeUTest` large atomspaces. Runs impossibly slowly.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
@@ -121,6 +118,12 @@ show-stoppers:
   [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
   for details. This is effectively a show-stopper, as it makes it
   impossible to safely terminate a running node with local data in it.
+* There is some insane gnutls/libnettle bug when it interacts with
+  BoehmGC.  It's provoked when running `MultiUserUTest` when the
+  line that creates `dht::crypto::generateIdentity();` is enabled.
+  It crashes with a bizarre realloc bug. One bug report is
+  [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
+  It appears that gnutls is not thread-safe... or something weird.
 
 ### Architecture concerns
 There are numerous concerns with using a DHT backend.
