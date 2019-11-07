@@ -1,4 +1,6 @@
-
+#
+# Build the OpenDHT driver for the AtomSpace
+#
 
 ADD_LIBRARY (persist-dht SHARED
 	DHTAtomDelete
@@ -25,15 +27,11 @@ INSTALL (TARGETS persist-dht EXPORT AtomSpaceTargets
 	DESTINATION "lib${LIB_DIR_SUFFIX}/opencog"
 )
 
-# yo.
+# Smell tests.
 
-ADD_EXECUTABLE(sniff
-	sniff
-)
+ADD_EXECUTABLE(sniff sniff)
+TARGET_LINK_LIBRARIES(sniff opendht gnutls nettle argon2)
 
-TARGET_LINK_LIBRARIES(sniff
-	opendht
-	gnutls
-	nettle
-	argon2
-)
+ADD_EXECUTABLE(snuff snuff)
+TARGET_LINK_LIBRARIES(snuff opendht gnutls nettle argon2)
+

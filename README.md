@@ -43,8 +43,8 @@ In the current implementation:
     + Rate-limiting issues leading to missing data.
     + Inability to flush pending output to the network.
     + Assorted desirable enhancements missing.
- * All seven unit tests have been ported over (from the original
-   SQL backend driver tests). Currently six of seven pass. The
+ * All eight unit tests have been ported over (from the original
+   SQL backend driver tests). Currently six of eight pass. The
    tests below (usually) pass; sometimes ValueUTest fails; this is
    due to rate-limiting and/or flush problems.
 ```
@@ -59,6 +59,8 @@ In the current implementation:
    + `7 - MultiUserUTest` crashes with bizarre realloc bug. One
      report is
      [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
+     It appears that gnutls is not thread-safe, nor is OpenDHT...
+   + `8 - LargeUTest` large atomspaces. Runs impossibley slowly.
 
 ### Architecture
 This implementation will provide a full, complete implementation of the
