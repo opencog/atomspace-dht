@@ -28,7 +28,7 @@ storage of data.
 Real-world data sets are often larger than the amount of RAM available on
 a single machine; therefore, data processing algos have to be carefully
 designed to fetch only that data which is needed at the moment.
-Currently, this means using the PostgreSQL backend, which is the only
+Currently, this means using the PostgreSQL (PG) backend, which is the only
 stable, time-tested backend currently available for the AtomSpace.  It
 works great! ... but:
 
@@ -36,12 +36,17 @@ works great! ... but:
   it up, including the tuning it needs to be efficient for the AtomSpace.
 * Its not terribly fast. It can process about 2K Atoms/sec on 2015-era
   server hardware. Which is OK, but... more is always better.
-* The AtomSpace is "distributed": you can access a single PG database
-  instance from multiple machines, each running a copy of the AtomSpace.
-  So that's nice.  It is not known how well this scales, what the
- scaling bottlenecks are.
 
-With the DHT backend, there is a vague, general hope that perhaps the
+The OpenDHT backend is interesting, because the AtomSpace API is already
+"distributed" or "decentralized": which one depends on the actual backend
+in use.  With Postgres, its "distributed": mutiple AtomSpace instances
+can access a single PG dataset; it scales the same way that PG scales.
+If you are a very good PG DBA, and have all the right hardware and
+servers, I suppose this means it scales very well.  So that's nice.
+There's no practical experience scaling PG with the AtomSpace.
+
+With the DHT backend, there is a vague, general hope that perhaps not
+only does the install/config story becomes trivial, but also that the
 scalability story will be brilliant: that, many machines on a shared
 network, or globally distributed, can host giant AtomSpace datasets.
 At least, that is the general hope. How well this might work out is
