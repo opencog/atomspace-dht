@@ -226,4 +226,8 @@ After installing the pre-reqs, do this:
    make -j
    sudo make install
 ```
-Then go through the [examples](examples) directory.
+Then go through the [examples](examples) directory. Run unit tests as
+usual:
+```
+   make -j test
+```
