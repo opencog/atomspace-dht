@@ -24,6 +24,36 @@ OpenDHT is an internet-wide globally-accessible storage system, providing
 a variety of distributed hash table services.  It provides decentralized
 storage of data.
 
+### Why do this? Motivation
+Real-world data sets are often larger than the amount of RAM available on
+a single machine; therefore, data processing algos have to be carefully
+designed to fetch only that data which is needed at the moment.
+Currently, this means using the PostgreSQL backend, which is the only
+stable, time-tested backend currently available for the AtomSpace.  It
+works great! ... but:
+
+* Its difficult to set up; non-DBA's and ordinary users struggle to set
+  it up, including the tuning it needs to be efficient for the AtomSpace.
+* Its not terribly fast. It can process about 2K Atoms/sec on 2015-era
+  server hardware. Which is OK, but... more is always better.
+* The AtomSpace is "distributed": you can access a single PG database
+  instance from multiple machines, each running a copy of the AtomSpace.
+  So that's nice.  It is not known how well this scales, what the
+ scaling bottlenecks are.
+
+With the DHT backend, there is a vague, general hope that perhaps the
+scalability story will be brilliant: that, many machines on a shared
+network, or globally distributed, can host giant AtomSpace datasets.
+At least, that is the general hope. How well this might work out is
+unknown.
+
+Quite unclear is how OpenDHT fetch and eviction work, when local
+processing is creating hot-spots in the datasets. This will be the
+interesting technical and theoretical question to explore with this
+driver.  Closely tied to this are questions of RAM usage and efficiency.
+These are confusing and unknown. They're counter-balanced by the dream
+of some super-giant AtomSpace pie-in-the-sky with millions of users.
+
 ## Proof-of-concept version 0.2.0
 All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
