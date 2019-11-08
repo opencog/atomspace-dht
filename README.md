@@ -42,15 +42,15 @@ The OpenDHT backend is interesting, because the AtomSpace API is already
 in use.  With Postgres, its "distributed": mutiple AtomSpace instances
 can access a single PG dataset; it scales the same way that PG scales.
 If you are a very good PG DBA, and have all the right hardware and
-servers, I suppose this means it scales very well.  So that's nice.
+network gear, I suppose this means it scales very well.  So that's nice.
 There's no practical experience scaling PG with the AtomSpace.
 
 With the DHT backend, there is a vague, general hope that perhaps not
 only does the install/config story becomes trivial, but also that the
-scalability story will be brilliant: that, many machines on a shared
-network, or globally distributed, can host giant AtomSpace datasets.
-At least, that is the general hope. How well this might work out is
-unknown.
+scalability story will be brilliant: that, with many machines on a
+local network, or globally distributed, one will be able to create
+giant AtomSpace datasets.  At least, that is the general hope. How
+well this might work out is unknown.
 
 Quite unclear is how OpenDHT fetch and eviction work, when local
 processing is creating hot-spots in the datasets. This will be the
