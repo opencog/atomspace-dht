@@ -216,6 +216,17 @@ There are numerous concerns with using a DHT backend.
    sudo apt install dhtnode libopendht-dev
    ```
 
+ * Better yet, get the latest version, which contains bug fixes that
+   we depend on (This includes a fix for shut-down)
+   ```
+   git clone https://github.com/savoirfairelinux/opendht
+   cd opendht
+   ./autogen.sh --no-configure
+   mkdir build; cd build
+	../configure
+   make -j
+   ```
+
 ## Building
 Building is just like that for any other OpenCog component.
 After installing the pre-reqs, do this:
