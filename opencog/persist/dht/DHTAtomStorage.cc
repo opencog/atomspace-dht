@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <chrono>
+#include <ctime>
 #include <thread>
 
 #include <opencog/atomspace/AtomSpace.h>
@@ -193,20 +194,25 @@ DHTAtomStorage::~DHTAtomStorage()
 	std::mutex mtx;
 	std::condition_variable* cv = new std::condition_variable();
 	std::unique_lock<std::mutex> lck(mtx);
+	bool done = false;  // Handle spruious wakeups.
+	std::time_t start = time(0);
 
-	_runner.shutdown([cv](void) { cv->notify_one(); });
+	_runner.shutdown([cv, &done](void) { done = true; cv->notify_one(); });
 
 	// Sometimes the shutdown hangs. I don't know why.
 	// See https://github.com/savoirfairelinux/opendht/issues/461
 	// for details.
-	cv->wait_for(lck, std::chrono::seconds(5));
+	#define SECS_TO_WAIT 6
+	cv->wait_for(lck, std::chrono::seconds(SECS_TO_WAIT), [done]{ return done; });
 	// cv->wait(lck);
 	delete cv;
 
-// Annoyingly, the shutdown is not enough.  The queues
-// still got stuff trickling in...
-printf("duuuude down===============================\n");
-sleep(1);
+	std::time_t elapsed = time(0) - start;
+	if (SECS_TO_WAIT <= elapsed)
+	{
+		logger().info("CAUTION: shutdown was hung for %lu seconds\n", elapsed);
+	}
+
 	// Wait for dht threads to end. This seems to clobber the
 	// pending job queues...
 	_runner.join();
