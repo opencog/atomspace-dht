@@ -86,7 +86,7 @@ void DHTPersistSCM::do_open(const std::string& uri)
     if (_as->isAttachedToBackingStore())
         throw RuntimeException(TRACE_INFO,
              "dht-open: Error: Atomspace connected to another storage backend!");
-    // Use the postgres driver.
+    // Use the DHT driver.
     DHTAtomStorage *store = new DHTAtomStorage(uri);
     if (!store)
         throw RuntimeException(TRACE_INFO,
