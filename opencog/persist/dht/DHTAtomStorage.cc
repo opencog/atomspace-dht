@@ -14,6 +14,8 @@
 #include <ctime>
 #include <thread>
 
+#include <opendht/log.h>
+
 #include <opencog/atomspace/AtomSpace.h>
 #include <opencog/atomspaceutils/TLB.h>
 
@@ -135,6 +137,9 @@ void DHTAtomStorage::init(const char * uri)
 	}
 	else
 		_runner.run(_port, _config);
+
+	// XXX for now, dump to a logfile. Disable this later.
+	dht::log::enableFileLogging(_runner, "atomspace-dht.log");
 
 	// Register the policies. These segfault, if done before the
 	// _runner.run() call above.

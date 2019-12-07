@@ -134,6 +134,8 @@ and install mechanisms are the same.
   will solve this.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
+* TODO: Change the default one-week data expiration policy.  Not
+  sure what to do, here.
 * TODO: Support read-write overlays on top of read-only datasets.
   This seems like it should be easy...
 * TODO: Enhancement: listen for new values on specific atoms
@@ -243,7 +245,7 @@ usual:
    make -j test
 ```
 
-## Running, Examples and Debugging
+## Running and Examples
 Please see the [examples](examples) directory. These show how to store
 individual Atoms into the DHT, how to fetch them back out, and how to
 run a DHT node so that saved values are retained even after individual
@@ -251,3 +253,8 @@ AtomSpace clients dettach from the network.
 
 In particular, these will illustrate how to run a DHT node, and how to
 go about looking at DHT data as needed, for debugging and development.
+
+## Development and Debugging
+Assorted notes:
+
+* DHT logging is going to the file `atomspace-dht.log`.
