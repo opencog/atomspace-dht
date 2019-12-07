@@ -217,7 +217,7 @@ There are numerous concerns with using a DHT backend.
    ```
 
  * Better yet, get the latest version, which contains bug fixes that
-   we depend on (This includes a fix for shut-down)
+   we depend on (This includes a fix for shut-down).
    ```
    git clone https://github.com/savoirfairelinux/opendht
    cd opendht
@@ -243,8 +243,11 @@ usual:
    make -j test
 ```
 
-## Examples
+## Running, Examples and Debugging
 Please see the [examples](examples) directory. These show how to store
 individual Atoms into the DHT, how to fetch them back out, and how to
 run a DHT node so that saved values are retained even after individual
 AtomSpace clients dettach from the network.
+
+In particular, these will illustrate how to run a DHT node, and how to
+go about looking at DHT data as needed, for debugging and development.

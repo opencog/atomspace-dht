@@ -15,13 +15,21 @@
 ; Alternately: run the DHT node on localhost at port 4545:
 ; (dht-open "dht://:4545/test-atomspace")
 ;
+; The general URI structure is
+;
+;     dht://[<hostname>][:<port-number>]/[<Atomspace-name>]
+;
+; For `dht-open`, the <hostname> MUST be blank; the DHT node is always
+; the localhost. To bootstrap to other hosts, keep reading...
+;
 ; Some things about DHT networks you need to know:
 ;
 ; * There is a global (planet-wide) OpenDHT network at port 4222, the
 ;   default port number for OpenDHT. Although it can be used, it is not
-;   very suitable for AtomSpace data, as it typically discards unwanted
-;   data after ten minutes. Data is "unwanted" if no one is asking for
-;   it. Clearly, this won't work well for AtomSpace data.
+;   very suitable for AtomSpace data, as it discards unwanted data after
+;   ten minutes. Data is "unwanted" if no one is asking for it. Clearly,
+;   this won't work well for AtomSpace data, which might be dormant for
+;   a long time.
 ;
 ; * Therefore, the AtomSpace driver defines it's own network, defaulting
 ;   to port 4343. By default, all users of the AtomSpace-DHT driver will
@@ -38,23 +46,54 @@
 ;
 ;       (dht-bootstrap "dht://bootstrap.opencog.org:4343/")
 ;
-; * To avoid polluting the "main" AtomSpace network with debugging junk,
-;   it is useful to run a local debug network. In these examples, it
-;   will be at port 4444. So: at another bash prompt, start a `dhtnode`:
+;   For now, you will have to run your own bootstrap network.  Do this
+;   by opening a SECOND guile shell (on localhost, or elsewhere) and
+;   saying
 ;
-;       $ dhtnode -p 4444 -n 42
+;       (dht-open "dht://:4444/")
 ;
-;   Then bootstrap to it, here:
+;   Notice that NO AtomSpace name is supplied! This creates a DHT node
+;   listening on port 4444; it will accept and mirror any data for any
+;   AtomSpace.  See `dht-node.scm` for details.
 ;
-;       (dht-bootstrap "dht://localhost:4444/")
+;   Now, connect to the bootstrap network:
+
+(dht-bootstrap "dht://localhost:4444/")
+
+;   The above assumes that that you ran the boostrap node on this same
+;   machine (localhost). If you have second machine, and want to run the
+;   demo over the network, start the bootstrap node on that machine, and
+;   connect to it with
 ;
-;   Debugging can be performed by examining the DHT directly with the
-;   `dhtnode` console. Alternately, see `dht-node.scm` for examples
-;   of accessing DHT data and status directly from guile/scheme.
+;       (dht-bootstrap "dht://some.other.machine:4444/")
 ;
+;   or you can use an IP address:
+;
+;       (dht-bootstrap "dht://192.168.1.2:4444/")
+;
+; * Caution: This demo will work fine, if you don't have a bootstrap
+;   node. However, the next demo, `basic-fetch.scm`, will fail without
+;   it.  That's because someone, somewhere, has to hold on to the
+;   AtomSpace data, after existing from this guile shell. One
+;   alternative to having a bootstrap node is to just use *this* shell
+;   as the bootstrap node: just keep it open, and run the `basic-fetch`
+;   demo in some other guile shell. (Keep in mind that you'll have to
+;   adjust the port numbers, if you do this.)
+;
+; * You can also view AtomSpace data with the `dhtnode` command-line
+;   tool, provided by OpenDHT. This can be mildly entertaining.  At
+;   a bash prompt, say
+;
+;       $ dhtnode -b localhost:4444 -n 42
+;
+;   This will connect to the bootstrap node on localhost.
 ;   The `-n 42` flag on `dhtnode` tells it to run the "private" DHT
 ;   network "42".  By default, all AtomSpace data will be marked with
 ;   this network ID. See `config.dht_config.node_config.network`.
+;
+;   Keep in mind that `dhtnode` is useless for holding AtomSpace data.
+;   Whatever AtomSpace data it receives, it will hold on to it for only
+;   ten minutes, and then it will delete it's copy.
 ;
 ; --------------------------------------------------------------------
 
