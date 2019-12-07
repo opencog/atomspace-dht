@@ -8,12 +8,12 @@
 (use-modules (opencog persist-dht))
 
 ; Use the atomspace called "test-atomspace" for this demo.
-; This will run an OpenDHT node on localhost at port 4444.
-(dht-open "dht://:4444/test-atomspace")
+; This will run an OpenDHT node on localhost at the default port 4343.
+(dht-open "dht:///test-atomspace")
 
 ; --------------------------------------------------------------------
-; Alternately: run the DHT node on locahost at the default port 4343:
-; (dht-open "dht:///test-atomspace")
+; Alternately: run the DHT node on localhost at port 4545:
+; (dht-open "dht://:4545/test-atomspace")
 ;
 ; Some things about DHT networks you need to know:
 ;
@@ -36,7 +36,7 @@
 ;   handle the rest. You can bootstrap to the (non-)"existing" global
 ;   AtomSpace DHT Network with:
 ;
-;        (dht-bootstrap "dht://bootstrap.opencog.org:4343/")
+;       (dht-bootstrap "dht://bootstrap.opencog.org:4343/")
 ;
 ; * To avoid polluting the "main" AtomSpace network with debugging junk,
 ;   it is useful to run a local debug network. In these examples, it
@@ -46,7 +46,7 @@
 ;
 ;   Then bootstrap to it, here:
 ;
-;     (dht-bootstrap "dht://localhost:4444/")
+;       (dht-bootstrap "dht://localhost:4444/")
 ;
 ;   Debugging can be performed by examining the DHT directly with the
 ;   `dhtnode` console. Alternately, see `dht-node.scm` for examples
@@ -64,31 +64,38 @@
 ; Obtain the DHT key-hash for this atom.  For this Atom in an AtomSpace
 ; with this particular name, this will be globally unique, and it
 ; should be equal to 2220eca6560c36cde76315204130dbb182756a9b.
-(display (dht-atom-hash (ConceptNode "foo")))
+; This 80-bit hash is derived from the Atom type and the Atom name.
+(display (dht-atom-hash (ConceptNode "foo"))) (newline)
 
 ; The Values and Incoming Set attached to it can be examined:
 (display (dht-examine (dht-atom-hash (ConceptNode "foo"))))
 
 ; Similarly, the hash of this atomspace is also unique; it should be
-; d2bf1fd0312cbf309df74c537bea16769b419f44.
-(display (dht-atomspace-hash))
+; d2bf1fd0312cbf309df74c537bea16769b419f44. This hash is derived from
+; the AtomSpace name (the name given in the `dht-open` clause.)
+(display (dht-atomspace-hash)) (newline)
 
-; Printing this should show the current contents of the AtomSpace,
-; as it exists in the DHT.
+; Given an (80-bit DHT) hash that identifies an AtomSpace, the current
+; contents of that AtomSpace can be viewed, as they exist in the DHT:
 (display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
 
-; View stats
+; AtomSpace backend storage stats can be viewed:
 (dht-stats)
 
-; Add some data to the atom
+; Add some data to the atom.
 (cog-set-value! (Concept "foo") (Predicate "floater")
 	(FloatValue 1 2 3 4))
 
 (cog-set-value! (Concept "foo") (Predicate "name list")
 	(StringValue "Joe" "Smith" "42nd and Main St."))
 
-; Store the new data
+; Store the new data. The Atom will NOT be pushed out to the DHT until
+; `store-atom` is called.  Until then, it exists only in the local
+; AtomSpace.
 (store-atom (Concept "foo"))
+
+; View the DHT contents, again.
+(display (dht-examine (dht-atomspace-hash)))
 
 ; Add an EvaluationLink to the AtomSpace; give it a TruthValue
 (define e
@@ -105,14 +112,15 @@
 ; Take a closer look at (Concept "foo")
 (display (dht-examine (dht-atom-hash (ConceptNode "foo"))))
 
-; Notice that it had an antry labelled "Incoming".  It should have
+; Notice that it had an entry labelled "Incoming".  It should have
 ; printed like so:
-; Incoming: 50a541b715203c5e94845aad68c5bd5f92068991
+;     Incoming: bc91a93a9a0d046e09cab9b9cea74a16f06c4675
 ; What is this mystery value?  Let's find out:
-(display (dht-examine "50a541b715203c5e94845aad68c5bd5f92068991"))
+(display (dht-examine "bc91a93a9a0d046e09cab9b9cea74a16f06c4675"))
 
 ; Oh. It was the (ListLink (ConceptNode "foo") (ConceptNode "bar"))
-; But where did this key come from?
+; That makes sense: "Incoming" is the incoming link (the ListLink).
+; But where did this hash-key come from? Why, it's this:
 (dht-immutable-hash (ListLink (ConceptNode "foo") (ConceptNode "bar")))
 
 ; The immutable hash is different from the atom-hash:
@@ -121,10 +129,11 @@
 ; The immutable hash stores the globally-unique scheme string
 ; representation of the Atom. This string representation is
 ; independent of the AtomSpace; all AtomSpaces use the same string.
-; The mutable hash stores the Values and IncomingSet of an Atom,
-; as these exist in some particular AtomSpace.  The Values and the
-; IncomingSet change over time, and they will be different, in general,
-; for different AtomSpaces.
+; The "mutable" hash is used to store the Values and IncomingSet of
+; an Atom, as these exist in some particular AtomSpace.  The "mutable"
+; hash thus incorporates the AtomSpace name; this allows different
+; AtomSpaces to hold different (and changing over time) Values and
+; IncomingSets for an Atom.
 
 ; We are done. Close the connection to the dht table.
 (dht-close)
