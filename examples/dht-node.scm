@@ -1,5 +1,5 @@
 ;
-; node.scm
+; dht-node.scm
 ;
 ; Example of running a stand-alone DHT node.
 ;

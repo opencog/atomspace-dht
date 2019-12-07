@@ -242,3 +242,9 @@ usual:
 ```
    make -j test
 ```
+
+## Examples
+Please see the [examples](examples) directory. These show how to store
+individual Atoms into the DHT, how to fetch them back out, and how to
+run a DHT node so that saved values are retained even after individual
+AtomSpace clients dettach from the network.
