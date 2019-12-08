@@ -59,7 +59,7 @@ driver.  Closely tied to this are questions of RAM usage and efficiency.
 These are confusing and unknown. They're counter-balanced by the dream
 of some super-giant AtomSpace pie-in-the-sky with millions of users.
 
-## Proof-of-concept version 0.2.0
+## Proof-of-concept version 0.2.1
 All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
@@ -78,14 +78,9 @@ In the current implementation:
  * Despite this, there are several serious issues that are roadblocks
    to further development. These are listed below.
  * The implementation is feature-complete.  Missing are:
-    + Rate-limiting issues leading to missing data.
-    + Inability to flush pending output to the network.
-    + Assorted desirable enhancements missing.
+    + Assorted desirable enhancements (see list further below).
  * All nine unit tests have been ported over (from the original
-   SQL backend driver tests). Currently six of nine pass. The
-   tests below (usually) pass. Sometimes `ValueSaveUTest` fails
-   because data gets lost; this is due to rate-limiting and/or
-   flush problems in OpenDHT.
+   SQL backend driver tests). Currently seven of nine (usually) pass:
 ```
 1 - BasicSaveUTest
 2 - ValueSaveUTest
@@ -93,10 +88,14 @@ In the current implementation:
 4 - FetchUTest
 5 - DeleteUTest
 6 - MultiPersistUTest
+7 - MultiUserUTest
 ```
+   Sometimes `ValueSaveUTest`, `FetchUTest` and/or `MultiUserUTest`
+   intermittently fail because data gets lost; the root cause for this
+   is unknwon, but seems to involve problems of flushing out data from
+   the local node, out to the network, and having the network receive
+   and hold that data.
  * The consistently failing tests are:
-   + `7 - MultiUserUTest` fails because sometimes data gets lost; this
-          is probably due to rate-limiting and/or flush side-effects.
    + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
           so actually, it's small, but bigger than the other tests).
           Runs impossibly slowly, (> 10 hours) and hits hard-coded
@@ -159,21 +158,34 @@ and install mechanisms are the same.
 ### Issues
 The following are serious issues, some of which are show-stoppers:
 
-* Rate limiting causes published data to be discarded.  This is
-  currently solved with a `std::this_thread::sleep_for()` in several
-  places in the code. See
-  [opendht issue #460](https://github.com/savoirfairelinux/opendht/issues/460)
-  for details. This is a show-stopper issue, and makes some of the unit
-  tests unreliable, sometimes passing, sometimes failing.  Dropped data
-  is a show-stopper; data storage MUST be reliable!
-* There does not seem to be any way of force-pushing local data out
-  onto the net, (for synchronization, e.g. for example, if it is known
-  that the local node is going down. See
-  [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
-  for details. This is effectively a show-stopper, as it makes it
-  impossible to safely terminate a running node with local data in it.
+* There are data loss issues; it appears that, for some reason, data
+  from a local node is never pushed out to the bigger network, and
+  thus, after the local node closes, that data cannot be retreived later.
+  The root cause of this is unknown.  This issue can be mostly avoided
+  by adding `std::this_thread::sleep_for()` in several places in the code.
+  Dropped data is a show-stopper; data storage MUST be reliable!
+  The [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
+  seems to capture some of this; although it is now marked resolved,
+  the intermittent data loss continues. Don't know why.
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
+* Its possible to hang the system. Unclear where the hang is from.
+  e.g. Running
+  ```
+   (dht-open "dht://:4999/")
+   (dht-bootstrap "dht://localhost:4555/")
+  ```
+  then running the unit tests (which connect to port 4555 for seeding)
+  and then trying to view one of the atomspaces
+  ```
+  (display (dht-examine "a8cf8a3cb42aaa86eefbd1a9d3a827ac57d87385"))
+  ```
+  can result in a hang that never times out -- until the unit tests
+  are re-run, so that the atomspace is re-published.
+* It appears to be impossible to saturate the system to 100% CPU usage,
+  even when running locally. This might be the reason why its slow:
+  something, somewhere is blocking and taking to long; doing nothing
+  at all. What this is is unknown.
 * There is some insane gnutls/libnettle bug when it interacts with
   BoehmGC.  It's provoked when running `MultiUserUTest` when the
   line that creates `dht::crypto::generateIdentity();` is enabled.
@@ -195,9 +207,8 @@ There are numerous concerns with using a DHT backend.
   initial networks are unlikely to have more than a few dozen nodes.
   (The data should not be mixed into the global DHT...)
 * How will performance compare with traditional distributed databases
-  (e.g. with Postgres?) Currently, OpenDHT has hard-coded performance
-  limits, intended to block DDOS attacks, but also limiting legitimate
-  users.
+  (e.g. with Postgres?) Current performance is poor, and the reason for
+  this is entirely unclear.
 * There appears to be other hard-coded limits in the OpenDHT code,
   preventing large datasets from being stored. This includes limits
   on the number of values per key. It might be possible to work around
@@ -208,7 +219,7 @@ There are numerous concerns with using a DHT backend.
   for Atoms threaten this.  I guess that, in the end, for each dataset,
   there always needs to be a seeder, e.g. working off of Postres? As
   otherwise, we want to keep Atom lifetimes small-ish, so that junk on
-  the net eventally expires.
+  the net eventually expires.
 
 ## Build Prereqs
 
