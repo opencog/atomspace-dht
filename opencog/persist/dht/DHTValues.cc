@@ -35,7 +35,11 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	{
 		auto afut = _runner.get(muid,
 			dht::Value::TypeFilter(_values_policy));
-		afut.wait();
+
+		std::future_status status = afut.wait_for(_wait_time);
+		if (std::future_status::ready != status)
+			throw IOException(TRACE_INFO, "DHT is not responding!");
+
 		auto dvals = afut.get();
 		if (0 < dvals.size())
 			delete_atom_values(atom);
@@ -81,9 +85,9 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 		dht::Value::TypeFilter(_values_policy));
 
 	// Block until we've got it.
-	std::cout << "Start waiting for values" << std::endl;
-	afut.wait();
-	std::cout << "Done waiting for values" << std::endl;
+	std::future_status status = afut.wait_for(_wait_time);
+	if (std::future_status::ready != status)
+		throw IOException(TRACE_INFO, "DHT is not responding!");
 
 	auto dvals = afut.get();
 	unsigned long timestamp = 0;

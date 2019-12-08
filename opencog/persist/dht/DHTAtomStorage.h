@@ -155,6 +155,11 @@ class DHTAtomStorage : public BackingStore
 		void decodeAlist(Handle&, std::string&);
 
 		// --------------------------
+		// Network configuration
+		using Timeout = std::chrono::milliseconds;
+		Timeout _wait_time;
+
+		// --------------------------
 		// Performance statistics
 		std::atomic<size_t> _num_get_atoms;
 		std::atomic<size_t> _num_got_nodes;

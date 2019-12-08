@@ -79,6 +79,11 @@ void DHTAtomStorage::init(const char * uri)
 
 	clear_stats();
 
+	// --------------------------------------------------------------
+	// Network configuration
+	// How long to wait for an answer
+	_wait_time = std::chrono::milliseconds(4000);
+
 	// Policies for storing atoms
 
 	// For now, hardcode to one week. In fact, atoms should probably be

@@ -30,9 +30,9 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 		dht::Value::TypeFilter(_incoming_policy));
 
 	// Block until we've got it.
-	std::cout << "Start waiting for incoming" << std::endl;
-	afut.wait();
-	std::cout << "Done waiting for incoming" << std::endl;
+	std::future_status status = afut.wait_for(_wait_time);
+	if (std::future_status::ready != status)
+		throw IOException(TRACE_INFO, "DHT is not responding!");
 
 	auto dincs = afut.get();
 	for (const auto& dinc : dincs)
@@ -65,9 +65,9 @@ void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t
 		dht::Value::TypeFilter(_incoming_policy));
 
 	// Block until we've got it.
-	std::cout << "Start waiting for incoming" << std::endl;
-	afut.wait();
-	std::cout << "Done waiting for incoming" << std::endl;
+	std::future_status status = afut.wait_for(_wait_time);
+	if (std::future_status::ready != status)
+		throw IOException(TRACE_INFO, "DHT is not responding!");
 
 	for (const auto& dinc : afut.get())
 	{
