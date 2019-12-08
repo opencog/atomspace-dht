@@ -165,6 +165,8 @@ The following are serious issues, some of which are show-stoppers:
   discard UDP packets when the network is congested. For us, this means
   lost data. An SCTP shim for OpenDHT is needed.
   Dropped data is a show-stopper; data storage MUST be reliable!
+  See [opendht issue #471](https://github.com/savoirfairelinux/opendht/issues/471)
+  for SCTP implementation status.
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
 * Its possible to hang the system. Unclear where the hang is from.
@@ -207,8 +209,7 @@ There are numerous concerns with using a DHT backend.
   initial networks are unlikely to have more than a few dozen nodes.
   (The data should not be mixed into the global DHT...)
 * How will performance compare with traditional distributed databases
-  (e.g. with Postgres?) Current performance is poor, and the reason for
-  this is entirely unclear.
+  (e.g. with Postgres?)
 * There appears to be other hard-coded limits in the OpenDHT code,
   preventing large datasets from being stored. This includes limits
   on the number of values per key. It might be possible to work around
@@ -229,9 +230,11 @@ There are numerous concerns with using a DHT backend.
    ```
    sudo apt install dhtnode libopendht-dev
    ```
+   The above might not be enough; we need recent (Nov 2019) versions of
+   OpenDHT. Get these from github, as below:
 
- * Better yet, get the latest version, which contains bug fixes that
-   we depend on (This includes a fix for shut-down).
+ * The newest versions of OpenDHT contain bug fixes that we need.
+   This includes a fix for shut-down, and a fix for rate-limiting.
    ```
    git clone https://github.com/savoirfairelinux/opendht
    cd opendht
