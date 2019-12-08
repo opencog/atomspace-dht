@@ -108,8 +108,8 @@ In the current implementation:
    blocking this).
 
 ### Architecture
-This implementation provides a full, complete implementation of the
-standard `BackingStore` API from the Atomspace. Its a backend driver.
+This provides a full, complete implementation of the standard
+`BackingStore` API from the Atomspace. Its a backend driver.
 
 The git repo layout is the same as that of the AtomSpace repo. Build
 and install mechanisms are the same.
@@ -122,34 +122,35 @@ and install mechanisms are the same.
 * Every (Atom, AtomSpace-name) pair gets a unique hash.
   The current values on that atom, as well as it's incoming set
   are stored under that hash.
-* How can we find all current members of an AtomSpace?
-  Easy, the AtomSpace is just one hash, and the atoms in it are
-  DHT values.
+* How can we find all current members of an AtomSpace? Easy!
+  The AtomSpace is just one hash, and each atom that is in it
+  corresponds to one DHT value on that hash.
 * How can we find all members of the incoming set of an Atom?
-  Easy, we generate the hash for that atom, and then look at
-  all the DHT entries on it.
+  Easy, we generate the DHT-hash for that Atom, and then look at
+  all the DHT-values attached to it.  This is effectively the
+  same mechanism as finding all the members of an AtomSpace.
 * How to delete entries? Atoms in the AtomSpace are tagged with
   a timestamp and an add/drop verb, so that precedence is known.
   An alternate design using CRDT seems like overkill.
-* TODO: gets()'s need to be queued so that they can run async,
-  and then call handlers when completed. I think futures w/callbacks
-  will solve this.
+* TODO: Using `DhtRunner::get()` with callbacks instead of futures
+  will improve performance.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
-* TODO: Change the default one-week data expiration policy.  Not
-  sure what to do, here.
-* TODO: Support read-write overlays on top of read-only datasets.
-  This seems like it should be easy...
+* TODO: Change the default one-week data expiration policy to
+  instead be a few hours ... or even tens of minutes?  Persistant
+  data still needs to live on disk, not in RAM, and to be provided
+  by seeders.
+* TODO: Support read-write overlay AtomSpaces on top of read-only
+  AtomSpaces.  This seems like it should be easy...
 * TODO: Enhancement: listen for new values on specific atoms
-  or atom types.
-* TODO: Enhancement: listen for atomspace updates.
+  or for new atom types.
+* TODO: Enhancement: listen for atomspace updates (Atom insertion
+  and deletion).
 * TODO: Enhancement: implement a CRDT type for `CountTruthValue`.
-* TODO: Defer fetches until barrier. The futures can be created
-  and then queued, until the time that they really need to be
-  resolved.
 * TODO: Measure total RAM usage.  This risks being quite the
   memory hog, if datasets with hundreds of millions of atoms are
-  published.
+  published, and the default DHT node size is raised to allow
+  that many hashes to be stored.
 * TODO: Create a "seeder", that maintains the AtomSpace in Postgres,
   listens for load requests and responds by seeding those Atoms into
   DHT if they are not already there.  Likewise, in a read-write mode,
@@ -191,8 +192,12 @@ other issues; see below.
 There are numerous concerns with using a DHT backend.
 * The representation is likely to be RAM intensive, requiring KBytes
   per atom, and thus causing trouble when datasets exceed tens of
-  millions of Atoms. The OpenDHT backend might not be able to hold
-  very much.
+  millions of Atoms. Single DHT nodes cannot really hold all that much.
+  To add insult to injury, OpenDHT is effectively an in-RAM database,
+  so it is competing for RAM with the AtomSpace itself.  Perhaps the
+  AtomSpace should be used only to "seed" a DHT node: if a DHT node
+  does not have an atom, it should look to see if there's an attached
+  AtomSpace, and if the AtomSpace is holding it.
 * There is no backup-to-disk; thus, a total data loss is risked if
   there are large system outages.  This is a big concern, as the
   initial networks are unlikely to have more than a few dozen nodes.
@@ -207,6 +212,12 @@ There are numerous concerns with using a DHT backend.
   total size of a node (`MAX_HASHES`) and others. It might be possible
   to work around these.  Other limits we've hit include:
   `RX_QUEUE_MAX_SIZE` and `RX_QUEUE_MAX_DELAY`.
+* The limit on DHT-values-per-DHT-key is a critical limit on the
+  maximum AtomSpace size; for a given AtomSpace, each Atom corresponds
+  to a DHT-value attached to the Atomspace name hash. This is how we
+  find all the members of an AtomSpace.  This same limit affects the
+  incoming set; the same mechanism is used to find the incoming set of
+  an atom.
 * If many users use a shared network and publish hundreds or thousands
   of datasets, then how do we avoid accumulating large amounts of cruft,
   and sweep away expired/obsolete/forgotten datasets? Long lifetimes
