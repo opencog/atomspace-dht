@@ -117,12 +117,10 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 	// Not found. Ask the DHT for it. Get a future for the atom,
 	// and wait on it. We cannot do an async wait here; we MUST
 	// get something back, before we return to the caller.
-	auto gfut = _runner.get(guid);
-	gfut.wait();
+	auto gvals = get_stuff(guid);
 
 	// Yikes! Fatal error! We're asked to process a GUID and we
 	// have no clue what Atom it corresponds to!
-	auto gvals = gfut.get();
 	if (0 == gvals.size())
 		throw RuntimeException(TRACE_INFO, "Can't find Atom!");
 

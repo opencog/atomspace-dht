@@ -30,12 +30,14 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 	time_t bulk_start = time(0);
 
 	dht::InfoHash space_hash = dht::InfoHash::get(spacename);
-	auto sfut = _runner.get(space_hash);
+
+	// XXX FIXME, when working on the Atomspace, we need
+	// a longer timeout!?!!!
 	std::cout << "Start waiting for atomspace" << std::endl;
-	sfut.wait();
+	auto atovs = get_stuff(space_hash);
 	std::cout << "Done waiting for atomspace" << std::endl;
 
-	for (auto ato: sfut.get())
+	for (auto ato: atovs)
 	{
 		std::string sname = ato->unpack<std::string>();
 
@@ -73,14 +75,14 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 ///
 void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 {
-	auto sfut = _runner.get(_atomspace_hash);
+	// XXX FIXME, when working on the Atomspace, we need
+	// a longer timeout!?!!!
 	std::cout << "Start waiting for atomspace" << std::endl;
-	sfut.wait();
-	auto toms = sfut.get();
+	auto atovs = get_stuff(_atomspace_hash);
 	std::cout << "Done waiting for atomspace, got "
-	          << std::to_string(toms.size()) << std::endl;
+	          << std::to_string(atovs.size()) << std::endl;
 
-	for (auto ato: toms)
+	for (auto ato: atovs)
 	{
 		std::string sname = ato->unpack<std::string>();
 

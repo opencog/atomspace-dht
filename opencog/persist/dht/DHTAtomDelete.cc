@@ -31,10 +31,7 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 
 	// First, check to see if there's an incoming set, or not.
 	dht::InfoHash mhash = get_membership(atom);
-	auto afut = _runner.get(mhash,
-		dht::Value::TypeFilter(_incoming_policy));
-	afut.wait();
-	auto dinset = afut.get();
+	auto dinset = get_stuff(mhash, _incoming_filter);
 
 	// Fail if not recursive and have a non-trivial incoming set.
 	// Note that this is racey: the incoming set can change,
