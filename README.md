@@ -102,8 +102,10 @@ In the current implementation:
           incoming set sizes.
 
    Bot of these a hard-coded limit in OpenDHT: each DHT node can only
-   store 64MBytes of data, and these tests generates about 3x more than
-   that.
+   store 64K blocks data, and these tests generates about 3x more than
+   that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
+   for a currently-unkown reason... (I can't find the limit that is
+   blocking this).
 
 ### Architecture
 This implementation provides a full, complete implementation of the
@@ -196,12 +198,15 @@ There are numerous concerns with using a DHT backend.
   initial networks are unlikely to have more than a few dozen nodes.
   (The data should not be mixed into the global DHT...)
 * How will performance compare with traditional distributed databases
-  (e.g. with Postgres?)
+  (e.g. with Postgres?) For the moment, it seems quite good, when
+  working with a local DHT node. This makes sense: its entirely in
+  RAM, and thus avoids disk I/O bottlenecks.
 * There appears to be other hard-coded limits in the OpenDHT code,
   preventing large datasets from being stored. This includes limits
-  on the number of values per key. It might be possible to work around
-  this, but only with a fair amount of extra code and extra complexity.
-  Limits include: RX_QUEUE_MAX_SIZE and RX_QUEUE_MAX_DELAY.
+  on the number of values per key (`MAX_VALUES`), a limit on the
+  total size of a node (`MAX_HASHES`) and others. It might be possible
+  to work around these.  Other limits we've hit include:
+  `RX_QUEUE_MAX_SIZE` and `RX_QUEUE_MAX_DELAY`.
 * If many users use a shared network and publish hundreds or thousands
   of datasets, then how do we avoid accumulating large amounts of cruft,
   and sweep away expired/obsolete/forgotten datasets? Long lifetimes
