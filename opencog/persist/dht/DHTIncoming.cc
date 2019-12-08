@@ -26,15 +26,7 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 	// Get a future for the incoming set on the atom. We filter,
 	// because the same membership hash gets used for both values
 	// and for incoming sets. We only want the incoming set.
-	auto afut = _runner.get(mhash,
-		dht::Value::TypeFilter(_incoming_policy));
-
-	// Block until we've got it.
-	std::future_status status = afut.wait_for(_wait_time);
-	if (std::future_status::ready != status)
-		throw IOException(TRACE_INFO, "DHT is not responding!");
-
-	auto dincs = afut.get();
+	auto dincs = get_stuff(mhash, dht::Value::TypeFilter(_incoming_policy));
 	for (const auto& dinc : dincs)
 	{
 		// std::cout << "Got incoming guid: " <<
@@ -61,15 +53,8 @@ void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t
 	// Get a future for the incoming set on the atom. We filter,
 	// because the same membership hash gets used for both values
 	// and for incoming sets. We only want the incoming set.
-	auto afut = _runner.get(mhash,
-		dht::Value::TypeFilter(_incoming_policy));
-
-	// Block until we've got it.
-	std::future_status status = afut.wait_for(_wait_time);
-	if (std::future_status::ready != status)
-		throw IOException(TRACE_INFO, "DHT is not responding!");
-
-	for (const auto& dinc : afut.get())
+	auto dincs = get_stuff(mhash, dht::Value::TypeFilter(_incoming_policy));
+	for (const auto& dinc : dincs)
 	{
 		// std::cout << "Got incoming guid: " <<
 		//	dinc->unpack<dht::InfoHash>().toString() << std::endl;

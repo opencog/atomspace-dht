@@ -311,6 +311,20 @@ std::string DHTAtomStorage::dht_searches_log(void)
 
 /* ================================================================== */
 
+std::vector<std::shared_ptr<dht::Value>>
+DHTAtomStorage::get_stuff(const dht::InfoHash& ihash,
+                          const dht::Value::Filter& filter)
+{
+	auto ifut = _runner.get(ihash, filter);
+	std::future_status status = ifut.wait_for(_wait_time);
+	if (std::future_status::ready != status)
+		throw IOException(TRACE_INFO, "DHT is not responding!");
+
+	return ifut.get();
+}
+
+/* ================================================================== */
+
 /**
  * Get the values attached to a key, decode and pretty-print them.
  */
@@ -318,15 +332,14 @@ std::string DHTAtomStorage::dht_examine(const std::string& hash)
 {
 	std::stringstream ss;
 
-	dht::InfoHash ihash(hash);
 	clock_t begin = clock();
-	auto ifut = _runner.get(ihash);
-	ifut.wait();
+	dht::InfoHash ihash(hash);
+	auto ivals = get_stuff(ihash);
+
 	clock_t end = clock();
 	double elapsed = double(end-begin)/CLOCKS_PER_SEC;
 	ss << "Elapsed time: " << std::to_string(elapsed) << " seconds" << std::endl;
 
-	auto ivals = ifut.get();
 	ss << "Found " << std::to_string(ivals.size())
 	   << " values" << std::endl;
 	for (const auto& ival : ivals)

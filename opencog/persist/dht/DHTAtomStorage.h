@@ -159,6 +159,9 @@ class DHTAtomStorage : public BackingStore
 		using Timeout = std::chrono::milliseconds;
 		Timeout _wait_time;
 
+		std::vector<std::shared_ptr<dht::Value>>
+		get_stuff(const dht::InfoHash&, const dht::Value::Filter& = {});
+
 		// --------------------------
 		// Performance statistics
 		std::atomic<size_t> _num_get_atoms;
