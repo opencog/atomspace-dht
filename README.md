@@ -168,19 +168,6 @@ The following are serious issues, some of which are show-stoppers:
   for SCTP implementation status.
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
-* Its possible to hang the system. Unclear where the hang is from.
-  e.g. Running
-  ```
-   (dht-open "dht://:4999/")
-   (dht-bootstrap "dht://localhost:4555/")
-  ```
-  then running the unit tests (which connect to port 4555 for seeding)
-  and then trying to view one of the atomspaces
-  ```
-  (display (dht-examine "a8cf8a3cb42aaa86eefbd1a9d3a827ac57d87385"))
-  ```
-  can result in a hang that never times out -- until the unit tests
-  are re-run, so that the atomspace is re-published.
 * It appears to be impossible to saturate the system to 100% CPU usage,
   even when running locally. This might be the reason why its slow:
   something, somewhere is blocking and taking too long; doing nothing
