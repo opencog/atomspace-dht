@@ -39,7 +39,7 @@ works great! ... but:
 
 The OpenDHT backend is interesting, because the AtomSpace API is already
 "distributed" or "decentralized": which one depends on the actual backend
-in use.  With Postgres, its "distributed": mutiple AtomSpace instances
+in use.  With Postgres, its "distributed": multiple AtomSpace instances
 can access a single PG dataset; it scales the same way that PG scales.
 If you are a very good PG DBA, and have all the right hardware and
 network gear, I suppose this means it scales very well.  So that's nice.
@@ -92,7 +92,7 @@ In the current implementation:
 ```
    Sometimes `ValueSaveUTest`, `FetchUTest` and/or `MultiUserUTest`
    intermittently fail because data gets lost; the root cause for this
-   is unknwon, but seems to involve problems of flushing out data from
+   is unknown, but seems to involve problems of flushing out data from
    the local node, out to the network, and having the network receive
    and hold that data.
  * The consistently failing tests are:
@@ -160,7 +160,7 @@ The following are serious issues, some of which are show-stoppers:
 
 * There are data loss issues; it appears that, for some reason, data
   from a local node is never pushed out to the bigger network, and
-  thus, after the local node closes, that data cannot be retreived later.
+  thus, after the local node closes, that data cannot be retrieved later.
   The root cause of this is unknown.  This issue can be mostly avoided
   by adding `std::this_thread::sleep_for()` in several places in the code.
   Dropped data is a show-stopper; data storage MUST be reliable!
@@ -199,7 +199,7 @@ other issues; see below.
 ### Architecture concerns
 There are numerous concerns with using a DHT backend.
 * The representation is likely to be RAM intensive, requiring KBytes
-  per atom, and thus causing trouble when datasets exceeed tens of
+  per atom, and thus causing trouble when datasets exceed tens of
   millions of Atoms. The OpenDHT backend might not be able to hold
   very much.
 * There is no backup-to-disk; thus, a total data loss is risked if
@@ -217,7 +217,7 @@ There are numerous concerns with using a DHT backend.
   of datasets, then how do we avoid accumulating large amounts of cruft,
   and sweep away expired/obsolete/forgotten datasets? Long lifetimes
   for Atoms threaten this.  I guess that, in the end, for each dataset,
-  there always needs to be a seeder, e.g. working off of Postres? As
+  there always needs to be a seeder, e.g. working off of Postgres? As
   otherwise, we want to keep Atom lifetimes small-ish, so that junk on
   the net eventually expires.
 
@@ -260,7 +260,7 @@ usual:
 Please see the [examples](examples) directory. These show how to store
 individual Atoms into the DHT, how to fetch them back out, and how to
 run a DHT node so that saved values are retained even after individual
-AtomSpace clients dettach from the network.
+AtomSpace clients detach from the network.
 
 In particular, these will illustrate how to run a DHT node, and how to
 go about looking at DHT data as needed, for debugging and development.
