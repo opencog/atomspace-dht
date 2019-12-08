@@ -204,25 +204,28 @@ DHTAtomStorage::~DHTAtomStorage()
 	// The condition variable attempts to halt progress
 	// until the shutdown callback is called...
 	std::mutex mtx;
-	std::condition_variable* cv = new std::condition_variable();
-	std::unique_lock<std::mutex> lck(mtx);
+	std::condition_variable cv;
+	bool ready = false; // Handle spurious wakeups.
 	bool done = false;  // Handle spurious wakeups.
 
-	_runner.shutdown([cv, &lck, &done](void)
+	// dhtRunner::shutdown queues the callback in a different thread.
+	_runner.shutdown([&cv, &mtx, &ready, &done](void)
 	{
-		// Make sure we don't run before the cv->wait()
-		lck.lock();
-		lck.unlock();
+		std::unique_lock<std::mutex> lck(mtx);
+		cv.wait(lck, [&ready]{ return ready; });
 		done = true;
-		cv->notify_all();
+		lck.unlock();
+		cv.notify_one();
 	});
 
-	// unlock, so that the above callback can run.
+	std::unique_lock<std::mutex> lck(mtx);
+	ready = true;
 	lck.unlock();
+	cv.notify_one();
 
-	// use predicate to avoid spurious wakeups.
-	cv->wait(lck, [&done]{ return done; });
-	delete cv;
+	// Use predicate to avoid spurious wakeups.
+	lck.lock();
+	cv.wait(lck, [&done]{ return done; });
 
 	// Wait for dht threads to end.
 	_runner.join();
