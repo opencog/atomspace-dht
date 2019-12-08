@@ -74,12 +74,6 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 {
 	dht::InfoHash muid = get_membership(h);
 
-#if SLOW_THINGS_DOWN
-// XXX HACK ALERT -- data loss bug!! Adding a sleep here helps
-// avoid data loss. Do NOT know why ... but it makes a difference.
-// Terrible performance results.
-std::this_thread::sleep_for(std::chrono::milliseconds(20));
-#endif
 	// Get a future for the values on this atom. We filter,
 	// because the same membership hash gets used for both
 	// values and for incoming sets. We only want the values.

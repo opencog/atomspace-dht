@@ -87,12 +87,6 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 
 	lck.unlock();
 
-#if SLOW_THINGS_DOWN
-// XXX FIXME!! There is data loss without this. And sometimes with
-// even with this...
-std::this_thread::sleep_for(std::chrono::milliseconds(12));
-#endif
-
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
 	// is kept around.

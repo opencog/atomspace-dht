@@ -235,11 +235,6 @@ DHTAtomStorage::~DHTAtomStorage()
 	lck.lock();
 	cv.wait(lck, [&done]{ return done; });
 
-#ifdef SLOW_THINGS_DOWN
-// XXX FIXME ... if I don't sleep, then data loss occurs. Why???
-// See https://github.com/savoirfairelinux/opendht/issues/461
-sleep(4);
-#endif
 	// Wait for dht threads to end.
 	_runner.join();
 }

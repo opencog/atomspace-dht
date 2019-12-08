@@ -215,6 +215,7 @@ There are numerous concerns with using a DHT backend.
   preventing large datasets from being stored. This includes limits
   on the number of values per key. It might be possible to work around
   this, but only with a fair amount of extra code and extra complexity.
+  Limits include: RX_QUEUE_MAX_SIZE and RX_QUEUE_MAX_DELAY.
 * If many users use a shared network and publish hundreds or thousands
   of datasets, then how do we avoid accumulating large amounts of cruft,
   and sweep away expired/obsolete/forgotten datasets? Long lifetimes
