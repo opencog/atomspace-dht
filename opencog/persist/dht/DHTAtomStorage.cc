@@ -85,18 +85,19 @@ void DHTAtomStorage::init(const char * uri)
 	// permanent, and the rest should be configureable on a per-atomspace
 	// basis. Which means that we may need to adjust these dynamically...
 #define DATA_LIFETIME 24*7
+	std::chrono::hours lifetime(DATA_LIFETIME);
 
 	_atom_policy = dht::ValueType(ATOM_ID, "atom policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_atom, cy_edit_atom);
+		lifetime, cy_store_atom, cy_edit_atom);
 
 	_space_policy = dht::ValueType(SPACE_ID, "space policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_space, cy_edit_space);
+		lifetime, cy_store_space, cy_edit_space);
 
 	_values_policy = dht::ValueType(VALUES_ID, "values policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_values, cy_edit_values);
+		lifetime, cy_store_values, cy_edit_values);
 
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
-		std::chrono::hours(DATA_LIFETIME), cy_store_incoming, cy_edit_incoming);
+		lifetime, cy_store_incoming, cy_edit_incoming);
 
 	// Run a private NetID only for AtomSpace data!
 	_config.dht_config.node_config.network = 42;
