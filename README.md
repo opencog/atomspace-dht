@@ -92,9 +92,10 @@ In the current implementation:
 ```
    Sometimes `ValueSaveUTest`, `FetchUTest` and/or `MultiUserUTest`
    intermittently fail because data gets lost; the root cause for this
-   is unknown, but seems to involve problems of flushing out data from
-   the local node, out to the network, and having the network receive
-   and hold that data.
+   would seem to be that the underlying protocol for OpenDHT is UDP
+   and not SCTP. Due to network congestion, the OS kernel and/or the
+   network cards and routers are free to discard UDP packets. This
+   translates into data loss for us.
  * The consistently failing tests are:
    + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
           so actually, it's small, but bigger than the other tests).
@@ -158,15 +159,12 @@ and install mechanisms are the same.
 ### Issues
 The following are serious issues, some of which are show-stoppers:
 
-* There are data loss issues; it appears that, for some reason, data
-  from a local node is never pushed out to the bigger network, and
-  thus, after the local node closes, that data cannot be retrieved later.
-  The root cause of this is unknown.  This issue can be mostly avoided
-  by adding `std::this_thread::sleep_for()` in several places in the code.
+* There are data loss issues that are almost surely due to the use of
+  UDP as the underlying OpenDHT protocol. The problem with UDP is that
+  the OS kernel, the network cards, and network routers are free to
+  discard UDP packets when the network is congested. For us, this means
+  lost data. An SCTP shim for OpenDHT is needed.
   Dropped data is a show-stopper; data storage MUST be reliable!
-  The [opendht issue #461](https://github.com/savoirfairelinux/opendht/issues/461)
-  seems to capture some of this; although it is now marked resolved,
-  the intermittent data loss continues. Don't know why.
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
 * Its possible to hang the system. Unclear where the hang is from.
@@ -184,7 +182,7 @@ The following are serious issues, some of which are show-stoppers:
   are re-run, so that the atomspace is re-published.
 * It appears to be impossible to saturate the system to 100% CPU usage,
   even when running locally. This might be the reason why its slow:
-  something, somewhere is blocking and taking to long; doing nothing
+  something, somewhere is blocking and taking too long; doing nothing
   at all. What this is is unknown. This is particularly visible with
   `MultiUserUTest`, which starts at 100% CPU and then drops to
   single-digit percentages.
