@@ -107,7 +107,6 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 
 	size_t cnt = 0;
 	time_t bulk_start = time(0);
-	time_t last = bulk_start;
 
 	auto storat = [&](const Handle& h)->void
 	{
@@ -115,13 +114,24 @@ void DHTAtomStorage::storeAtomSpace(const AtomTable &table)
 		cnt++;
 		if (0 == cnt%500)
 		{
-			time_t secs = time(0);
-			time_t elap = secs - bulk_start;
-			secs = secs - last;
-			last = bulk_start;
-			double rate = ((double) cnt) / secs;
-			printf("\tStored %zu atoms in %d seconds (%d per second) %d secs elapsed\n",
-			       cnt, (int) secs, (int) rate, (int) elap);
+			// Force DHT to flush pending queues every so often.
+			// Otherwise, the user perceives a hang. Worse, failure
+			// to flush often enough does TWO bad things: it wrecks
+			// performance, and also causes OpenDHT to print message
+			// "Dropped NNN packets with high delay".  Yow!!
+			// On my system, 500 seems to be the magic number.
+			barrier();
+		}
+		if (0 == cnt%1000)
+		{
+			time_t now = time(0);
+			time_t elap = now - bulk_start;
+			if (0 < elap)
+			{
+				double rate = ((double) cnt) / elap;
+				printf("\tStored %zu atoms in %d seconds (%d per second)\n",
+				       cnt, (int) elap, (int) rate);
+			}
 		}
 	};
 

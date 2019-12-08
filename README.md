@@ -98,10 +98,12 @@ In the current implementation:
  * The consistently failing tests are:
    + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
           so actually, it's small, but bigger than the other tests).
-          Hits hard-coded limits on OpenDHT.
    + `9 - LargeZipfUTest` attempts a "large" atomspace w/ Zipfian
-          incoming set sizes. Runs slow (but why?) and hits
-          hard-coded limits on OpenDHT.
+          incoming set sizes.
+
+   Bot of these a hard-coded limit in OpenDHT: each DHT node can only
+   store 64MBytes of data, and these tests generates about 3x more than
+   that.
 
 ### Architecture
 This implementation provides a full, complete implementation of the
