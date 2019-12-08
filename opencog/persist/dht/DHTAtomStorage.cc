@@ -11,7 +11,6 @@
 #include <unistd.h>
 
 #include <chrono>
-#include <ctime>
 #include <thread>
 
 #include <opendht/log.h>
@@ -121,7 +120,15 @@ void DHTAtomStorage::init(const char * uri)
 		{
 			try
 			{
+// #define DEBUG 1
+#ifdef DEBUG
+				// Log to stdout.
+				dht::DhtRunner::Context ctxt;
+				ctxt.logger = dht::log::getStdLogger();
+				_runner.run(_port, _config, std::move(ctxt));
+#else
 				_runner.run(_port, _config);
+#endif
 			}
 			catch (const dht::DhtException& ex)
 			{
@@ -199,27 +206,25 @@ DHTAtomStorage::~DHTAtomStorage()
 	std::mutex mtx;
 	std::condition_variable* cv = new std::condition_variable();
 	std::unique_lock<std::mutex> lck(mtx);
-	bool done = false;  // Handle spruious wakeups.
-	std::time_t start = time(0);
+	bool done = false;  // Handle spurious wakeups.
 
-	_runner.shutdown([cv, &done](void) { done = true; cv->notify_one(); });
+	_runner.shutdown([cv, &lck, &done](void)
+	{
+		// Make sure we don't run before the cv->wait()
+		lck.lock();
+		lck.unlock();
+		done = true;
+		cv->notify_all();
+	});
 
-	// Sometimes the shutdown hangs. I don't know why.
-	// See https://github.com/savoirfairelinux/opendht/issues/461
-	// for details.
-	#define SECS_TO_WAIT 6
-	cv->wait_for(lck, std::chrono::seconds(SECS_TO_WAIT), [done]{ return done; });
-	// cv->wait(lck);
+	// unlock, so that the above callback can run.
+	lck.unlock();
+
+	// use predicate to avoid spurious wakeups.
+	cv->wait(lck, [&done]{ return done; });
 	delete cv;
 
-	std::time_t elapsed = time(0) - start;
-	if (SECS_TO_WAIT <= elapsed)
-	{
-		logger().info("CAUTION: shutdown was hung for %lu seconds\n", elapsed);
-	}
-
-	// Wait for dht threads to end. This seems to clobber the
-	// pending job queues...
+	// Wait for dht threads to end.
 	_runner.join();
 }
 
