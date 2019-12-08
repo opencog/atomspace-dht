@@ -73,6 +73,9 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 	dht::InfoHash muid = get_membership(h);
 
 	auto dvals = get_stuff(muid, _values_filter);
+
+	// There may be multiple values attached to this Atom.
+	// We only want one; the one with the latest timestamp.
 	unsigned long timestamp = 0;
 	std::string alist;
 	for (const auto& dval : dvals)
@@ -84,7 +87,7 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 			alist = dval->unpack<std::string>();
 		}
 	}
-	std::cout << "Latest svalue: " << alist << std::endl;
+	// std::cout << "Latest svalue: " << alist << std::endl;
 	decodeAlist(h, alist);
 	_value_fetches++;
 
@@ -132,7 +135,7 @@ std::string DHTAtomStorage::encodeValuesToAlist(const Handle& h)
  * For example, `(FloatValue 1 2 3 4)`
  *
  * XXX FIXME This needs to be fuzzed; it is very likely to crash
- * and/or contain bugs if it is given strings of unexpected formats
+ * and/or contain bugs if it is given strings of unexpected formats.
  */
 ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 {
@@ -260,7 +263,7 @@ ValuePtr DHTAtomStorage::decodeStrValue(std::string& stv, size_t& pos)
 /* ================================================================== */
 
 /**
- * Decode a Valuations association list.
+ * Decode a Valuation association list.
  * This list has the format
  * ((KEY . VALUE)(KEY2 . VALUE2)...)
  * Store the results as values on the atom.

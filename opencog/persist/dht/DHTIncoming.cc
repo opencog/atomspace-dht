@@ -25,10 +25,10 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 	auto dincs = get_stuff(mhash, _incoming_filter);
 	for (const auto& dinc : dincs)
 	{
-		// std::cout << "Got incoming guid: " <<
-		//	dinc->unpack<dht::InfoHash>().toString() << std::endl;
+		// std::cout << "Got incoming guid: "
+		//	      << dinc->unpack<dht::InfoHash>().toString() << std::endl;
 		Handle h(fetch_values(fetch_atom(dinc->unpack<dht::InfoHash>())));
-		std::cout << "Got incoming Atom: " << h->to_string() << std::endl;
+		// std::cout << "Got incoming Atom: " << h->to_string() << std::endl;
 
 		table.add(h, false);
 	}
@@ -48,13 +48,14 @@ void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t
 	auto dincs = get_stuff(mhash, _incoming_filter);
 	for (const auto& dinc : dincs)
 	{
-		// std::cout << "Got incoming guid: " <<
-		//	dinc->unpack<dht::InfoHash>().toString() << std::endl;
+		// std::cout << "Got incoming guid: "
+		//	   << dinc->unpack<dht::InfoHash>().toString() << std::endl;
 		Handle h(fetch_atom(dinc->unpack<dht::InfoHash>()));
 		if (h->get_type() != t) continue;
 
 		Handle hv(fetch_values(std::move(h)));
-		std::cout << "Got typed incoming Atom: " << hv->to_string() << std::endl;
+		// std::cout << "Got typed incoming Atom: "
+		//           << hv->to_string() << std::endl;
 
 		table.add(hv, false);
 		_num_get_inlinks ++;
