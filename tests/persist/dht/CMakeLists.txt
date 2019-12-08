@@ -19,5 +19,5 @@ ADD_CXXTEST(MultiUserUTest)
 
 # XXX FIXME Disable these two tests for now; they hang
 # (take forever to run) Don't know why. Needs fixing.
-# ADD_CXXTEST(LargeFlatUTest)
+ADD_CXXTEST(LargeFlatUTest)
 # ADD_CXXTEST(LargeZipfUTest)

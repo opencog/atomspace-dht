@@ -59,7 +59,7 @@ driver.  Closely tied to this are questions of RAM usage and efficiency.
 These are confusing and unknown. They're counter-balanced by the dream
 of some super-giant AtomSpace pie-in-the-sky with millions of users.
 
-## Proof-of-concept version 0.2.1
+## Proof-of-concept version 0.2.2
 All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
@@ -98,10 +98,9 @@ In the current implementation:
  * The consistently failing tests are:
    + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
           so actually, it's small, but bigger than the other tests).
-          Runs impossibly slowly, (> 10 hours) and hits hard-coded
-          limits on OpenDHT.
+          Hits hard-coded limits on OpenDHT.
    + `9 - LargeZipfUTest` attempts a "large" atomspace w/ Zipfian
-          incoming set sizes.  Runs impossibly slowly, likely to break
+          incoming set sizes. Runs slow (but why?) and hits
           hard-coded limits on OpenDHT.
 
 ### Architecture
