@@ -64,10 +64,9 @@ All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
 this backend, prevent a full pass). Many desirable enhancements are
-missing; performance is terrible, and that is a huge issue. There are
-several show-stopper or near-show-stopper issues preventing further
-development; see the issues list below, and also the architecture
-concerns list.
+missing. There is one show-stopper and one or more near-show-stopper
+issues discouraging further development; see the issues list below,
+and also the architecture concerns list.
 
 ### Status
 In the current implementation:
