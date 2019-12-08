@@ -23,11 +23,13 @@
 
 using namespace opencog;
 
-class LargeZipfTest :  public CxxTest::TestSuite
+class LargeZipfUTest :  public CxxTest::TestSuite
 {
 	private:
 		AtomSpace *_as;
 		std::string uri;
+		std::string boot;
+		DHTAtomStorage *astore;
 
 #define NWORDS 5000
 		Handle hword[NWORDS];
@@ -37,13 +39,8 @@ class LargeZipfTest :  public CxxTest::TestSuite
 
 	public:
 
-		LargeZipfTest(void);
-		~LargeZipfTest()
-		{
-			// erase the log file if no assertions failed
-			if (!CxxTest::TestTracker::tracker().suiteFailed())
-				std::remove(logger().get_filename().c_str());
-		}
+		LargeZipfUTest(void);
+		~LargeZipfUTest();
 
 		void setUp(void);
 		void tearDown(void);
@@ -57,30 +54,49 @@ class LargeZipfTest :  public CxxTest::TestSuite
 		void test_atomspace(void);
 };
 
-LargeZipfTest:: LargeZipfTest(void)
+LargeZipfUTest:: LargeZipfUTest(void)
 {
-	uri = "dht:///atomspace-dht-test";
 	// logger().set_level(Logger::DEBUG);
 	logger().set_level(Logger::INFO);
 	logger().set_print_to_stdout_flag(true);
+
+	uri = "dht:///atomspace-dht-test";
+	boot = "dht://localhost:4555/";
+
+	// Create a singe DHT node that will act as
+	// as the repo for the duration of the test.
+	astore = new DHTAtomStorage("dht://:4555/");
+	if (!astore->connected())
+	{
+		logger().error("LargeZipfUTest: cannot setup a DHT node");
+		exit(1);
+	}
+}
+
+LargeZipfUTest::~LargeZipfUTest()
+{
+	delete astore;
+	// erase the log file if no assertions failed
+	if (!CxxTest::TestTracker::tracker().suiteFailed())
+		std::remove(logger().get_filename().c_str());
 }
 
 /*
  * This is called once before each test, for each test (!!)
  */
-void LargeZipfTest::setUp(void)
+void LargeZipfUTest::setUp(void)
 {
 	_as = new AtomSpace();
 }
 
-void LargeZipfTest::tearDown(void)
+void LargeZipfUTest::tearDown(void)
 {
 	delete _as;
 }
 
 // ============================================================
 
-void LargeZipfTest::atomCompare(AtomPtr a, AtomPtr b, std::string where)
+void LargeZipfUTest::atomCompare(AtomPtr a, AtomPtr b, std::string where)
 {
 	// printf("Check %s expect %s\n", where.c_str(), a->to_string().c_str());
 	TSM_ASSERT("No atom found", b != nullptr);
@@ -128,7 +144,7 @@ void LargeZipfTest::atomCompare(AtomPtr a, AtomPtr b, std::string where)
 
 // ============================================================
 
-void LargeZipfTest::fetch_space(AtomSpace *space)
+void LargeZipfUTest::fetch_space(AtomSpace *space)
 {
 	for (int w=0; w<NWORDS; w++)
 	{
@@ -144,7 +160,7 @@ void LargeZipfTest::fetch_space(AtomSpace *space)
 	}
 }
 
-void LargeZipfTest::check_space(AtomSpace *space, std::string dbgmsg)
+void LargeZipfUTest::check_space(AtomSpace *space, std::string dbgmsg)
 {
 	for (int w=0; w<NWORDS; w++)
 	{
@@ -160,7 +176,7 @@ void LargeZipfTest::check_space(AtomSpace *space, std::string dbgmsg)
 	}
 }
 
-void LargeZipfTest::check_empty(AtomSpace *space)
+void LargeZipfUTest::check_empty(AtomSpace *space)
 {
 	for (int w=0; w<NWORDS; w++)
 	{
@@ -178,7 +194,7 @@ void LargeZipfTest::check_empty(AtomSpace *space)
 
 // ============================================================
 
-int LargeZipfTest::filler_up(AtomSpace *space)
+int LargeZipfUTest::filler_up(AtomSpace *space)
 {
 	// Emulate a word, with a spelling that is not long, not short ...
 	std::string wrd = "Word-ishy ";
@@ -236,7 +252,7 @@ int LargeZipfTest::filler_up(AtomSpace *space)
 
 // ============================================================
 
-void LargeZipfTest::test_atomspace(void)
+void LargeZipfUTest::test_atomspace(void)
 {
 	logger().debug("BEGIN TEST: %s", __FUNCTION__);
 
