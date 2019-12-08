@@ -102,6 +102,11 @@ void DHTAtomStorage::init(const char * uri)
 	_config.dht_config.node_config.network = 42;
 	_config.threaded = true;
 
+	// Disable rate limiting, at least for localhost...
+	// XXX FIXME, this is problematic for DDOS reasons...
+	_config.dht_config.node_config.max_req_per_sec = -1;
+	_config.dht_config.node_config.max_peer_req_per_sec = -1;
+
 	// Calling dht::crypto::generateIdentity() results in an insane
 	// crash in the crypto library libnettle. See
 	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041
