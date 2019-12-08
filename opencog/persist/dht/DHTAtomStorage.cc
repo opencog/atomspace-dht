@@ -104,6 +104,11 @@ void DHTAtomStorage::init(const char * uri)
 	_incoming_policy = dht::ValueType(INCOMING_ID, "incoming policy",
 		lifetime, cy_store_incoming, cy_edit_incoming);
 
+	// Use filters, because the same membership hash gets used
+	// for both values and for incoming sets.
+	_values_filter = dht::Value::TypeFilter(_values_policy);
+	_incoming_filter = dht::Value::TypeFilter(_incoming_policy);
+
 	// Run a private NetID only for AtomSpace data!
 	_config.dht_config.node_config.network = 42;
 	_config.threaded = true;

@@ -22,11 +22,7 @@ using namespace opencog;
 void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 {
 	dht::InfoHash mhash = get_membership(h);
-
-	// Get a future for the incoming set on the atom. We filter,
-	// because the same membership hash gets used for both values
-	// and for incoming sets. We only want the incoming set.
-	auto dincs = get_stuff(mhash, dht::Value::TypeFilter(_incoming_policy));
+	auto dincs = get_stuff(mhash, _incoming_filter);
 	for (const auto& dinc : dincs)
 	{
 		// std::cout << "Got incoming guid: " <<
@@ -49,11 +45,7 @@ void DHTAtomStorage::getIncomingSet(AtomTable& table, const Handle& h)
 void DHTAtomStorage::getIncomingByType(AtomTable& table, const Handle& h, Type t)
 {
 	dht::InfoHash mhash = get_membership(h);
-
-	// Get a future for the incoming set on the atom. We filter,
-	// because the same membership hash gets used for both values
-	// and for incoming sets. We only want the incoming set.
-	auto dincs = get_stuff(mhash, dht::Value::TypeFilter(_incoming_policy));
+	auto dincs = get_stuff(mhash, _incoming_filter);
 	for (const auto& dinc : dincs)
 	{
 		// std::cout << "Got incoming guid: " <<

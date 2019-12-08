@@ -29,18 +29,12 @@ void DHTAtomStorage::store_atom_values(const Handle& atom)
 	dht::InfoHash muid = get_membership(atom);
 
 	// If there are no keys currently on the atom, but there are values
-	// in the DHT, then we need to clobber them.  Try to avoid putting,
-	// by doing a get first.  Maybe we can get more efficient by caching?
+	// in the DHT, then we need to clobber the values in the DHT.  Try
+	// to avoid having to to a put, by doing a get first.  Maybe we can
+	// get more efficient by caching?
 	if (0 == atom->getKeys().size())
 	{
-		auto afut = _runner.get(muid,
-			dht::Value::TypeFilter(_values_policy));
-
-		std::future_status status = afut.wait_for(_wait_time);
-		if (std::future_status::ready != status)
-			throw IOException(TRACE_INFO, "DHT is not responding!");
-
-		auto dvals = afut.get();
+		auto dvals = get_stuff(muid, _values_filter);
 		if (0 < dvals.size())
 			delete_atom_values(atom);
 		return;
@@ -78,18 +72,7 @@ Handle DHTAtomStorage::fetch_values(Handle&& h)
 {
 	dht::InfoHash muid = get_membership(h);
 
-	// Get a future for the values on this atom. We filter,
-	// because the same membership hash gets used for both
-	// values and for incoming sets. We only want the values.
-	auto afut = _runner.get(muid,
-		dht::Value::TypeFilter(_values_policy));
-
-	// Block until we've got it.
-	std::future_status status = afut.wait_for(_wait_time);
-	if (std::future_status::ready != status)
-		throw IOException(TRACE_INFO, "DHT is not responding!");
-
-	auto dvals = afut.get();
+	auto dvals = get_stuff(muid, _values_filter);
 	unsigned long timestamp = 0;
 	std::string alist;
 	for (const auto& dval : dvals)
