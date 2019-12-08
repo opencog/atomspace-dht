@@ -103,7 +103,7 @@
 ; Obtain the DHT key-hash for this atom.  For this Atom in an AtomSpace
 ; with this particular name, this will be globally unique, and it
 ; should be equal to 2220eca6560c36cde76315204130dbb182756a9b.
-; This 80-bit hash is derived from the Atom type and the Atom name.
+; This 160-bit hash is derived from the Atom type and the Atom name.
 (display (dht-atom-hash (ConceptNode "foo"))) (newline)
 
 ; The Values and Incoming Set attached to it can be examined:
@@ -114,7 +114,7 @@
 ; the AtomSpace name (the name given in the `dht-open` clause.)
 (display (dht-atomspace-hash)) (newline)
 
-; Given an (80-bit DHT) hash that identifies an AtomSpace, the current
+; Given an (160-bit DHT) hash that identifies an AtomSpace, the current
 ; contents of that AtomSpace can be viewed, as they exist in the DHT:
 (display (dht-examine "d2bf1fd0312cbf309df74c537bea16769b419f44"))
 
