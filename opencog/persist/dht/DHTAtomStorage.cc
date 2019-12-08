@@ -198,6 +198,8 @@ DHTAtomStorage::DHTAtomStorage(std::string uri)
 
 DHTAtomStorage::~DHTAtomStorage()
 {
+	// Calling the loop manually causes pending message queues to drain.
+	// Once for the high-priority queue, and once for the regular queue,
 	_runner.loop();
 	_runner.loop();
 
@@ -227,6 +229,9 @@ DHTAtomStorage::~DHTAtomStorage()
 	lck.lock();
 	cv.wait(lck, [&done]{ return done; });
 
+// XXX FIXME ... if I don't sleep, then data loss occurs. Why???
+// See https://github.com/savoirfairelinux/opendht/issues/461
+sleep(2);
 	// Wait for dht threads to end.
 	_runner.join();
 }
