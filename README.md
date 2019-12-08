@@ -132,8 +132,6 @@ and install mechanisms are the same.
 * How to delete entries? Atoms in the AtomSpace are tagged with
   a timestamp and an add/drop verb, so that precedence is known.
   An alternate design using CRDT seems like overkill.
-* TODO: Using `DhtRunner::get()` with callbacks instead of futures
-  will improve performance.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
 * TODO: Change the default one-week data expiration policy to
@@ -146,6 +144,12 @@ and install mechanisms are the same.
   or for new atom types.
 * TODO: Enhancement: listen for atomspace updates (Atom insertion
   and deletion).
+* TODO: use MSGPACK_DEFINE_MAP for more efficient serialization
+  of values (esp. of FloatValue).
+* TODO: Using `DhtRunner::get()` with callbacks instead of futures
+  will improve performance. This is somewhat tricky, though, because
+  one callback might trigger more gets (for values, incoming set, etc.)
+  and it's not clear if OpenDHT might deadlock in this case...
 * TODO: Enhancement: implement a CRDT type for `CountTruthValue`.
 * TODO: Measure total RAM usage.  This risks being quite the
   memory hog, if datasets with hundreds of millions of atoms are
