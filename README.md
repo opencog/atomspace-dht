@@ -185,7 +185,9 @@ The following are serious issues, some of which are show-stoppers:
 * It appears to be impossible to saturate the system to 100% CPU usage,
   even when running locally. This might be the reason why its slow:
   something, somewhere is blocking and taking to long; doing nothing
-  at all. What this is is unknown.
+  at all. What this is is unknown. This is particularly visible with
+  `MultiUserUTest`, which starts at 100% CPU and then drops to
+  single-digit percentages.
 * There is some insane gnutls/libnettle bug when it interacts with
   BoehmGC.  It's provoked when running `MultiUserUTest` when the
   line that creates `dht::crypto::generateIdentity();` is enabled.

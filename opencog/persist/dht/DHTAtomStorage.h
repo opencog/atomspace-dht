@@ -41,6 +41,10 @@ namespace opencog
  *  @{
  */
 
+// XXX a hack to make unit tests usually mostly pass, at the cost
+// of terrible performance!  Remove this when fixed!
+// #define SLOW_THINGS_DOWN 1
+
 class DHTAtomStorage : public BackingStore
 {
 	private:

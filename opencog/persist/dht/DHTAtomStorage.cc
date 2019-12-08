@@ -125,11 +125,12 @@ void DHTAtomStorage::init(const char * uri)
 		{
 			try
 			{
-// #define DEBUG 1
+#define DEBUG 1
 #ifdef DEBUG
 				// Log to stdout.
 				dht::DhtRunner::Context ctxt;
-				ctxt.logger = dht::log::getStdLogger();
+				// ctxt.logger = dht::log::getStdLogger();
+				ctxt.logger = dht::log::getFileLogger("atomspace-dhtnode.log");
 				_runner.run(_port, _config, std::move(ctxt));
 #else
 				_runner.run(_port, _config);
@@ -234,9 +235,11 @@ DHTAtomStorage::~DHTAtomStorage()
 	lck.lock();
 	cv.wait(lck, [&done]{ return done; });
 
+#ifdef SLOW_THINGS_DOWN
 // XXX FIXME ... if I don't sleep, then data loss occurs. Why???
 // See https://github.com/savoirfairelinux/opendht/issues/461
-sleep(2);
+sleep(4);
+#endif
 	// Wait for dht threads to end.
 	_runner.join();
 }

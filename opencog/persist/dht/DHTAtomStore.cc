@@ -87,10 +87,11 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 
 	lck.unlock();
 
-// XXX FIXME!! Currently, rate-limiting hoses our ability to store
-// atoms and values. So use a hard-coded stall. See issue
-// https://github.com/savoirfairelinux/opendht/issues/460
+#if SLOW_THINGS_DOWN
+// XXX FIXME!! There is data loss without this. And sometimes with
+// even with this...
 std::this_thread::sleep_for(std::chrono::milliseconds(12));
+#endif
 
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
