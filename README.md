@@ -61,22 +61,22 @@ All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
 this backend, prevent a full pass). Many desirable enhancements are
-missing. There is one show-stopper and one or more near-show-stopper
-issues discouraging further development; see the issues list below,
-and also the architecture concerns list.
+missing. There is at least one coding show-stopper issue discouraging
+further development; there are also multiple serious architectural
+issues suggesting that the "naive" approach is inadequate for the
+stated vision (see further below).
 
-### Status
-In the current implementation:
- * OpenDHT appears to be compatible with the requirements imposed by
-   the AtomSpace backend API. It seems to provide most of the services
-   that the AtomSpace needs. This makes future development and
-   operation look promising.
- * Despite this, there are several serious issues that are roadblocks
-   to further development. These are listed below.
- * The implementation is feature-complete.  Missing are:
-    + Assorted desirable enhancements (see list further below).
- * All nine unit tests have been ported over (from the original
-   SQL backend driver tests). Currently seven of nine (usually) pass:
+The current implementation is a full, complete implementation of the
+public (generic) `BackingStore` API from the Atomspace. It's a
+standard backend driver for the AtomSpace. The actual design is a naive
+mapping of AtomSpace Atoms and Values onto the DHT key-value store;
+thus, Atoms are directly persisted into the DHT, as DHT content.
+
+The git repo layout is the same as that of the AtomSpace repo. Build,
+unit-test and install mechanisms are the same.
+
+All nine unit tests have been ported over (from the original SQL
+backend driver tests). Currently seven of nine (usually) pass:
 ```
 1 - BasicSaveUTest
 2 - ValueSaveUTest
@@ -86,32 +86,26 @@ In the current implementation:
 6 - MultiPersistUTest
 7 - MultiUserUTest
 ```
-   Sometimes `ValueSaveUTest`, `FetchUTest` and/or `MultiUserUTest`
-   intermittently fail because data gets lost; the root cause for this
-   would seem to be that the underlying protocol for OpenDHT is UDP
-   and not SCTP. Due to network congestion, the OS kernel and/or the
-   network cards and routers are free to discard UDP packets. This
-   translates into data loss for us.
- * The consistently failing tests are:
-   + `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
-          so actually, it's small, but bigger than the other tests).
-   + `9 - LargeZipfUTest` attempts a "large" atomspace w/ Zipfian
-          incoming set sizes.
+Sometimes `ValueSaveUTest`, `FetchUTest` and/or `MultiUserUTest`
+intermittently fail because data gets lost; the root cause for this
+would seem to be that the underlying protocol for OpenDHT is UDP
+and not SCTP. Due to network congestion, the OS kernel and/or the
+network cards and routers are free to discard UDP packets. This
+translates into data loss for us.
 
-   Bot of these a hard-coded limit in OpenDHT: each DHT node can only
-   store 64K blocks data, and these tests generates about 3x more than
-   that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
-   for a currently-unkown reason... (I can't find the limit that is
-   blocking this).
+The consistently failing tests are:
+ * `8 - LargeFlatUTest` attempts a "large" atomspace (of only 35K Atoms,
+        so actually, it's small, but bigger than the other tests).
+ * `9 - LargeZipfUTest` attempts a "large" atomspace w/ Zipfian
+        incoming set sizes.
+
+Both of these hit hard-coded limits in OpenDHT: each DHT node can only
+store 64K blocks data, and these tests generates about 3x more than
+that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
+for a currently-unkown reason... (I can't find the limit that is
+blocking this).
 
 ### Architecture
-This provides a full, complete implementation of the standard
-`BackingStore` API from the Atomspace. Its a backend driver.
-
-The git repo layout is the same as that of the AtomSpace repo. Build
-and install mechanisms are the same.
-
-### Design Notes
 * Every Atom gets a unique hash. This is called the GUID.
   Every GUID is published, because, given only a GUID,
   there needs to be a way of finding out what the Atom is.
