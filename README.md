@@ -14,10 +14,10 @@ The [AtomSpace](https://wiki.opencog.org/w/AtomSpace) is a
 (hyper-)graph database whose nodes and links are called
 ["Atoms"](https://wiki.opencog.org/w/Atom). Each (immutable) Atom has
 an associated (mutable)
-[key-value store](https://wiki.opencog.org/w/Value).
-The Atomspace has a variety of advanced features not normally found
-in ordinary graph databases, including an advanced query language
-and "active" Atoms.
+[key-value store](https://wiki.opencog.org/w/Value).  This split
+between mutable and immutable data ("water" and "pipes") enables
+a variety of advanced features not normally found in ordinary graph
+databases, including an advanced query language and "active" Atoms.
 
 ### OpenDHT
 OpenDHT is an internet-wide globally-accessible storage system, providing
@@ -49,15 +49,12 @@ With the DHT backend, there is a vague, general hope that perhaps not
 only does the install/config story becomes trivial, but also that the
 scalability story will be brilliant: that, with many machines on a
 local network, or globally distributed, one will be able to create
-giant AtomSpace datasets.  At least, that is the general hope. How
-well this might work out is unknown.
-
-Quite unclear is how OpenDHT fetch and eviction work, when local
-processing is creating hot-spots in the datasets. This will be the
-interesting technical and theoretical question to explore with this
-driver.  Closely tied to this are questions of RAM usage and efficiency.
-These are confusing and unknown. They're counter-balanced by the dream
-of some super-giant AtomSpace pie-in-the-sky with millions of users.
+giant AtomSpace datasets.  At least, that is the general daydream.
+The code here is an attempt to explore this idea.  The approach taken
+is "naive", treating the DHT as a key-value store, and then mapping the
+AtomSpace onto it, in the simplest, "most obvious" way possible. It
+turns out that this naive approach has multiple difficulties, which
+are presented and critiqued furhter below. But first, status.
 
 ## Proof-of-concept version 0.2.2
 All core functions are implemented. They work, on a small scale, for
