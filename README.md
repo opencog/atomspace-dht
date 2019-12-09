@@ -189,6 +189,10 @@ the architectural issues, given in the next section.
   for SCTP implementation status.
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
+  These include a limit on the number of values per key (`MAX_VALUES`),
+  a limit on the total size of a node (`MAX_HASHES`), the size of
+  pending (unprocessed) received data (`RX_QUEUE_MAX_SIZE`) and
+  how stale/old the unprecessed data is (`RX_QUEUE_MAX_DELAY`).
 * It appears to be impossible to saturate the system to 100% CPU usage,
   even when running locally. This might be the reason why its slow:
   something, somewhere is blocking and taking too long; doing nothing
@@ -246,7 +250,20 @@ These are discussed here.
   scheme that preserves graph locality.  For example, it would be
   very nice, excellent, even, if two graphically-close atoms had
   XOR-close hashes. But it's not clear how to obtain this.
-  
+
+* The naive implementation ignores scalability issues with AtomSpace
+  memebership. That is, the grand-total list of *all* Atoms in a given
+  AtomSpace are recorded as DHT-values on a *single* DHT-key.  For
+  large AtomSpaces (hundreds of millions or even billions of Atoms)
+  this mans that *one* DHT-key has a vast number of DHT-values attached
+  to it. This is simply not scalable, as DHT's do not distribute
+  (scatter) the DHT-values, only the DHT-keys. The OpenDHT codebase
+  has a hard-coded limit of 1K DHT-values per DHT-key, as well as a
+  limit of 64KBytes per DHT-key. This means that storing AtomSpace
+  contents under one key is a fundamentally broken design. Similar
+  remarks apply for storing the IncomingSet. But if this is the wrong
+  way to store large sets, then what is right way?
+
 
 
 * 
@@ -258,18 +275,6 @@ These are discussed here.
   (e.g. with Postgres?) For the moment, it seems quite good, when
   working with a local DHT node. This makes sense: its entirely in
   RAM, and thus avoids disk I/O bottlenecks.
-* There appears to be other hard-coded limits in the OpenDHT code,
-  preventing large datasets from being stored. This includes limits
-  on the number of values per key (`MAX_VALUES`), a limit on the
-  total size of a node (`MAX_HASHES`) and others. It might be possible
-  to work around these.  Other limits we've hit include:
-  `RX_QUEUE_MAX_SIZE` and `RX_QUEUE_MAX_DELAY`.
-* Scalability: The limit on DHT-values-per-DHT-key is a critical limit on the
-  maximum AtomSpace size; for a given AtomSpace, each Atom corresponds
-  to a DHT-value attached to the Atomspace name hash. This is how we
-  find all the members of an AtomSpace.  This same limit affects the
-  incoming set; the same mechanism is used to find the incoming set of
-  an atom.
 
 # Build, Test, Install, Examples
 Practical matters.
