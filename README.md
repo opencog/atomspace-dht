@@ -11,9 +11,9 @@ allowing many AtomSpace processes to access and perform updates to
 huge datasets.
 
 The driver more-or-less works, but is a failed experiment. A detailed
-critique of the architecture is given much farther down, below. As of
-this writing (2019), there isn't any obvious way of resolving the
-architectural issues that are raised.
+critique of the architecture is given below. As of this writing (2019),
+there isn't any obvious way of resolving the architectural issues that
+are raised.
 
 ### The AtomSpace
 The [AtomSpace](https://wiki.opencog.org/w/AtomSpace) is a
@@ -193,18 +193,24 @@ the architectural issues, given in the next section.
   Dropped data is a show-stopper; data storage MUST be reliable!
   See [opendht issue #471](https://github.com/savoirfairelinux/opendht/issues/471)
   for SCTP implementation status.
+
 * Hard-coded limits on various OpenDHT structures. See
   [opendht issue #426](https://github.com/savoirfairelinux/opendht/issues/426)
   These include a limit on the number of values per key (`MAX_VALUES`),
   a limit on the total size of a node (`MAX_HASHES`), the size of
   pending (unprocessed) received data (`RX_QUEUE_MAX_SIZE`) and
   how stale/old the unprocessed data is (`RX_QUEUE_MAX_DELAY`).
-* It appears to be impossible to saturate the system to 100% CPU usage,
-  even when running locally. This might be the reason why its slow:
-  something, somewhere is blocking and taking too long; doing nothing
-  at all. What this is is unknown. This is particularly visible with
-  `MultiUserUTest`, which starts at 100% CPU and then drops to
-  single-digit percentages.
+
+  This needs to be worked around by creating a "large set" primitive,
+  and using this to hold the large sets of MUID's/GUID's. Without this,
+  the driver is limited to AtomSpaces of about 15K Atoms or less.
+
+* It has not been possible to saturate the system to 100% CPU usage,
+  even when running locally. The reason for this is not known.
+  Presumably, some timer somewhere is waiting.  This is particularly
+  visible with `MultiUserUTest`, which starts at 100% CPU and then
+  drops to single-digit percentages.
+
 * There is some insane gnutls/libnettle bug when it interacts with
   BoehmGC.  It's provoked when running `MultiUserUTest` when the
   line that creates `dht::crypto::generateIdentity();` is enabled.
@@ -212,8 +218,6 @@ the architectural issues, given in the next section.
   [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
   It appears that gnutls is not thread-safe... or something weird.
 
-These all appear to be "early adopter" pains. There are likely to be
-other issues.
 
 # Architecture
 The "naive" architecture given above has numerous very serious flaws.
@@ -271,10 +275,28 @@ solutions.
   to it. This is simply not scalable, as DHT's do not distribute
   (scatter) the DHT-values, only the DHT-keys. The OpenDHT codebase
   has a hard-coded limit of 1K DHT-values per DHT-key, as well as a
-  limit of 64KBytes per DHT-key. This means that storing AtomSpace
-  contents under one key is a fundamentally broken design. Similar
-  remarks apply for storing the IncomingSet. But if this is the wrong
-  way to store large sets, then what is right way?
+  limit of 64KBytes per DHT-key. To store AtomSpaces of unbounded size,
+  one needs to map some other data structure, e.g. an rb-tree, onto
+  the DHT. That would allow DHT-values of unbounded size to be stored,
+  but at a cost.
+
+* The naive implementation is *NOT* decentralized. Indicating the
+  AtomSpace with a single DHT-key means that there is a single point of
+  truth for the contents of the AtomSpace. Multiple writers are then
+  in competition to add and delete Atoms into this global singleton.
+  In practical applications, there is almost never any particular need
+  for a single, global AtomSpace; there is instead only the need to
+  obtain all Atoms of some given particular type, or to find all of the
+  (nearest) neighbors of an Atom. Both of these queries are at best only
+  approximate: if Atoms are added or removed over time, so be it; one
+  only needs a best-effort query in some approximate time-frame.  That
+  is, there is no inherent demand that the AtomSpace be a global
+  singleton. The naive implementation is treating it as such, and
+  causing more problems (edit contention) than it solves (query
+  uniqueness). It is enough for the AtomSpace to follow "BASE"
+  consistency principles, instead of "ACID" principles; the naive
+  implementation is forcing ACID when its not really needed, and worse:
+  forcing a global singleton.
 
 ## Architectural Alternatives
 
