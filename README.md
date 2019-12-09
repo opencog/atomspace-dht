@@ -105,24 +105,47 @@ that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
 for a currently-unkown reason... (I can't find the limit that is
 blocking this).
 
-### Architecture
-* Every Atom gets a unique hash. This is called the GUID.
-  Every GUID is published, because, given only a GUID,
-  there needs to be a way of finding out what the Atom is.
-  This is needed for IncomingSet fetch, for example.
-* Every (Atom, AtomSpace-name) pair gets a unique hash.
-  The current values on that atom, as well as it's incoming set
-  are stored under that hash.
-* How can we find all current members of an AtomSpace? Easy!
-  The AtomSpace is just one hash, and each atom that is in it
-  corresponds to one DHT value on that hash.
-* How can we find all members of the incoming set of an Atom?
-  Easy, we generate the DHT-hash for that Atom, and then look at
-  all the DHT-values attached to it.  This is effectively the
-  same mechanism as finding all the members of an AtomSpace.
-* How to delete entries? Atoms in the AtomSpace are tagged with
-  a timestamp and an add/drop verb, so that precedence is known.
-  An alternate design using CRDT seems like overkill.
+## Architecture
+The architecture of this implementation is termed "naive", because
+it uses the simplest, "most obvious" mapping of the AtomSpace and
+AtomSpace concepts onto a flat key-value store. It's naive, in that
+it ignores most characteristics that make a DHT different from an
+ordinary key-value database. It's naive in that it ignores a number
+of design challanges presented by large AtomSpaces.  These are
+addressed and critiqued in a following section.
+
+The "naive" design is characterized as follows:
+
+* Every Atom gets a unique (160-bit) hash. This is called the GUID.
+  Every GUID is published to the DHT, with the hash serving as DHT-key,
+  and the Atom name/outgoing-set serving as the DHT-value.  As a
+  result, given only a GUID, the actual Atom can always be recreated.
+* Every (Atom, AtomSpace-name) pair gets a unique (160-bit) hash.
+  This is termed the MUID or "Membership UID", as it referes to
+  an Atom in a specific AtomSpace.  The MUID is used as a DHT-key;
+  the corresponding DHT-values are used to hold the IncomingSet,
+  and the Atom-Values. Keep in mind that although Atoms are independent
+  of AtomSpaces, the IncomingSets and the Atom-Values depend on the
+  actual AtomSpace an Atom might be in. That is, an AtomSpace provides
+  a "context" or "frame" for an Atom.
+* The AtomSpace-name gets a unique (160-bit) hash. The set of all Atoms
+  in the AtomSpace are stored as DHT-values on this DHT-key.
+* Given an MUID, the Atoms in the IncomingSet are stored as DHT-values
+  under that MUID.  This is effectively the same mechanism as finding
+  all the members of an AtomSpace.
+* Atom deletion presents a challange. This is solved by tagging each
+  DHT-value under the AtomSpace key with a timestamp and an add/drop
+  verb.  The timestamp indicates the most recent version, in case an
+  Atom is added/dropped repeatedly.
+
+That's it. It's pretty straight-forward. The implementation is small:
+less than 2.5 KLOC grand-total, including whitespace lines, comments
+and boilerplate.
+
+### Design To-Do List
+The "naive" design described above suggests some "obvious" to-do list
+items.  These are  listed here.
+
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
 * TODO: Change the default one-week data expiration policy to
