@@ -154,21 +154,18 @@ items.  These are  listed here.
   by seeders.
 * TODO: Support read-write overlay AtomSpaces on top of read-only
   AtomSpaces.  This seems like it should be easy...
-* TODO: Enhancement: listen for new values on specific atoms
-  or for new atom types.
-* TODO: Enhancement: listen for atomspace updates (Atom insertion
-  and deletion).
-* TODO: use MSGPACK_DEFINE_MAP for more efficient serialization
-  of values (esp. of FloatValue).
+* TODO: Enhancement: listen for new Atom-Values on specific Atoms,
+  or for the addition/deletion of Atom in an AtomSpace.
+* TODO: use `MSGPACK_DEFINE_MAP` for more efficient serialization
+  of Atom-Values (esp. of FloatValue).
 * TODO: Using `DhtRunner::get()` with callbacks instead of futures
   will improve performance. This is somewhat tricky, though, because
-  one callback might trigger more gets (for values, incoming set, etc.)
-  and it's not clear if OpenDHT might deadlock in this case...
+  one callback might trigger more gets (for Atom-Values, IncomingSets,
+  etc.) and it's not clear if OpenDHT might deadlock in this case...
 * TODO: Enhancement: implement a CRDT type for `CountTruthValue`.
-* TODO: Measure total RAM usage.  This risks being quite the
-  memory hog, if datasets with hundreds of millions of atoms are
-  published, and the default DHT node size is raised to allow
-  that many hashes to be stored.
+* TODO: Measure total RAM usage.  How much RAM does a DHT-Atom use?
+  How does this compare to the amount of RAM that an Atom uses when
+  it's in the AtomSpace?
 * TODO: Create a "seeder", that maintains the AtomSpace in Postgres,
   listens for load requests and responds by seeding those Atoms into
   DHT if they are not already there.  Likewise, in a read-write mode,
@@ -177,8 +174,10 @@ items.  These are  listed here.
   code with zero modifications, and just act as a bridge between two
   backends.
 
-### Issues
-The following are serious issues, some of which are show-stoppers:
+### Implementation Issues
+The following is a list of coding issues affecting the current
+code-base.  Some of these are show-stoppers.  This is distinct from
+the architectural issues, given in the next section.
 
 * There are data loss issues that are almost surely due to the use of
   UDP as the underlying OpenDHT protocol. The problem with UDP is that
@@ -203,10 +202,10 @@ The following are serious issues, some of which are show-stoppers:
   [bug#38041 in guile](https://debbugs.gnu.org/cgi/bugreport.cgi?bug=38041).
   It appears that gnutls is not thread-safe... or something weird.
 
-These all appear to be "early adopter" pains. There are likely to be many
-other issues; see below.
+These all appear to be "early adopter" pains. There are likely to be
+other issues.
 
-### Architecture concerns
+## Architecture concerns
 There are numerous concerns with using a DHT backend.
 * The representation is likely to be RAM intensive, requiring KBytes
   per atom, and thus causing trouble when datasets exceed tens of
