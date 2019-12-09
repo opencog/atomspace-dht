@@ -108,7 +108,7 @@ The consistently failing tests are:
 Both of these hit hard-coded limits in OpenDHT: each DHT node can only
 store 64K blocks data, and these tests generates about 3x more than
 that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
-for a currently-unkown reason... (I can't find the limit that is
+for a currently-unknown reason... (I can't find the limit that is
 blocking this).
 
 ## Naive Architecture
@@ -117,7 +117,7 @@ it uses the simplest, "most obvious" mapping of the AtomSpace and
 AtomSpace concepts onto a flat key-value store. It's naive, in that
 it ignores most characteristics that make a DHT different from an
 ordinary key-value database. It's naive in that it ignores a number
-of design challanges presented by large AtomSpaces.  These are
+of design challenges presented by large AtomSpaces.  These are
 addressed and critiqued in a following section.
 
 The "naive" design is characterized as follows:
@@ -127,7 +127,7 @@ The "naive" design is characterized as follows:
   and the Atom name/outgoing-set serving as the DHT-value.  As a
   result, given only a GUID, the actual Atom can always be recreated.
 * Every (Atom, AtomSpace-name) pair gets a unique (160-bit) hash.
-  This is termed the MUID or "Membership UID", as it referes to
+  This is termed the MUID or "Membership UID", as it refers to
   an Atom in a specific AtomSpace.  The MUID is used as a DHT-key;
   the corresponding DHT-values are used to hold the IncomingSet,
   and the Atom-Values. Keep in mind that although Atoms are independent
@@ -139,7 +139,7 @@ The "naive" design is characterized as follows:
 * Given an MUID, the Atoms in the IncomingSet are stored as DHT-values
   under that MUID.  This is effectively the same mechanism as finding
   all the members of an AtomSpace.
-* Atom deletion presents a challange. This is solved by tagging each
+* Atom deletion presents a challenge. This is solved by tagging each
   DHT-value under the AtomSpace key with a timestamp and an add/drop
   verb.  The timestamp indicates the most recent version, in case an
   Atom is added/dropped repeatedly.
@@ -155,7 +155,7 @@ items.  These are  listed here.
 * TODO: Optionally use crypto signatures to verify that the data
   comes from legitimate, cooperating sources.
 * TODO: Change the default one-week data expiration policy to
-  instead be a few hours ... or even tens of minutes?  Persistant
+  instead be a few hours ... or even tens of minutes?  Persistent
   data still needs to live on disk, not in RAM, and to be provided
   by seeders.
 * TODO: Support read-write overlay AtomSpaces on top of read-only
@@ -198,7 +198,7 @@ the architectural issues, given in the next section.
   These include a limit on the number of values per key (`MAX_VALUES`),
   a limit on the total size of a node (`MAX_HASHES`), the size of
   pending (unprocessed) received data (`RX_QUEUE_MAX_SIZE`) and
-  how stale/old the unprecessed data is (`RX_QUEUE_MAX_DELAY`).
+  how stale/old the unprocessed data is (`RX_QUEUE_MAX_DELAY`).
 * It appears to be impossible to saturate the system to 100% CPU usage,
   even when running locally. This might be the reason why its slow:
   something, somewhere is blocking and taking too long; doing nothing
@@ -230,7 +230,7 @@ solutions.
   already too large to fit into RAM, this is ... a problem.
 
 * Worse: it seems unlikely that the DHT representation of an Atom is
-  smaller than an AtomSpace-Atom. Currenly, AtomSpace-Atoms are about
+  smaller than an AtomSpace-Atom. Currently, AtomSpace-Atoms are about
   1.5KBytes in size; this includes "everything" (indexes, caches) for
   "typical" (Zipfian-distributed) Atoms. The size of a DHT-Atom has
   not been measured, but there is no reason to think it will be much
@@ -249,8 +249,8 @@ solutions.
   RAM is extremely wasteful. This again points at disk storage.
 
 * The naive implementation ignores locality issues. The association
-  between Atoms and thier hash keys is strongly random. Placing an
-  Atom in the DHT means that it will reside on unpredicatable,
+  between Atoms and their hash keys is strongly random. Placing an
+  Atom in the DHT means that it will reside on unpredictable,
   effectively random network hosts, which, in general, will be
   unlikely be close by. This completely erases the explicit graph
   relationship between Atoms: Atoms connected with links are meant
@@ -258,13 +258,13 @@ solutions.
   that close-by Atoms are far more likely to be accessed than
   unconnected ones.  This is particularly true for pattern matching
   and graph exploration, which proceeds by walking over connected
-  graph regions. What seems to be neeed is some kind of hashing
+  graph regions. What seems to be need is some kind of hashing
   scheme that preserves graph locality.  For example, it would be
   very nice, excellent, even, if two graphically-close atoms had
   XOR-close hashes. But it's not clear how to obtain this.
 
 * The naive implementation ignores scalability issues with AtomSpace
-  memebership. That is, the grand-total list of *all* Atoms in a given
+  membership. That is, the grand-total list of *all* Atoms in a given
   AtomSpace are recorded as DHT-values on a *single* DHT-key.  For
   large AtomSpaces (hundreds of millions or even billions of Atoms)
   this mans that *one* DHT-key has a vast number of DHT-values attached
@@ -307,10 +307,10 @@ How might some of the above problems be solved?
   running AtomSpace publish a list of Atoms that it holds, such that
   others can find it?
 
-  + The "bittorent" solution for this would be to let each Atom
+  + The "BitTorrent" solution for this would be to let each Atom
     hash down to an MUID, as before, but the contents would be
     locators for the peers that are serving that Atom. This seems
-    plausbile, except for the fact that it's still incredibly
+    plausible, except for the fact that it's still incredibly
     RAM-hungry. An AtomSpace containing 100 million Atoms has to
     publish 100 million keys, all pointing back to itself. The
     size of the locator is not all that much smaller than the size
@@ -384,6 +384,6 @@ Assorted notes:
 
 * DHT logging is going to the file `atomspace-dht.log`.
   See also `atomspace-dhtnode.log`.
-* Always rememebr to bootstrap. You can "listen" to the unit tests
+* Always remember to bootstrap. You can "listen" to the unit tests
   by bootstrapping to `(dht-bootstrap "dht://localhost:4555")`,
   which is the port-number used by the unit tests.
