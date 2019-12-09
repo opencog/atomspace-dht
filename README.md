@@ -209,18 +209,51 @@ other issues.
 The "naive" architecture given above has numerous very serious flaws.
 These are discussed here.
 
-* The representation is likely to be RAM intensive, requiring KBytes
-  per atom, and thus causing trouble when datasets exceed tens of
-  millions of Atoms. Single DHT nodes cannot really hold all that much.
-  To add insult to injury, OpenDHT is effectively an in-RAM database,
-  so it is competing for RAM with the AtomSpace itself.  Perhaps the
+* What's the AtomSpace, really? Well, it's a kind of in-RAM database.
+  What's the DHT, really? Well, it's a kind of in-RAM database ...
+  distributed over the net. So right here, we have a problem: two
+  different systems, representing the same data in two different ways,
+  both competing for RAM.  Ouch. Given that existing AtomSpaces are
+  already too large to fit into RAM, this is ... a problem.
+* Worse: it seems unlikely that the DHT representation of an Atom is
+  smaller than an AtomSpace-Atom. Currenly, AtomSpace-Atoms are about
+  1.5KBytes in size; this includes "everything" (indexes, caches) for
+  "typical" (Zipfian-distributed) Atoms. The size of a DHT-Atom is
+  has not been measured, but there is no reason to think it will be
+  much smaller.
+* This raises a trio of problems: Who is doing to be providing this
+  RAM?  What happens if most of the providers shut down, leading to
+  a critical shortage of storage?  What happens if there is a loss
+  of network connectivity? All this suggests that AtomSpace data
+  really needs to live on disk, where specific admins or curators
+  can administrate it, publish or archive it.
+* Naive storage into the DHT also presents garbage-collection issues.
+  What's the lifetime of an AtomSpace, if no one is using it? By
+  definition, RAM is precious; letting unused junk to accumulate in
+  RAM is extremely wasteful. This again points at disk storage.
+
+* The naive implementation ignores locality issues. The association
+  between Atoms and thier hash keys is strongly random. Placing an
+  Atom in the DHT means that it will reside on unpredicatable,
+  effectively random network hosts, which, in general, will be
+  unlikely be close by. This completely erases the explicit graph
+  relationship between Atoms: Atoms connected with links are meant
+  to be literally close-to-one-another, and access patterns are such
+  that close-by Atoms are far more likely to be accessed than
+  unconnected ones.  This is particularly true for pattern matching
+  and graph exploration, which proceeds by walking over connected
+  graph regions. What seems to be neeed is some kind of hashing
+  scheme that preserves graph locality.  For example, it would be
+  very nice, excellent, even, if two graphically-close atoms had
+  XOR-close hashes. But it's not clear how to obtain this.
+  
+
+
+* 
+   Perhaps the
   AtomSpace should be used only to "seed" a DHT node: if a DHT node
   does not have an atom, it should look to see if there's an attached
   AtomSpace, and if the AtomSpace is holding it.
-* There is no backup-to-disk; thus, a total data loss is risked if
-  there are large system outages.  This is a big concern, as the
-  initial networks are unlikely to have more than a few dozen nodes.
-  (The data should not be mixed into the global DHT...)
 * How will performance compare with traditional distributed databases
   (e.g. with Postgres?) For the moment, it seems quite good, when
   working with a local DHT node. This makes sense: its entirely in
@@ -231,19 +264,12 @@ These are discussed here.
   total size of a node (`MAX_HASHES`) and others. It might be possible
   to work around these.  Other limits we've hit include:
   `RX_QUEUE_MAX_SIZE` and `RX_QUEUE_MAX_DELAY`.
-* The limit on DHT-values-per-DHT-key is a critical limit on the
+* Scalability: The limit on DHT-values-per-DHT-key is a critical limit on the
   maximum AtomSpace size; for a given AtomSpace, each Atom corresponds
   to a DHT-value attached to the Atomspace name hash. This is how we
   find all the members of an AtomSpace.  This same limit affects the
   incoming set; the same mechanism is used to find the incoming set of
   an atom.
-* If many users use a shared network and publish hundreds or thousands
-  of datasets, then how do we avoid accumulating large amounts of cruft,
-  and sweep away expired/obsolete/forgotten datasets? Long lifetimes
-  for Atoms threaten this.  I guess that, in the end, for each dataset,
-  there always needs to be a seeder, e.g. working off of Postgres? As
-  otherwise, we want to keep Atom lifetimes small-ish, so that junk on
-  the net eventually expires.
 
 # Build, Test, Install, Examples
 Practical matters.
