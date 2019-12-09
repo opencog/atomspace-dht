@@ -3,11 +3,17 @@
 backend driver to the
 [AtomSpace](https://github.com/opencog/atomspace) (hyper-)graph database.
 
-The code here is a backend driver to the AtomSpace graph database,
-enabling AtomSpace contents to be shared via the OpenDHT content
-distribution network.  The goal is to allow efficient decentralized,
-distributed operation over the global internet, allowing many
-AtomSpace processes to access and perform updates to huge datasets.
+The code here is an experimental backend driver to the AtomSpace graph
+database, enabling AtomSpace contents to be shared via the OpenDHT
+content distribution network.  The goal is to allow efficient
+decentralized, distributed operation over the global internet,
+allowing many AtomSpace processes to access and perform updates to
+huge datasets.
+
+The driver more-or-less works, but is a failed experiment. A detailed
+critique of the architecture is given much farther down, below. As of
+this writing (2019), there isn't any obvious way of resolving the
+architectural issues that are raised.
 
 ### The AtomSpace
 The [AtomSpace](https://wiki.opencog.org/w/AtomSpace) is a
@@ -54,10 +60,10 @@ The code here is an attempt to explore this idea.  The approach taken
 is "naive", treating the DHT as a key-value store, and then mapping the
 AtomSpace onto it, in the simplest, "most obvious" way possible. It
 turns out that this naive approach has multiple difficulties, which
-are presented and critiqued furhter below. But first, status.
+are presented and critiqued further below. But first, status.
 
 # Proof-of-concept version 0.2.2
-All core functions are implemented. They work, on a small scale, for
+All backend functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
 this backend, prevent a full pass). Many desirable enhancements are
