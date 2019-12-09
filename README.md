@@ -209,9 +209,12 @@ the architectural issues, given in the next section.
 These all appear to be "early adopter" pains. There are likely to be
 other issues.
 
-# Architecture Critique
+# Architecture
 The "naive" architecture given above has numerous very serious flaws.
-These are discussed here.
+These are discussed here, followed by some remarks about possible
+solutions.
+
+## Architecture Critique
 
 * What's the AtomSpace, really? Well, it's a kind of in-RAM database.
   What's the DHT, really? Well, it's a kind of in-RAM database ...
@@ -219,18 +222,21 @@ These are discussed here.
   different systems, representing the same data in two different ways,
   both competing for RAM.  Ouch. Given that existing AtomSpaces are
   already too large to fit into RAM, this is ... a problem.
+
 * Worse: it seems unlikely that the DHT representation of an Atom is
   smaller than an AtomSpace-Atom. Currenly, AtomSpace-Atoms are about
   1.5KBytes in size; this includes "everything" (indexes, caches) for
-  "typical" (Zipfian-distributed) Atoms. The size of a DHT-Atom is
-  has not been measured, but there is no reason to think it will be
-  much smaller.
+  "typical" (Zipfian-distributed) Atoms. The size of a DHT-Atom has
+  not been measured, but there is no reason to think it will be much
+  smaller.
+
 * This raises a trio of problems: Who is doing to be providing this
   RAM?  What happens if most of the providers shut down, leading to
   a critical shortage of storage?  What happens if there is a loss
   of network connectivity? All this suggests that AtomSpace data
   really needs to live on disk, where specific admins or curators
   can administrate it, publish or archive it.
+
 * Naive storage into the DHT also presents garbage-collection issues.
   What's the lifetime of an AtomSpace, if no one is using it? By
   definition, RAM is precious; letting unused junk to accumulate in
@@ -264,17 +270,59 @@ These are discussed here.
   remarks apply for storing the IncomingSet. But if this is the wrong
   way to store large sets, then what is right way?
 
+## Architectural Alternatives
 
+How might some of the above problems be solved?
 
-* 
-   Perhaps the
-  AtomSpace should be used only to "seed" a DHT node: if a DHT node
-  does not have an atom, it should look to see if there's an attached
-  AtomSpace, and if the AtomSpace is holding it.
-* How will performance compare with traditional distributed databases
-  (e.g. with Postgres?) For the moment, it seems quite good, when
-  working with a local DHT node. This makes sense: its entirely in
-  RAM, and thus avoids disk I/O bottlenecks.
+* Disk storage suggests that, in the absence of any active dataset
+  users, any given AtomSpace should be "seeded" by a small number of
+  nodes holding an on-disk copy of the AtomSpace.  This can be
+  implemented in several ways, none of which seem particularly
+  appealing.
+
+  + One is to use the BitTorrent model, where the only thing the
+    DHT holds are the addresses of the "peers" who are serving the
+    content. The content is served via distinct, independent channels.
+    At the time of this writing (2019), there isn't any code wherein
+    one running AtomSpace can serve some of it's content to another
+    running AtomSpace.
+
+  + Another possibility is to keep the existing naive architecture,
+    but allow DHT nodes to respond to requests by pulling in data off
+    a disk. At the time of this writing (2019), OpenDHT doesn't expose
+    a public API to accomplish this.  Nor is there any low-brow,
+    dirt-simple way of storing (caching) Atoms into files.  Never mind
+    that this doesn't solve any of the other problems: garbage-collection,
+    locality, scalability.
+
+* Locality.  A given, active running instance of an AtomSpace is likely
+  to already hold most of the locally-connected Atoms that another
+  user may want to get access to. Thus, the question is: how can a
+  running AtomSpace publish a list of Atoms that it holds, such that
+  others can find it?
+
+  + The "bittorent" solution for this would be to let each Atom
+    hash down to an MUID, as before, but the contents would be
+    locators for the peers that are serving that Atom. This seems
+    plausbile, except for the fact that it's still incredibly
+    RAM-hungry. An AtomSpace containing 100 million Atoms has to
+    publish 100 million keys, all pointing back to itself. The
+    size of the locator is not all that much smaller than the size
+    of the Atom itself. Atoms are *small*.  This solution also
+    has lifetime (garbage collection) issues: how long should the
+    published records stay valid? If they expire quickly, then
+    how can the holders of any particular Atom be found?  This
+    solution is again "naive".
+
+* Set membership.  How can one publish the contents of a large set?
+
+All of these design issues suggest that serious attention must be paid
+to the performance characteristics of traditional distributed
+databases. For example, Postgres can be run on large, geographically
+distributed clusters with petabytes of attached storage. This is not
+to be sneezed at: its a mature, proven technology. Displacing it
+with naive decentralization dreams will not be easy.
+
 
 # Build, Test, Install, Examples
 Practical matters.
