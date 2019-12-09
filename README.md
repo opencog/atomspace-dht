@@ -56,7 +56,7 @@ AtomSpace onto it, in the simplest, "most obvious" way possible. It
 turns out that this naive approach has multiple difficulties, which
 are presented and critiqued furhter below. But first, status.
 
-## Proof-of-concept version 0.2.2
+# Proof-of-concept version 0.2.2
 All core functions are implemented. They work, on a small scale, for
 small datasets.  See the [examples](examples) for a walk-through. Most
 unit tests usually pass (several generic OpenDHT issues, unrelated to
@@ -105,7 +105,7 @@ that.  When this limit is hit, OpenDHT busy-waits at 100% cpu...
 for a currently-unkown reason... (I can't find the limit that is
 blocking this).
 
-## Architecture
+## Naive Architecture
 The architecture of this implementation is termed "naive", because
 it uses the simplest, "most obvious" mapping of the AtomSpace and
 AtomSpace concepts onto a flat key-value store. It's naive, in that
@@ -205,8 +205,10 @@ the architectural issues, given in the next section.
 These all appear to be "early adopter" pains. There are likely to be
 other issues.
 
-## Architecture concerns
-There are numerous concerns with using a DHT backend.
+# Architecture Critique
+The "naive" architecture given above has numerous very serious flaws.
+These are discussed here.
+
 * The representation is likely to be RAM intensive, requiring KBytes
   per atom, and thus causing trouble when datasets exceed tens of
   millions of Atoms. Single DHT nodes cannot really hold all that much.
@@ -243,7 +245,10 @@ There are numerous concerns with using a DHT backend.
   otherwise, we want to keep Atom lifetimes small-ish, so that junk on
   the net eventually expires.
 
-## Build Prereqs
+# Build, Test, Install, Examples
+Practical matters.
+
+### Build Prereqs
 
  * Clone and build the [AtomSpace](https://github.com/opencog/atomspace).
  * Install OpenDHT. On Debian/Ubuntu:
@@ -264,7 +269,7 @@ There are numerous concerns with using a DHT backend.
    make -j
    ```
 
-## Building
+### Building
 Building is just like that for any other OpenCog component.
 After installing the pre-reqs, do this:
 ```
@@ -280,7 +285,7 @@ usual:
    make -j test
 ```
 
-## Running and Examples
+### Running and Examples
 Please see the [examples](examples) directory. These show how to store
 individual Atoms into the DHT, how to fetch them back out, and how to
 run a DHT node so that saved values are retained even after individual
@@ -289,7 +294,11 @@ AtomSpace clients detach from the network.
 In particular, these will illustrate how to run a DHT node, and how to
 go about looking at DHT data as needed, for debugging and development.
 
-## Development and Debugging
+### Development and Debugging
 Assorted notes:
 
 * DHT logging is going to the file `atomspace-dht.log`.
+  See also `atomspace-dhtnode.log`.
+* Always rememebr to bootstrap. You can "listen" to the unit tests
+  by bootstrapping to `(dht-bootstrap "dht://localhost:4555")`,
+  which is the port-number used by the unit tests.
