@@ -342,15 +342,32 @@ How might some of the above problems be solved?
     how can the holders of any particular Atom be found?  This
     solution is again "naive".
 
-* Set membership.  How can one publish the contents of a large set?
+* Set membership.  How can one publish the contents of a large set,
+  a set of unbounded size?  As hinted above, what is really needed
+  is a decentralized set-membership function.
 
-All of these design issues suggest that serious attention must be paid
-to the performance characteristics of traditional distributed
-databases. For example, Postgres can be run on large, geographically
-distributed clusters with petabytes of attached storage. This is not
-to be sneezed at: its a mature, proven technology. Displacing it
-with naive decentralization dreams will not be easy.
+### Other Backends
+All of these design issues suggest that it's entirely reasonable to let
+"someone else" solve these problems: i.e. some existing distributed
+database system.  For example, the AtomSpace already has a mature,
+stable Postgres driver, and Postgres can be run on large, geographically
+distributed clusters with petabytes of attached storage. What's wrong
+with that?
 
+Alternately, one could write AtomSpace back-ends for Apache Ignite, or
+maybe even some other graph database (Redis, Riak, Grakn) that solves
+some/many/most of these distributed database issues.
+
+This is not to be sneezed at: Postgres provides a mature, proven
+technology. The others have large developer bases. Displacing them
+with naive grow-your-own dreams is not be easy.
+
+In the end, the primary problem with having the AtomSpace layered on
+top of another system is that Atoms have to be translated between
+multiple representations: one representation for disk storage, another
+for network communication, and the third, most important one: the
+in-RAM AtomSpace itself, which is optimized for pattern-matching.
+The hunt is for an optimal system, maximizing performance.
 
 # Build, Test, Install, Examples
 Practical matters.
