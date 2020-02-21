@@ -240,12 +240,12 @@ solutions.
   not been measured, but there is no reason to think it will be much
   smaller.
 
-* This raises a trio of problems: Who is doing to be providing this
-  RAM?  What happens if most of the providers shut down, leading to
-  a critical shortage of storage?  What happens if there is a loss
-  of network connectivity? All this suggests that AtomSpace data
-  really needs to live on disk, where specific admins or curators
-  can administrate it, publish or archive it.
+* This raises a trio of problems: Who is providing this RAM?  What
+  happens if most of the providers shut down, leading to a critical
+  shortage of storage?  What happens if there is a loss of network
+  connectivity? All this suggests that AtomSpace data really needs
+  to live on disk, where specific admins or curators can administrate
+  it, publish or archive it.
 
 * Naive storage into the DHT also presents garbage-collection issues.
   What's the lifetime of an AtomSpace, if no one is using it? By
@@ -271,7 +271,7 @@ solutions.
   membership. That is, the grand-total list of *all* Atoms in a given
   AtomSpace are recorded as DHT-values on a *single* DHT-key.  For
   large AtomSpaces (hundreds of millions or even billions of Atoms)
-  this mans that *one* DHT-key has a vast number of DHT-values attached
+  this means that *one* DHT-key has a vast number of DHT-values attached
   to it. This is simply not scalable, as DHT's do not distribute
   (scatter) the DHT-values, only the DHT-keys. The OpenDHT codebase
   has a hard-coded limit of 1K DHT-values per DHT-key, as well as a
@@ -352,7 +352,7 @@ All of these design issues suggest that it's entirely reasonable to let
 database system.  For example, the AtomSpace already has a mature,
 stable Postgres driver, and Postgres can be run on large, geographically
 distributed clusters with petabytes of attached storage. What's wrong
-with that?
+with that? (What's wrong with that is that it's slow.)
 
 Alternately, one could write AtomSpace back-ends for Apache Ignite, or
 maybe even some other graph database (Redis, Riak, Grakn) that solves
