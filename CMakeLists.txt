@@ -150,8 +150,7 @@ ENDIF (NOT DEFINED LIB_DIR_SUFFIX)
 SET(CMAKE_SKIP_BUILD_RPATH	FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH
-	"${CMAKE_INSTALL_PREFIX}/lib/opencog"
-	"${CMAKE_INSTALL_PREFIX}/lib/opencog/modules")
+	"${CMAKE_INSTALL_PREFIX}/lib/opencog")
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -191,10 +190,7 @@ IF (CXXTEST_FOUND)
 			# TODO set it up so that we can pick to run coverage per test, or
 			# combined across all tests (the latter is MUCH faster). Use a define?
 			# There is coverage specific stuff in AddCxxTest.cmake now...
-			# -
-			# Depends on cogserver because RESTFulTest needs it
-			# and cmake has no way to add non-test dependencies to tests
-			DEPENDS tests cogserver
+			DEPENDS tests
 			WORKING_DIRECTORY tests
 			COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process --output-on-failure $(ARGS)
 
