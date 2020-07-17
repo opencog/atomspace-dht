@@ -121,16 +121,6 @@ class DHTAtomStorage : public BackingStore
 		// --------------------------
 		// Fetch and storing of atoms
 
-		static std::string encodeValueToStr(const ValuePtr&);
-		static std::string encodeValuesToAlist(const Handle&);
-		static std::string encodeAtomToStr(const Handle& h) {
-			return h->to_short_string(); }
-		Handle decodeStrAtom(std::string& s) {
-			size_t junk = 0;
-			return decodeStrAtom(s, junk);
-		}
-		Handle decodeStrAtom(std::string&, size_t&);
-
 		std::mutex _guid_mutex;
 		std::unordered_map<Handle, dht::InfoHash> _guid_map;
 		dht::InfoHash get_guid(const Handle&);
@@ -153,9 +143,6 @@ class DHTAtomStorage : public BackingStore
 		void store_atom_values(const Handle &);
 		Handle fetch_values(Handle&&);
 		void delete_atom_values(const Handle&);
-
-		ValuePtr decodeStrValue(std::string&, size_t&);
-		void decodeAlist(Handle&, std::string&);
 
 		// --------------------------
 		// Network configuration

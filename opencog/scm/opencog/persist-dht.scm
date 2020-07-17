@@ -106,7 +106,7 @@
 
 (set-procedure-property! dht-open 'documentation
 "
- dht-open URL - Open a connection to an IPFS server.
+ dht-open URL - Open a connection to an OpenDHT server.
 
   The URL must be one of these formats:
      dht:///KEY-NAME

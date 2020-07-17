@@ -14,6 +14,7 @@
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atomspace/AtomSpace.h>
+#include <opencog/persist/sexpr/Sexpr.h>
 
 #include "DHTAtomStorage.h"
 
@@ -53,7 +54,7 @@ void DHTAtomStorage::load_atomspace(AtomSpace* as,
 		// at least it will be for the next bijillion seconds.
 		// size_t pos = sname.find('(');
 		size_t pos = sizeof("add 1572978874.801600");
-		Handle h(decodeStrAtom(sname, pos));
+		Handle h(Sexpr::decode_atom(sname, pos));
 		as->add_atom(fetch_values(std::move(h)));
 		_load_count++;
 	}
@@ -91,7 +92,7 @@ void DHTAtomStorage::loadType(AtomTable &table, Type atom_type)
 			continue;
 
 		size_t pos = sizeof("add 1572978874.801600");
-		Handle h(decodeStrAtom(sname, pos));
+		Handle h(Sexpr::decode_atom(sname, pos));
 		if (h->get_type() != atom_type) continue;
 
 		// std::cout << "Load Atom " << sname << std::endl;

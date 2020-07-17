@@ -11,6 +11,7 @@
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
+#include <opencog/persist/sexpr/Sexpr.h>
 
 #include "DHTAtomStorage.h"
 
@@ -90,7 +91,7 @@ void DHTAtomStorage::publish_to_atomspace(const Handle& atom)
 	// Publish the generic AtomSpace encoding.
 	// These will always have a dht-id of "1", so that only one copy
 	// is kept around.
-	std::string gstr = encodeAtomToStr(atom);
+	std::string gstr = Sexpr::encode_atom(atom);
 	_runner.put(get_guid(atom), dht::Value(_atom_policy, gstr, 1));
 
 	// Put the atom into the atomspace.
@@ -132,7 +133,7 @@ dht::InfoHash DHTAtomStorage::get_guid(const Handle& h)
 	const auto& ip = _guid_map.find(h);
 	if (_guid_map.end() != ip)
 		return ip->second;
-	std::string gstr = encodeAtomToStr(h);
+	std::string gstr = Sexpr::encode_atom(h);
 	dht::InfoHash gkey = dht::InfoHash::get(gstr);
 	_guid_map[h] = gkey;
 	return gkey;
@@ -151,7 +152,7 @@ dht::InfoHash DHTAtomStorage::get_membership(const Handle& h)
 	if (_membership_map.end() != ip)
 		return ip->second;
 
-	std::string astr = _atomspace_name + encodeAtomToStr(h);
+	std::string astr = _atomspace_name + Sexpr::encode_atom(h);
 	dht::InfoHash akey = dht::InfoHash::get(astr);
 	_membership_map[h] = akey;
 	return akey;

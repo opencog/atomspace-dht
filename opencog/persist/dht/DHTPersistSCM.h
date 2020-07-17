@@ -21,7 +21,6 @@ namespace opencog
  *  @{
  */
 
-class DHTBackingStore;
 class DHTPersistSCM
 {
 private:

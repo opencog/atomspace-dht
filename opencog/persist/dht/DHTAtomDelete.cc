@@ -11,6 +11,7 @@
 
 #include <opencog/atoms/base/Atom.h>
 #include <opencog/atomspace/AtomSpace.h>
+#include <opencog/persist/sexpr/Sexpr.h>
 
 #include "DHTAtomStorage.h"
 
@@ -69,7 +70,7 @@ void DHTAtomStorage::removeAtom(const Handle& atom, bool recursive)
 	// case, we want to broadcast the string, to disambiguate
 	// which one is to be removed.
 	std::string gstr = "drop " + std::to_string(now())
-		+ " " + encodeAtomToStr(atom);
+		+ " " + Sexpr::encode_atom(atom);
 	_runner.put(_atomspace_hash,
 	            dht::Value(_space_policy, gstr, atom->get_hash()));
 

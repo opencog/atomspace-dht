@@ -14,85 +14,12 @@
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atomspace/AtomSpace.h>
+#include <opencog/persist/sexpr/Sexpr.h>
 
 #include "DHTAtomStorage.h"
 
 using namespace opencog;
 
-
-/* ================================================================ */
-
-/// Convert a scheme expression into a C++ Atom.
-/// For example: `(Concept "foobar")`  or
-/// `(Evaluation (Predicate "blort") (List (Concept "foo") (Concept "bar")))`
-/// will return the corresponding atoms.
-///
-Handle DHTAtomStorage::decodeStrAtom(std::string& scm, size_t& pos)
-{
-	size_t vos = scm.find('(', pos);
-	if (std::string::npos == vos)
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-			scm.substr(pos).c_str());
-
-	size_t post = scm.find(' ', vos+1);
-	if (post != std::string::npos)
-		scm[post] = 0;
-	else
-	{
-		post = scm.find(')', vos+1);
-		if (post == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-				scm.substr(pos).c_str());
-		scm[post] = 0;
-	}
-
-	Type t = nameserver().getType(&scm[vos+1]);
-	if (nameserver().isNode(t))
-	{
-		size_t name_start = scm.find('"', post+1);
-		if (name_start == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-				scm.substr(pos).c_str());
-		size_t name_end = scm.find('"', name_start+1);
-		if (name_end == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-				scm.substr(pos).c_str());
-		scm[name_end] = 0; // Clobber the ending quote
-		size_t close = scm.find(')', name_end + 1);
-		if (close == std::string::npos)
-			throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-				scm.substr(pos).c_str());
-		pos = close + 1;
-		_num_got_nodes ++;
-		return createNode(t, &scm[name_start+1]);
-	}
-
-	if (not nameserver().isLink(t))
-		throw SyntaxException(TRACE_INFO, "Bad Atom string! %s\n",
-			scm.substr(pos).c_str());
-
-	// If we are here, its a Link.
-	HandleSeq oset;
-	size_t oset_start = scm.find('(', post+1);
-	size_t oset_end = scm.find(')', post+1);
-	if (std::string::npos == oset_end)
-		throw SyntaxException(TRACE_INFO, "Bad Atom string! %s\n",
-			scm.substr(pos).c_str());
-	while (oset_start != std::string::npos and oset_start < oset_end)
-	{
-		size_t vos = oset_start;
-		oset.push_back(decodeStrAtom(scm, vos));
-		oset_start = scm.find('(', vos);
-		oset_end = scm.find(')', vos);
-	}
-	if (oset_end == std::string::npos)
-		throw RuntimeException(TRACE_INFO, "Bad Atom string! %s\n",
-			scm.substr(pos).c_str());
-	pos = oset_end + 1;
-
-	_num_got_links ++;
-	return createLink(oset, t);
-}
 
 /* ================================================================ */
 
@@ -127,7 +54,7 @@ Handle DHTAtomStorage::fetch_atom(const dht::InfoHash& guid)
 	// There may be more than one value, but they should all be
 	// one and the same.
 	std::string satom = gvals[0]->unpack<std::string>();
-	Handle h(decodeStrAtom(satom));
+	Handle h(Sexpr::decode_atom(satom));
 
 	lck.lock();
 	_decode_map.emplace(std::make_pair(guid, h));

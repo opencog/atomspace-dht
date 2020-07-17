@@ -34,4 +34,3 @@ TARGET_LINK_LIBRARIES(sniff opendht gnutls nettle argon2)
 
 ADD_EXECUTABLE(snuff snuff)
 TARGET_LINK_LIBRARIES(snuff opendht gnutls nettle argon2)
-
